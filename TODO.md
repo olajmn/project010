@@ -201,6 +201,22 @@ only). Numbers are stable ids, not rank.
     already fixed). Holds at every zoom: zoomed out, the grid
     only drops dots, and every dot left is on the 1× grid. Layout change,
     not CSS only.
+63. **How much context the chat gets** (Question) — the goal is that
+    the chat can use the whole project as context: the map and the full
+    history of changes. Today each message sends a fixed slice instead:
+    every label, the last 10 changes, the changes on a selected day,
+    and the last 20 turns ([[04-current-state]] § 4). Sending everything
+    every time does not scale: slower replies, weaker answers from a
+    small model as the prompt grows, and a cost per token on the demo.
+    Candidate shapes, not decided:
+    1. **Summary** — older history condensed into a short text that is
+       always sent.
+    2. **Lookup** — the model fetches what a question needs from the
+       history, instead of getting it all up front.
+    3. **Richer events** — each saved change says more, so the slice
+       already sent carries more (38).
+    Related: 33 (labels only, not what is behind a node), 38, and the
+    open question in [[04-current-state]] § 6.
 
 ## Ideas (not decided)
 
