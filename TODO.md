@@ -150,6 +150,37 @@ only). Numbers are stable ids, not rank.
     there is a reason to touch them. `05-decisions.md` keeps "Talk" as
     history; "Talk about …" in the UI is ordinary English and stays.
 
+64. **pytest as the test runner** (Step) — each suite runs as its own
+    module today (`python -m backend.<path>.test_<name>`). Run the
+    existing suites under pytest first, with as little rewriting as
+    possible; a gentle first framework. Related to 44.7.
+65. **FastAPI for the API layer** (Step, after 64) — replace
+    `BaseHTTPRequestHandler` in `api/requests_from_browser.py` route by
+    route: path parameters typed and checked, JSON in and out handled,
+    and an API reference generated from the routes. Project and Storage
+    stay as they are ([[03-architecture]] § 3). Closes 44.6, and 30 via
+    the generated reference. Demo checks (`api/demo/`) need a new home
+    (middleware or a dependency).
+66. **Parked Time code: keep, branch, or remove** (Question) —
+    `backend/foundation/` (about 1,800 lines) is used by nothing in the
+    product ([[04-current-state]]); it backs P1, P2 and Queue 21. Decide
+    whether it stays in `main`, moves to a branch, or goes.
+
+### Tier 3
+
+67. **A real database** (Step, shape open) — storage is JSON files
+    under `data/` (`current.json`, `events.jsonl`). Candidate: SQLite,
+    still a local file, so local-first holds ([[03-architecture]] § 5).
+    Only Storage changes, by the layer rule. To decide: tables for
+    projects, nodes and events; migrating existing data; whether the
+    demo sandboxes copy a database file instead of a folder. Related
+    to 50 (id shape).
+68. **Frontend framework** (Question) — moving the UI off hand-written
+    DOM updates means rewriting the frontend in any case. Candidates:
+    React or Svelte (stays web and TypeScript), or Flutter (desktop,
+    web and mobile from one codebase, built as a new project beside
+    this one, on the same API). Not before 65.
+
 ### Tier 4
 
 9. **A second capability** (Step) — the app can only do Project today.
@@ -217,6 +248,13 @@ only). Numbers are stable ids, not rank.
        already sent carries more (38).
     Related: 33 (labels only, not what is behind a node), 38, and the
     open question in [[04-current-state]] § 6.
+
+69. **Does the structure help the chat?** (Question) — the project's
+    central claim (README) is untested: no comparison exists between
+    the chat with the project's structure and history and the same
+    model without it. A small experiment: about 10 realistic questions
+    on a demo project, each asked both ways, answers scored side by
+    side. Findings go in `docs/01-research.md`; they also inform 63.
 
 ## Ideas (not decided)
 
