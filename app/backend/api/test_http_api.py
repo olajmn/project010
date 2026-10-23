@@ -2,66 +2,14 @@
 checked by status code and JSON. Storage points at a temporary folder;
 the model is never called (slash commands, or a patched send_chat).
 
-Only the `api` fixture knows how the server is built, so the tests
-themselves hold for any implementation of the same routes (TODO.md 65).
+The server comes from conftest.py: each test runs against both the
+standard-library Handler and the FastAPI app, so the tests themselves
+hold for any implementation of the same routes (TODO.md 65).
 """
-
-import json
-import threading
-import urllib.error
-import urllib.request
-from http.server import ThreadingHTTPServer
 
 import pytest
 
-from backend.api import requests_from_browser
 from backend.project.panes.chat import reply as reply_module
-from backend.storage import accounts_persistence as ap
-from backend.storage import paths as storage_paths
-from backend.storage import project_persistence as pp
-from backend.storage import saved_trees_persistence as st
-
-
-class Api:
-    def __init__(self, base: str) -> None:
-        self.base = base
-
-    def request(self, method: str, path: str, body=None, raw: bytes | None = None):
-        """(status, parsed JSON or plain text)."""
-        data = raw if raw is not None else (json.dumps(body).encode() if body is not None else None)
-        req = urllib.request.Request(self.base + path, data=data, method=method)
-        if data is not None:
-            req.add_header("Content-Type", "application/json")
-        try:
-            with urllib.request.urlopen(req, timeout=5) as response:
-                status, text, kind = response.status, response.read(), response.headers.get_content_type()
-        except urllib.error.HTTPError as e:
-            status, text, kind = e.code, e.read(), e.headers.get_content_type()
-        text = text.decode("utf-8")
-        return status, json.loads(text) if kind == "application/json" else text
-
-    def get(self, path: str):
-        return self.request("GET", path)
-
-    def post(self, path: str, body=None, raw: bytes | None = None):
-        return self.request("POST", path, {} if body is None and raw is None else body, raw)
-
-
-@pytest.fixture
-def api(tmp_path, monkeypatch):
-    """The app's server on a free port, with data/ in a temporary folder."""
-    monkeypatch.setattr(storage_paths, "DATA_DIR", tmp_path)
-    monkeypatch.setattr(pp, "DATA_DIR", tmp_path)
-    monkeypatch.setattr(pp, "PROJECTS_DIR", tmp_path / "projects")
-    monkeypatch.setattr(ap, "ACCOUNTS_FILE", tmp_path / "accounts.json")
-    monkeypatch.setattr(st, "SAVED_TREES_FILE", tmp_path / "saved_trees.json")
-    monkeypatch.setattr(requests_from_browser.demo, "ENABLED", False)
-    server = ThreadingHTTPServer(("127.0.0.1", 0), requests_from_browser.Handler)
-    thread = threading.Thread(target=server.serve_forever, args=(0.01,), daemon=True)
-    thread.start()
-    yield Api(f"http://127.0.0.1:{server.server_address[1]}")
-    server.shutdown()
-    server.server_close()
 
 
 def ids(node: dict) -> dict[str, str]:
