@@ -11,7 +11,38 @@ next.
 
 ## Active
 
-Nothing chosen yet; pick the next item from the Queue.
+71. **Chat logic watertight** (Bug) — how the chat reads saved turns
+    and uses nodes, found 2026-10-24. Work through it in order: agree
+    the rules, pin each hole with a test that fails today, then fix.
+    Rules to start from: a chat turn is only what was saved as one
+    (`event: "chat"`); a node is identified by its id, not its label;
+    the model is told when a node it has heard about is gone.
+    1. **Reply and message share one text field.** A turn is saved as
+       `"<reply> Note: <message>"` and split at the first ` Note: `
+       (`panes/chat/reply.py`, `screen/chat_thread.py`,
+       `model/brief/conversation.py`, `project/timeline.py`). A reply
+       that contains ` Note: ` is split in the wrong place. Store reply
+       and message in their own fields; decide whether saved turns in
+       `data/` are converted once or both shapes are read.
+    2. **A map edit can pass for a chat turn.** Turns are recognised by
+       ` Note: ` in the text, not by `event`, so adding a node named
+       "Site Note: walls" shows up as a conversation, on screen and to
+       the model. Read only `event: "chat"` lines as turns.
+    3. **Removed nodes stay in the conversation.** Past turns about a
+       node that was later removed still say `[about: Kitchen]` with no
+       sign it is gone; renames are handled, removals and moves are not.
+    4. **A selected node that no longer exists** falls back to its bare
+       label, so the model is told about a part it cannot find in the
+       structure (`_background()` in `conversation.py`).
+    5. **Same label in two places.** Two nodes under different parents
+       can share a label; `[about: Planning]` does not say which one.
+       Tag turns by path or id, not label alone.
+    6. **The structure is cut at 400 lines without saying so**
+       (`MAX_LINES` in `project/node/tree_as_text.py`); the model is
+       told it sees every name.
+    Related, not part of this item: how much context the chat gets
+    (63), whether the structure helps at all (69), and `/select` hints
+    (53).
 
 ## Queue
 
