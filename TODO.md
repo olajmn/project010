@@ -25,6 +25,13 @@ next.
 
 ### Backend and code
 
+70. **Ruff and type checking** (Step, after 65) — Ruff would replace
+    pyflakes as linter and add a formatter. Measured 2026-10-23: 61
+    findings with its default rules (style and modernization, no
+    bugs), and `ruff format` would change 39 of 84 files. Do it in one
+    commit after 65: pick the rules, fix or ignore the rest, format
+    once, swap pyflakes out of `tools/project_check.py`. Type checking
+    (Pylance or mypy) fits the same step, since FastAPI leans on types.
 66. **Parked Time code: keep, branch, or remove** (Question) —
     `backend/foundation/` (about 1,800 lines) is used by nothing in the
     product ([[04-current-state]]): `week_windows()` / `day_windows()`
