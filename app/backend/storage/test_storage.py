@@ -30,7 +30,9 @@ def _two_projects():
     user = ap.save_account("Health")
     second_user = ap.save_account("Grow as a musician")
     abs_project = pp.save_plan("Get visible abs", {"now": "..."}, account_id=user["id"])
-    cardio_project = pp.save_plan("Improve cardio", {"now": "..."}, account_id=user["id"])
+    cardio_project = pp.save_plan(
+        "Improve cardio", {"now": "..."}, account_id=user["id"]
+    )
     return user, second_user, abs_project, cardio_project
 
 
@@ -86,8 +88,18 @@ def test_saving_again_appends_one_event() -> None:
         account_id=user["id"],
         event="chat",
     )
-    assert pp.events_path(abs_project["project_id"]).read_text(encoding="utf-8").count("\n") == 2
-    assert pp.events_path(cardio_project["project_id"]).read_text(encoding="utf-8").count("\n") == 1
+    assert (
+        pp.events_path(abs_project["project_id"])
+        .read_text(encoding="utf-8")
+        .count("\n")
+        == 2
+    )
+    assert (
+        pp.events_path(cardio_project["project_id"])
+        .read_text(encoding="utf-8")
+        .count("\n")
+        == 1
+    )
     assert pp.load_current(abs_project["project_id"])["plan"]["now"] == "again"
     assert pp.load_current(abs_project["project_id"])["account_n"] == 1
 

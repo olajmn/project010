@@ -34,17 +34,24 @@ def chat(model: str, messages: list[dict], temperature: float) -> str:
     key = os.environ.get("OPENROUTER_API_KEY", "").strip()
     if not key:
         raise OpenRouterError("OPENROUTER_API_KEY is not set")
-    body = json.dumps({
-        "model": model,
-        "messages": messages,
-        "temperature": temperature,
-        "max_tokens": MAX_TOKENS,
-        "reasoning": {"enabled": False},
-    }).encode("utf-8")
-    request = urllib.request.Request(URL, data=body, method="POST", headers={
-        "Authorization": f"Bearer {key}",
-        "Content-Type": "application/json",
-    })
+    body = json.dumps(
+        {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": MAX_TOKENS,
+            "reasoning": {"enabled": False},
+        }
+    ).encode("utf-8")
+    request = urllib.request.Request(
+        URL,
+        data=body,
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+        },
+    )
     try:
         with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
             data = json.loads(response.read())
@@ -58,7 +65,7 @@ def chat(model: str, messages: list[dict], temperature: float) -> str:
     # and no choices.
     try:
         content = data["choices"][0]["message"]["content"]
-    except (KeyError, IndexError, TypeError):
+    except KeyError, IndexError, TypeError:
         raise OpenRouterError("no reply in response") from None
     if not isinstance(content, str) or not content.strip():
         raise OpenRouterError("empty reply")

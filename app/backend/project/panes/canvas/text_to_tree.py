@@ -88,7 +88,7 @@ def _split_indent_and_label(raw_line: str) -> tuple[int, str | None]:
         match = marker.match(rest)
         if match:
             indent += len(match.group(0))
-            rest = rest[match.end():]
+            rest = rest[match.end() :]
             break
 
     label = rest.strip()

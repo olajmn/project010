@@ -66,9 +66,12 @@ def set_project_user(project_id: int, account_id: int | None) -> dict | None:
         feedback_text = f"{verb} account: {account['text']}"
 
     return save_plan(
-        latest["name"], latest["plan"], feedback=feedback_text,
+        latest["name"],
+        latest["plan"],
+        feedback=feedback_text,
         project_id=latest["project_id"],
-        completed=latest.get("completed", False), account_id=account_id,
+        completed=latest.get("completed", False),
+        account_id=account_id,
         event="owner_changed",
     )
 
@@ -101,9 +104,11 @@ def archive_account(account_id: int) -> dict | None:
         return None
 
     for latest in get_latest_for_all_projects():
-        if (latest.get("account_id") == account_id
-                and not latest.get("completed")
-                and not latest.get("cancelled")):
+        if (
+            latest.get("account_id") == account_id
+            and not latest.get("completed")
+            and not latest.get("cancelled")
+        ):
             set_project_user(latest["project_id"], None)
 
     return account

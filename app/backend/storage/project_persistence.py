@@ -103,8 +103,16 @@ def _slim_event(record: dict) -> dict:
         "created_at": record.get("created_at"),
     }
     for key in (
-        "event", "feedback", "sent_at", "map_focus", "focus_step_id", "focus_day",
-        "name", "account_id", "completed", "cancelled",
+        "event",
+        "feedback",
+        "sent_at",
+        "map_focus",
+        "focus_step_id",
+        "focus_day",
+        "name",
+        "account_id",
+        "completed",
+        "cancelled",
         "archived_at",
     ):
         if key in record and record[key] is not None:

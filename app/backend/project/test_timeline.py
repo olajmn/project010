@@ -15,13 +15,20 @@ def test_event_name() -> None:
 
 def test_to_event() -> None:
     chat = to_event(
-        {"project_id": 4, "feedback": "Sure. Note: what next?",
-         "created_at": "2026-09-25T18:00:00.000+00:00", "event": "chat"},
+        {
+            "project_id": 4,
+            "feedback": "Sure. Note: what next?",
+            "created_at": "2026-09-25T18:00:00.000+00:00",
+            "event": "chat",
+        },
         "House",
     )
     assert chat == {
-        "at": "2026-09-25T18:00:00.000+00:00", "project_id": 4,
-        "project": "House", "event": "chat", "kind": "Chat",
+        "at": "2026-09-25T18:00:00.000+00:00",
+        "project_id": 4,
+        "project": "House",
+        "event": "chat",
+        "kind": "Chat",
         "text": "what next?",
     }
     created = to_event({"project_id": 4, "feedback": None, "event": "created"}, "House")
@@ -38,19 +45,28 @@ def test_to_event() -> None:
 def test_all_events_pages_newest_first(monkeypatch) -> None:
     # Offset skips what is already shown.
     lines = [
-        {"project_id": 1, "event": "node_added", "feedback": f"Added step: {n}",
-         "created_at": f"2026-09-2{n}T10:00:00"}
+        {
+            "project_id": 1,
+            "event": "node_added",
+            "feedback": f"Added step: {n}",
+            "created_at": f"2026-09-2{n}T10:00:00",
+        }
         for n in range(1, 6)
     ]
     monkeypatch.setattr(timeline, "load_history", lambda: lines)
     monkeypatch.setattr(
-        timeline, "get_latest_for_all_projects", lambda: [{"project_id": 1, "name": "P"}],
+        timeline,
+        "get_latest_for_all_projects",
+        lambda: [{"project_id": 1, "name": "P"}],
     )
 
     def texts(events):
         return [e["text"] for e in events]
 
     assert texts(timeline.all_events(limit=2)) == ["Added step: 5", "Added step: 4"]
-    assert texts(timeline.all_events(limit=2, offset=2)) == ["Added step: 3", "Added step: 2"]
+    assert texts(timeline.all_events(limit=2, offset=2)) == [
+        "Added step: 3",
+        "Added step: 2",
+    ]
     assert texts(timeline.all_events(limit=2, offset=4)) == ["Added step: 1"]
     assert timeline.all_events(limit=2, offset=9) == []

@@ -44,7 +44,11 @@ class Api:
 
     def request(self, method: str, path: str, body=None, raw: bytes | None = None):
         """(status, parsed JSON or plain text)."""
-        data = raw if raw is not None else (json.dumps(body).encode() if body is not None else None)
+        data = (
+            raw
+            if raw is not None
+            else (json.dumps(body).encode() if body is not None else None)
+        )
         req = urllib.request.Request(self.base + path, data=data, method=method)
         if data is not None:
             req.add_header("Content-Type", "application/json")
@@ -52,7 +56,11 @@ class Api:
             req.add_header("Cookie", self.cookie)
         try:
             with _opener.open(req, timeout=5) as response:
-                status, text, self.headers = response.status, response.read(), response.headers
+                status, text, self.headers = (
+                    response.status,
+                    response.read(),
+                    response.headers,
+                )
         except urllib.error.HTTPError as e:
             status, text, self.headers = e.code, e.read(), e.headers
         text = text.decode("utf-8")
@@ -63,7 +71,9 @@ class Api:
         return self.request("GET", path)
 
     def post(self, path: str, body=None, raw: bytes | None = None):
-        return self.request("POST", path, {} if body is None and raw is None else body, raw)
+        return self.request(
+            "POST", path, {} if body is None and raw is None else body, raw
+        )
 
 
 @pytest.fixture
@@ -72,7 +82,9 @@ def server():
     sock = socket.socket()
     sock.bind(("127.0.0.1", 0))
     server = uvicorn.Server(uvicorn.Config(app, log_level="warning"))
-    thread = threading.Thread(target=server.run, kwargs={"sockets": [sock]}, daemon=True)
+    thread = threading.Thread(
+        target=server.run, kwargs={"sockets": [sock]}, daemon=True
+    )
     thread.start()
     while not server.started:
         time.sleep(0.005)
@@ -106,8 +118,13 @@ def demo_api(data_dir, tmp_path, monkeypatch, server) -> Api:
     monkeypatch.setattr(demo, "ENABLED", True)
     monkeypatch.setattr(settings, "PASSWORD", "secret")
     monkeypatch.setattr(settings, "SECURE_COOKIE", False)  # the test server is http
-    monkeypatch.setattr(check, "sessions", Sessions(
-        idle=30 * 60, max_age=8 * 60 * 60, limit=5, on_end=check._remove_sandbox))
+    monkeypatch.setattr(
+        check,
+        "sessions",
+        Sessions(
+            idle=30 * 60, max_age=8 * 60 * 60, limit=5, on_end=check._remove_sandbox
+        ),
+    )
     monkeypatch.setattr(check, "login_failures", RateLimit(3, 60))
     monkeypatch.setattr(check, "talk_per_session", RateLimit(2, 60))
     monkeypatch.setattr(check, "talk_per_ip", RateLimit(10, 60))
@@ -115,7 +132,8 @@ def demo_api(data_dir, tmp_path, monkeypatch, server) -> Api:
     seed = tmp_path / "seed"
     seed.mkdir()
     (seed / "accounts.json").write_text(
-        '[{"id": 1, "text": "Demo", "created_at": "2026-10-14T00:00:00.000+00:00"}]')
+        '[{"id": 1, "text": "Demo", "created_at": "2026-10-14T00:00:00.000+00:00"}]'
+    )
     monkeypatch.setattr(sandboxes, "ROOT", tmp_path / "boxes")
     monkeypatch.setattr(sandboxes, "SEED_DIR", seed)
     yield Api(f"http://127.0.0.1:{server}")

@@ -50,7 +50,11 @@ def freeze_duration(duration: str | None) -> dict | None:
     if span is None:
         return None
     start, end = span
-    return {"start": start.isoformat(), "end": end.isoformat(), "text": describe_duration(duration)}
+    return {
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+        "text": describe_duration(duration),
+    }
 
 
 def _span_from_frozen(frozen: dict | None) -> tuple[datetime, datetime] | None:
@@ -58,7 +62,9 @@ def _span_from_frozen(frozen: dict | None) -> tuple[datetime, datetime] | None:
     datetimes, or None if there's nothing frozen to read."""
     if not frozen:
         return None
-    return datetime.fromisoformat(frozen["start"]), datetime.fromisoformat(frozen["end"])
+    return datetime.fromisoformat(frozen["start"]), datetime.fromisoformat(
+        frozen["end"]
+    )
 
 
 # 2. Progress
@@ -223,12 +229,14 @@ def week_windows(frozen: dict | None) -> list[dict] | None:
         s = datetime.combine(ws, datetime.min.time())
         e = datetime.combine(we + timedelta(days=1), datetime.min.time())
         start_label, end_label = _window_labels(s, e)
-        windows.append({
-            "start": s.isoformat(),
-            "end": e.isoformat(),
-            "start_label": start_label,
-            "end_label": end_label,
-        })
+        windows.append(
+            {
+                "start": s.isoformat(),
+                "end": e.isoformat(),
+                "start_label": start_label,
+                "end_label": end_label,
+            }
+        )
     return windows or None
 
 
@@ -264,12 +272,14 @@ def day_windows(week: dict) -> list[dict]:
         s = datetime.combine(d, datetime.min.time())
         e = datetime.combine(d + timedelta(days=1), datetime.min.time())
         day_label = s.strftime("%a %b %d")
-        days.append({
-            "start": s.isoformat(),
-            "end": e.isoformat(),
-            "start_label": day_label,
-            "end_label": day_label,
-        })
+        days.append(
+            {
+                "start": s.isoformat(),
+                "end": e.isoformat(),
+                "start_label": day_label,
+                "end_label": day_label,
+            }
+        )
     return days
 
 
@@ -298,7 +308,9 @@ def step_plan(frozen: dict | None, steps: list[str] | None) -> list[dict] | None
         if isinstance(step, dict):
             texts.append(step.get("label") or "")
             sl, el = step.get("start_label"), step.get("end_label")
-            dated.append((sl, el) if isinstance(sl, str) and isinstance(el, str) else None)
+            dated.append(
+                (sl, el) if isinstance(sl, str) and isinstance(el, str) else None
+            )
         else:
             texts.append(step)
             dated.append(None)
@@ -319,9 +331,11 @@ def step_plan(frozen: dict | None, steps: list[str] | None) -> list[dict] | None
     result = []
     for (s, e), text in zip(spans, texts, strict=False):
         start_label, end_label = _window_labels(s, e)
-        result.append({
-            "text": text,
-            "start_label": start_label,
-            "end_label": end_label,
-        })
+        result.append(
+            {
+                "text": text,
+                "start_label": start_label,
+                "end_label": end_label,
+            }
+        )
     return result

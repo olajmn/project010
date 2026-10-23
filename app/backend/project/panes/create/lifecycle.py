@@ -111,9 +111,12 @@ def cancel_project(project_id: int) -> dict | None:
         return latest
 
     return save_plan(
-        latest["name"], latest["plan"], feedback="Cancelled",
+        latest["name"],
+        latest["plan"],
+        feedback="Cancelled",
         project_id=latest["project_id"],
-        account_id=latest.get("account_id"), cancelled=True,
+        account_id=latest.get("account_id"),
+        cancelled=True,
         event="archived",
     )
 
@@ -139,9 +142,12 @@ def restore_project(project_id: int) -> dict | None:
         owner = None
 
     return save_plan(
-        latest["name"], latest["plan"], feedback="Restored",
+        latest["name"],
+        latest["plan"],
+        feedback="Restored",
         project_id=latest["project_id"],
-        account_id=owner, cancelled=False,
+        account_id=owner,
+        cancelled=False,
         completed=False,
         event="restored",
     )

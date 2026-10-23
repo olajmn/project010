@@ -18,7 +18,7 @@ def path_segments(args: str) -> list[str]:
 
 
 _SLASH_HINT = (
-    'Put spaces around every / like: Parent / Child '
+    "Put spaces around every / like: Parent / Child "
     "(not Parent /Child or Parent/Child)."
 )
 

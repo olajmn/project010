@@ -12,29 +12,59 @@ def saved(monkeypatch) -> dict:
     """What would be saved, captured instead of written to data/."""
     captured: dict = {}
     monkeypatch.setattr(
-        edit_map, "save_plan", lambda name, plan, **kw: captured.update(kw, plan=plan) or kw,
+        edit_map,
+        "save_plan",
+        lambda name, plan, **kw: captured.update(kw, plan=plan) or kw,
     )
     return captured
 
 
 def tree() -> dict:
-    return {"name": "T", "project_id": 1, "plan": {"progression": {"steps": [
-        {"id": "p1", "label": "Top", "children": [
-            {"id": "p2", "label": "Mid", "children": [
-                {"id": "p3", "label": "Leaf", "children": []},
-            ]},
-        ]},
-    ]}}}
+    return {
+        "name": "T",
+        "project_id": 1,
+        "plan": {
+            "progression": {
+                "steps": [
+                    {
+                        "id": "p1",
+                        "label": "Top",
+                        "children": [
+                            {
+                                "id": "p2",
+                                "label": "Mid",
+                                "children": [
+                                    {"id": "p3", "label": "Leaf", "children": []},
+                                ],
+                            },
+                        ],
+                    },
+                ]
+            }
+        },
+    }
 
 
 def row() -> dict:
-    return {"name": "T", "project_id": 1, "plan": {"progression": {"steps": [
-        {"id": "p1", "label": "A", "children": []},
-        {"id": "p2", "label": "B", "children": [
-            {"id": "p3", "label": "B1", "children": []},
-            {"id": "p4", "label": "B2", "children": []},
-        ]},
-    ]}}}
+    return {
+        "name": "T",
+        "project_id": 1,
+        "plan": {
+            "progression": {
+                "steps": [
+                    {"id": "p1", "label": "A", "children": []},
+                    {
+                        "id": "p2",
+                        "label": "B",
+                        "children": [
+                            {"id": "p3", "label": "B1", "children": []},
+                            {"id": "p4", "label": "B2", "children": []},
+                        ],
+                    },
+                ]
+            }
+        },
+    }
 
 
 def order(steps: list) -> list[str]:
@@ -55,13 +85,20 @@ def test_remove_says_where_and_what_went_with_it(saved) -> None:
 def test_import_counts_every_node(saved) -> None:
     # One import is one change, but its text counts every node it
     # brought in, not only the top level.
-    forest = [{"label": "A", "children": [
-        {"label": "B", "children": [{"label": "C", "children": []}]},
-        {"label": "D", "children": []},
-    ]}]
+    forest = [
+        {
+            "label": "A",
+            "children": [
+                {"label": "B", "children": [{"label": "C", "children": []}]},
+                {"label": "D", "children": []},
+            ],
+        }
+    ]
     edit_map.import_map_outline(tree(), forest=forest)
     assert saved["feedback"] == "Imported 4 nodes", saved
-    edit_map.import_map_outline(tree(), forest=[{"label": "E", "children": []}], parent_id="p3")
+    edit_map.import_map_outline(
+        tree(), forest=[{"label": "E", "children": []}], parent_id="p3"
+    )
     assert saved["feedback"] == "Imported 1 node under Leaf", saved
 
 
@@ -78,7 +115,9 @@ def test_move_swaps_with_one_sibling(saved) -> None:
     assert saved["feedback"] == "Moved step under B: B1 below B2", saved
 
 
-@pytest.mark.parametrize("step_id, direction", [("p1", "up"), ("p4", "down"), ("p9", "up")])
+@pytest.mark.parametrize(
+    "step_id, direction", [("p1", "up"), ("p4", "down"), ("p9", "up")]
+)
 def test_move_past_the_edge_or_unknown_fails(saved, step_id, direction) -> None:
     with pytest.raises(ValueError):
         edit_map.move_map_node(row(), step_id, direction)

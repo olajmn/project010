@@ -8,9 +8,13 @@ from backend.model.brief.conversation import (
 
 LATEST = {
     "name": "Garden",
-    "plan": {"progression": {"steps": [
-        {"id": "p1", "label": "Beds", "children": []},
-    ]}},
+    "plan": {
+        "progression": {
+            "steps": [
+                {"id": "p1", "label": "Beds", "children": []},
+            ]
+        }
+    },
 }
 HISTORY = [
     {"feedback": None},  # first record: no turn
@@ -56,14 +60,26 @@ def test_past_turns_are_capped() -> None:
 def test_map_text_and_selected_path() -> None:
     # As the system text shows them.
     tree = {
-        "plan": {"progression": {"steps": [
-            {"id": "p1", "label": "Sample", "children": [
-                {"id": "p2", "label": "src", "children": [
-                    {"id": "p4", "label": "main.py", "children": []},
-                ]},
-                {"id": "p3", "label": "readme.txt", "children": []},
-            ]},
-        ]}},
+        "plan": {
+            "progression": {
+                "steps": [
+                    {
+                        "id": "p1",
+                        "label": "Sample",
+                        "children": [
+                            {
+                                "id": "p2",
+                                "label": "src",
+                                "children": [
+                                    {"id": "p4", "label": "main.py", "children": []},
+                                ],
+                            },
+                            {"id": "p3", "label": "readme.txt", "children": []},
+                        ],
+                    },
+                ]
+            }
+        },
     }
     system = build_messages(tree, "hi", [], "main.py", "p4")[0]["content"]
     assert "readme.txt" in system
@@ -77,9 +93,17 @@ def test_map_text_and_selected_path() -> None:
 def test_selected_day_of_changes() -> None:
     # Listed in the background, tagged on turns.
     tape = [
-        {"feedback": "Added step: Beds", "event": "node_added", "created_at": "2026-09-20T12:00:00"},
-        {"feedback": "Two beds. Note: what changed?", "event": "chat",
-         "created_at": "2026-09-20T13:00:00", "focus_day": "2026-09-20"},
+        {
+            "feedback": "Added step: Beds",
+            "event": "node_added",
+            "created_at": "2026-09-20T12:00:00",
+        },
+        {
+            "feedback": "Two beds. Note: what changed?",
+            "event": "chat",
+            "created_at": "2026-09-20T13:00:00",
+            "focus_day": "2026-09-20",
+        },
     ]
     day = build_messages(LATEST, "and?", tape, focus_day="2026-09-20")
     assert "selected the changes on 20 Sep" in day[0]["content"]
@@ -92,12 +116,28 @@ def test_selected_day_of_changes() -> None:
 def test_renamed_node_in_past_turns() -> None:
     # Past turns name the node as it is called now, and what it was
     # called then.
-    renamed_tree = {"name": "Garden", "plan": {"progression": {"steps": [
-        {"id": "p1", "label": "Flower beds", "children": []},
-    ]}}}
-    talk = [{"feedback": "Beds hold soil. Note: what is this",
-             "map_focus": "Beds", "focus_step_id": "p1"}]
+    renamed_tree = {
+        "name": "Garden",
+        "plan": {
+            "progression": {
+                "steps": [
+                    {"id": "p1", "label": "Flower beds", "children": []},
+                ]
+            }
+        },
+    }
+    talk = [
+        {
+            "feedback": "Beds hold soil. Note: what is this",
+            "map_focus": "Beds",
+            "focus_step_id": "p1",
+        }
+    ]
     later = build_messages(renamed_tree, "and now?", talk)
-    assert later[1] == {"role": "user",
-                        "content": "[about: Flower beds (then called Beds)] what is this"}
-    assert past_turns(talk, {"p1": "Beds"})[0]["content"] == "[about: Beds] what is this"
+    assert later[1] == {
+        "role": "user",
+        "content": "[about: Flower beds (then called Beds)] what is this",
+    }
+    assert (
+        past_turns(talk, {"p1": "Beds"})[0]["content"] == "[about: Beds] what is this"
+    )

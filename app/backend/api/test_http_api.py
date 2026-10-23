@@ -32,7 +32,9 @@ def project(api) -> dict:
     api.post(f"/api/projects/{pid}/map", {"label": "Rooms"})
     _, view = api.post(f"/api/projects/{pid}/map", {"label": "Garden"})
     rooms = ids(view["node"])["Rooms"]
-    _, view = api.post(f"/api/projects/{pid}/map", {"label": "Kitchen", "parent_id": rooms})
+    _, view = api.post(
+        f"/api/projects/{pid}/map", {"label": "Kitchen", "parent_id": rooms}
+    )
     return view
 
 
@@ -47,7 +49,8 @@ def test_empty_app(api) -> None:
 
 def test_session_outside_demo(api) -> None:
     assert api.get("/api/session") == (
-        200, {"demo": False, "map_start_depth": None, "start_project_id": None},
+        200,
+        {"demo": False, "map_start_depth": None, "start_project_id": None},
     )
 
 
@@ -86,7 +89,10 @@ def test_create_project(api) -> None:
     assert {"thread", "status", "completed", "cancelled", "account_id"} <= set(view)
     # Empty text picks the next `New project N`.
     assert api.post("/api/projects", {"text": ""})[1]["name"] == "New project 1"
-    assert [p["name"] for p in api.get("/api/projects")[1]] == ["New project 1", "House"]
+    assert [p["name"] for p in api.get("/api/projects")[1]] == [
+        "New project 1",
+        "House",
+    ]
 
 
 def test_rename_project(api, project) -> None:
@@ -115,7 +121,10 @@ def test_archive_restore_delete_project(api, project) -> None:
     assert [p["project_id"] for p in api.get("/api/projects/archived")[1]] == [pid]
     status, view = api.post(f"/api/projects/{pid}/restore")
     assert status == 200 and view["cancelled"] is False
-    assert api.post(f"/api/projects/{pid}/delete") == (200, {"ok": True, "project_id": pid})
+    assert api.post(f"/api/projects/{pid}/delete") == (
+        200,
+        {"ok": True, "project_id": pid},
+    )
     assert api.post(f"/api/projects/{pid}/delete")[0] == 404
     assert api.post("/api/projects/99/cancel")[0] == 404
 
@@ -139,7 +148,9 @@ def test_add_nodes(project) -> None:
 
 def test_rename_move_remove_node(api, project) -> None:
     pid, node = project["project_id"], ids(project["node"])
-    status, view = api.post(f"/api/projects/{pid}/map/{node['Kitchen']}/rename", {"text": "Bath"})
+    status, view = api.post(
+        f"/api/projects/{pid}/map/{node['Kitchen']}/rename", {"text": "Bath"}
+    )
     assert status == 200 and ids(view["node"])["Bath"] == node["Kitchen"]  # id stays
     _, view = api.post(f"/api/projects/{pid}/map/{node['Garden']}/move-up")
     assert [label for label, _ in labels(view["node"])] == ["Garden", "Rooms"]
@@ -153,7 +164,10 @@ def test_map_edit_errors(api, project) -> None:
     status, text = api.post(f"/api/projects/{pid}/map/p99/remove")
     assert status == 422 and isinstance(text, str) and text
     assert api.post(f"/api/projects/{pid}/map/{node['Rooms']}/move-up")[0] == 422
-    assert api.post(f"/api/projects/{pid}/map/{node['Kitchen']}/rename", {"text": " "})[0] == 400
+    assert (
+        api.post(f"/api/projects/{pid}/map/{node['Kitchen']}/rename", {"text": " "})[0]
+        == 400
+    )
     assert api.post("/api/projects/99/map", {"label": "X"}) == (404, "no such project")
 
 
@@ -161,14 +175,20 @@ def test_import_outline(api, project) -> None:
     pid, node = project["project_id"], ids(project["node"])
     text = "Plan\n- Walls\n  - Paint\n- Floor\n"
     status, view = api.post(
-        f"/api/projects/{pid}/map/import", {"text": text, "parent_id": node["Garden"]},
+        f"/api/projects/{pid}/map/import",
+        {"text": text, "parent_id": node["Garden"]},
     )
     assert status == 200
-    assert labels(view["node"])[1] == ("Garden", [("Walls", [("Paint", [])]), ("Floor", [])])
+    assert labels(view["node"])[1] == (
+        "Garden",
+        [("Walls", [("Paint", [])]), ("Floor", [])],
+    )
 
 
 def test_parse_outline_preview(api) -> None:
-    status, preview = api.post("/api/parse-outline-preview", {"text": "Plan\n- A\n- B\n"})
+    status, preview = api.post(
+        "/api/parse-outline-preview", {"text": "Plan\n- A\n- B\n"}
+    )
     assert status == 200
     assert [n["label"] for n in preview["stripped"]] == ["A", "B"]
     assert [n["label"] for n in preview["kept"]] == ["Plan"]
@@ -181,7 +201,10 @@ def test_add_folder(api, project, tmp_path) -> None:
     pid = project["project_id"]
     status, view = api.post(f"/api/projects/{pid}/map/folder", {"path": str(folder)})
     assert status == 200 and labels(view["node"])[-1] == ("Docs", [("notes.txt", [])])
-    assert api.post(f"/api/projects/{pid}/map/folder", {"path": str(tmp_path / "no")})[0] == 422
+    assert (
+        api.post(f"/api/projects/{pid}/map/folder", {"path": str(tmp_path / "no")})[0]
+        == 422
+    )
 
 
 # 4. Saved trees
@@ -195,9 +218,13 @@ def test_saved_trees(api, project) -> None:
     assert [t["id"] for t in api.get(f"/api/projects/{pid}/saved-trees")[1]] == ["t1"]
 
     status, view = api.post(
-        f"/api/projects/{pid}/map/insert-tree", {"tree_id": "t1", "parent_id": node["Garden"]},
+        f"/api/projects/{pid}/map/insert-tree",
+        {"tree_id": "t1", "parent_id": node["Garden"]},
     )
-    assert status == 200 and labels(view["node"])[1] == ("Garden", [("Rooms", [("Kitchen", [])])])
+    assert status == 200 and labels(view["node"])[1] == (
+        "Garden",
+        [("Rooms", [("Kitchen", [])])],
+    )
 
     assert api.post("/api/saved-trees/t1/delete")[0] == 200
     assert api.get(f"/api/projects/{pid}/saved-trees")[1] == []
@@ -209,34 +236,54 @@ def test_saved_trees(api, project) -> None:
 
 
 def test_chat_empty_text(api, project) -> None:
-    assert api.post(f"/api/projects/{project['project_id']}/chat", {"text": " "}) == (400, "empty text")
+    assert api.post(f"/api/projects/{project['project_id']}/chat", {"text": " "}) == (
+        400,
+        "empty text",
+    )
 
 
 def test_chat_slash_command_needs_no_model(api, project) -> None:
-    status, view = api.post(f"/api/projects/{project['project_id']}/chat", {"text": "/id"})
+    status, view = api.post(
+        f"/api/projects/{project['project_id']}/chat", {"text": "/id"}
+    )
     assert status == 200 and view["toggle_map_ids"] is True
 
 
 def test_chat_reply(api, project, monkeypatch) -> None:
     monkeypatch.setattr(reply_module, "send_chat", lambda messages: "Two rooms so far.")
     pid, node = project["project_id"], ids(project["node"])
-    status, view = api.post(f"/api/projects/{pid}/chat", {
-        "text": "what is here?", "focus_label": "Rooms", "focus_step_id": node["Rooms"],
-    })
+    status, view = api.post(
+        f"/api/projects/{pid}/chat",
+        {
+            "text": "what is here?",
+            "focus_label": "Rooms",
+            "focus_step_id": node["Rooms"],
+        },
+    )
     assert status == 200
-    assert [m["text"] for m in view["thread"][-2:]] == ["what is here?", "Two rooms so far."]
+    assert [m["text"] for m in view["thread"][-2:]] == [
+        "what is here?",
+        "Two rooms so far.",
+    ]
     assert view["thread"][-2]["focus_step_id"] == node["Rooms"]
 
 
-@pytest.mark.parametrize("error, message", [
-    (ConnectionError(), "the model is not running - start Ollama and try again"),
-    (TimeoutError(), "that took longer than expected - try again in a moment"),
-])
+@pytest.mark.parametrize(
+    "error, message",
+    [
+        (ConnectionError(), "the model is not running - start Ollama and try again"),
+        (TimeoutError(), "that took longer than expected - try again in a moment"),
+    ],
+)
 def test_chat_model_failure_is_503(api, project, monkeypatch, error, message) -> None:
     def fail(messages):
         raise error
+
     monkeypatch.setattr(reply_module, "send_chat", fail)
-    assert api.post(f"/api/projects/{project['project_id']}/chat", {"text": "hi"}) == (503, message)
+    assert api.post(f"/api/projects/{project['project_id']}/chat", {"text": "hi"}) == (
+        503,
+        message,
+    )
 
 
 # 6. Accounts

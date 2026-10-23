@@ -47,8 +47,12 @@ def reply(
         stamp_id = commanded.select_id or focus_step_id
         base = commanded.record if commanded.record is not None else latest
         record = _save_talk(
-            base, note, text, sent_at,
-            map_focus=stamp_label, focus_step_id=stamp_id,
+            base,
+            note,
+            text,
+            sent_at,
+            map_focus=stamp_label,
+            focus_step_id=stamp_id,
         )
         out: dict = {"record": record}
         if commanded.select_id and commanded.select_label:
@@ -61,18 +65,33 @@ def reply(
         return out
 
     history = get_history_for_project(latest["project_id"])
-    status = "\n\n".join(filter(None, [
-        status_text(build_status(history, current=latest)),
-        recent_changes_text(history),
-    ]))
+    status = "\n\n".join(
+        filter(
+            None,
+            [
+                status_text(build_status(history, current=latest)),
+                recent_changes_text(history),
+            ],
+        )
+    )
     messages = build_messages(
-        latest, note, history, map_focus, focus_step_id, status,
+        latest,
+        note,
+        history,
+        map_focus,
+        focus_step_id,
+        status,
         focus_day=focus_day,
     )
     text = send_chat(messages).strip()
     record = _save_talk(
-        latest, note, text, sent_at,
-        map_focus=map_focus, focus_step_id=focus_step_id, focus_day=focus_day,
+        latest,
+        note,
+        text,
+        sent_at,
+        map_focus=map_focus,
+        focus_step_id=focus_step_id,
+        focus_day=focus_day,
     )
     return {"record": record}
 
@@ -100,4 +119,3 @@ def _save_talk(
         focus_step_id=focus_step_id,
         focus_day=focus_day,
     )
-

@@ -104,7 +104,9 @@ def test_id_shows_selected_node_or_toggles_map() -> None:
 def test_clashing_sibling_label_is_numbered(monkeypatch) -> None:
     # Numbered, not refused (decision #53).
     monkeypatch.setattr(
-        edit_map, "save_plan", lambda name, plan, **kw: {"name": name, "plan": plan, **kw},
+        edit_map,
+        "save_plan",
+        lambda name, plan, **kw: {"name": name, "plan": plan, **kw},
     )
     dup = try_command(TREE, "/add CLIENT / hey3")
     assert dup is not None and dup.record is not None

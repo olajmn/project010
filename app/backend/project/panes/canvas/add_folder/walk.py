@@ -48,10 +48,11 @@ def _entries(path: Path) -> list[Path]:
         names = list(path.iterdir())
     except OSError as e:
         raise ValueError(f"cannot read {path.name}: {e.strerror}") from e
-    kept = [
-        entry
-        for entry in names
-        if not skipped(entry.name)
-    ]
-    kept.sort(key=lambda entry: (not entry.is_dir(follow_symlinks=False), entry.name.casefold()))
+    kept = [entry for entry in names if not skipped(entry.name)]
+    kept.sort(
+        key=lambda entry: (
+            not entry.is_dir(follow_symlinks=False),
+            entry.name.casefold(),
+        )
+    )
     return kept

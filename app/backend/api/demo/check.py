@@ -74,6 +74,7 @@ if settings.ENABLED:
 # 2. The check
 # ============================================================
 
+
 def guard(handler: BaseHTTPRequestHandler, method: str) -> bool:
     """True when the request was answered here; False lets the API
     answer it as usual."""
@@ -125,7 +126,9 @@ def guard(handler: BaseHTTPRequestHandler, method: str) -> bool:
         and talk_per_ip.allow(client_ip(handler))
         and talk_per_day.allow("all")
     ):
-        handler.send_error(429, "Too many messages for the demo. Try again in a minute.")
+        handler.send_error(
+            429, "Too many messages for the demo. Try again in a minute."
+        )
         return True
     return False
 
@@ -133,6 +136,7 @@ def guard(handler: BaseHTTPRequestHandler, method: str) -> bool:
 # ============================================================
 # 3. Login and logout
 # ============================================================
+
 
 def _login(handler: BaseHTTPRequestHandler) -> None:
     ip = client_ip(handler)
@@ -176,6 +180,7 @@ def _logout(handler: BaseHTTPRequestHandler) -> None:
 # 4. Helpers
 # ============================================================
 
+
 def client_ip(handler: BaseHTTPRequestHandler) -> str:
     """The visitor's IP: the proxy's header when one is configured,
     otherwise the connection's own address."""
@@ -205,7 +210,13 @@ def _content_length(handler: BaseHTTPRequestHandler) -> int | None:
 
 
 def _cookie(token: str, max_age: int) -> str:
-    parts = [f"{COOKIE}={token}", "HttpOnly", "SameSite=Strict", "Path=/", f"Max-Age={max_age}"]
+    parts = [
+        f"{COOKIE}={token}",
+        "HttpOnly",
+        "SameSite=Strict",
+        "Path=/",
+        f"Max-Age={max_age}",
+    ]
     if settings.SECURE_COOKIE:
         parts.append("Secure")
     return "; ".join(parts)

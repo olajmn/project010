@@ -38,7 +38,9 @@ def key(monkeypatch):
 
 def test_missing_key(monkeypatch) -> None:
     monkeypatch.setenv("OPENROUTER_API_KEY", "")
-    with pytest.raises(openrouter.OpenRouterError, match="^OPENROUTER_API_KEY is not set$"):
+    with pytest.raises(
+        openrouter.OpenRouterError, match="^OPENROUTER_API_KEY is not set$"
+    ):
         openrouter.chat("m", MESSAGES, 0.2)
 
 
@@ -57,22 +59,43 @@ def test_request_sent(key) -> None:
     assert urlopen.call_args.kwargs["timeout"] == openrouter.TIMEOUT_SECONDS
 
 
-@pytest.mark.parametrize("urlopen, message", [
-    pytest.param(
-        {"side_effect": urllib.error.HTTPError(
-            openrouter.URL, 401, "Unauthorized", {}, io.BytesIO(FAKE_KEY.encode()))},
-        "HTTP 401", id="http_error",
-    ),
-    pytest.param({"side_effect": TimeoutError()}, "request failed: TimeoutError", id="timeout"),
-    pytest.param(
-        {"return_value": _reply({"error": {"message": "provider down", "code": 502}})},
-        "no reply in response", id="upstream_error",
-    ),
-    pytest.param(
-        {"return_value": _reply({"choices": [{"message": {"content": "  "}}]})},
-        "empty reply", id="empty_reply",
-    ),
-])
+@pytest.mark.parametrize(
+    "urlopen, message",
+    [
+        pytest.param(
+            {
+                "side_effect": urllib.error.HTTPError(
+                    openrouter.URL,
+                    401,
+                    "Unauthorized",
+                    {},
+                    io.BytesIO(FAKE_KEY.encode()),
+                )
+            },
+            "HTTP 401",
+            id="http_error",
+        ),
+        pytest.param(
+            {"side_effect": TimeoutError()},
+            "request failed: TimeoutError",
+            id="timeout",
+        ),
+        pytest.param(
+            {
+                "return_value": _reply(
+                    {"error": {"message": "provider down", "code": 502}}
+                )
+            },
+            "no reply in response",
+            id="upstream_error",
+        ),
+        pytest.param(
+            {"return_value": _reply({"choices": [{"message": {"content": "  "}}]})},
+            "empty reply",
+            id="empty_reply",
+        ),
+    ],
+)
 def test_errors_say_what_failed(key, urlopen, message) -> None:
     # Never the key or the response body.
     with mock.patch("urllib.request.urlopen", **urlopen):
@@ -96,8 +119,10 @@ def test_default_provider_is_ollama(monkeypatch, reload_client) -> None:
     reload_client()
     assert client.PROVIDER == "ollama"
     assert client.MODEL_IN_USE == client.MODEL == "qwen3.5:9b"
-    with mock.patch("backend.model.openrouter.chat") as hosted, \
-         mock.patch("ollama.chat", return_value={"message": {"content": "local"}}):
+    with (
+        mock.patch("backend.model.openrouter.chat") as hosted,
+        mock.patch("ollama.chat", return_value={"message": {"content": "local"}}),
+    ):
         assert client.send_chat(MESSAGES) == "local"
     hosted.assert_not_called()
 
@@ -107,8 +132,10 @@ def test_openrouter_provider(monkeypatch, reload_client) -> None:
     reload_client()
     assert client.PROVIDER == "openrouter"
     assert client.MODEL_IN_USE == client.OPENROUTER_MODEL == "qwen/qwen3.5-9b"
-    with mock.patch("backend.model.openrouter.chat", return_value="hosted") as hosted, \
-         mock.patch("ollama.chat") as local:
+    with (
+        mock.patch("backend.model.openrouter.chat", return_value="hosted") as hosted,
+        mock.patch("ollama.chat") as local,
+    ):
         assert client.send_chat(MESSAGES) == "hosted"
     hosted.assert_called_once_with("qwen/qwen3.5-9b", MESSAGES, client.TEMPERATURE)
     local.assert_not_called()

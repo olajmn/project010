@@ -107,6 +107,7 @@ def account_view(account: dict) -> dict:
 def saved_tree_view(saved: dict) -> dict:
     """{id, name, saved_at, node_count} — what the picker lists; the
     structure itself stays on the server until it is inserted."""
+
     def count(node: dict) -> int:
         return 1 + sum(count(c) for c in node.get("children") or [])
 
@@ -116,7 +117,6 @@ def saved_tree_view(saved: dict) -> dict:
         "saved_at": saved["saved_at"],
         "node_count": count(saved.get("tree") or {}),
     }
-
 
 
 # ============================================================

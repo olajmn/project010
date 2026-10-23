@@ -41,7 +41,9 @@ def build_messages(
     system = _system_text(latest, map_focus, focus_step_id, status, selected_day)
     messages = [{"role": "system", "content": system}]
     messages.extend(past_turns(history, _labels_by_id(steps_of(latest))))
-    messages.append({"role": "user", "content": _with_focus(note, _focus_tag(map_focus, focus_day))})
+    messages.append(
+        {"role": "user", "content": _with_focus(note, _focus_tag(map_focus, focus_day))}
+    )
     return messages
 
 
@@ -63,11 +65,12 @@ def past_turns(
             continue
         reply, note = feedback.split(_NOTE_MARKER, 1)
         focus = _focus_tag(
-            _label_now(record, current_labels or {}), record.get("focus_day"),
+            _label_now(record, current_labels or {}),
+            record.get("focus_day"),
         )
         turns.append({"role": "user", "content": _with_focus(note, focus)})
         turns.append({"role": "assistant", "content": reply})
-    return turns[-2 * MAX_TURNS:]
+    return turns[-2 * MAX_TURNS :]
 
 
 def _system_text(
@@ -83,7 +86,10 @@ def _system_text(
         ("BEHAVIOR", BEHAVIOR),
         ("LIMITS", LIMITS),
         ("EXAMPLES", EXAMPLES),
-        ("PROJECT BACKGROUND", _background(latest, map_focus, focus_step_id, status, selected_day)),
+        (
+            "PROJECT BACKGROUND",
+            _background(latest, map_focus, focus_step_id, status, selected_day),
+        ),
     ]
     return "\n\n".join(f"{title}\n{text}" for title, text in slots if text)
 

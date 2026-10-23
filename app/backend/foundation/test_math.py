@@ -77,6 +77,7 @@ def test_divide(a, b, expected) -> None:
 
 # 2. Division by zero
 
+
 # Positive, negative, and zero dividend - must always raise, never
 # return 0/None/infinity.
 @pytest.mark.parametrize("a", (5, -5, 0))

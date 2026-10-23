@@ -81,11 +81,10 @@ def all_events(limit: int | None = None, offset: int = 0) -> list[dict]:
     """Every project's events together, newest first; `offset` skips the
     newest ones already shown and `limit` keeps the next ones only."""
     names = {
-        record_project_id(r): r.get("name") or ""
-        for r in get_latest_for_all_projects()
+        record_project_id(r): r.get("name") or "" for r in get_latest_for_all_projects()
     }
     records = sorted(load_history(), key=created_at_key, reverse=True)
-    records = records[max(offset, 0):]
+    records = records[max(offset, 0) :]
     if limit is not None:
         records = records[:limit]
     return [

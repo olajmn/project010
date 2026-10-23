@@ -54,6 +54,7 @@ _current: ContextVar[Path | None] = ContextVar("sandbox", default=None)
 # 2. The current sandbox
 # ============================================================
 
+
 def current() -> Path | None:
     """The folder storage uses for this request, or None for data/."""
     return _current.get()
@@ -70,6 +71,7 @@ def use(sandbox_id: str | None) -> None:
 # ============================================================
 # 3. Making and removing sandboxes
 # ============================================================
+
 
 def create() -> str:
     """A new sandbox: a copy of SEED_DIR (empty if there is no seed).

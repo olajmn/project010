@@ -108,7 +108,6 @@ app = FastAPI(
 )
 
 
-
 @app.middleware("http")
 async def _demo_mode(request: Request, call_next):
     """The demo checks in front of every request (docs/demo.md); off
@@ -116,6 +115,7 @@ async def _demo_mode(request: Request, call_next):
     if not demo.ENABLED:
         return await call_next(request)
     return await demo_guard(request, call_next)
+
 
 _MODEL_FAILED = "that took longer than expected - try again in a moment"
 _MODEL_UNREACHABLE = "the model is not running - start Ollama and try again"
@@ -132,7 +132,9 @@ def _plain_error(request: Request, error: StarletteHTTPException) -> PlainTextRe
 
 
 @app.exception_handler(RequestValidationError)
-def _invalid_request(request: Request, error: RequestValidationError) -> PlainTextResponse:
+def _invalid_request(
+    request: Request, error: RequestValidationError
+) -> PlainTextResponse:
     """A path that does not fit a route's types is a route that does not
     exist (404); a body that is not JSON, or not the expected shape, is 400."""
     problems = error.errors()
@@ -147,6 +149,7 @@ def _invalid_request(request: Request, error: RequestValidationError) -> PlainTe
 # 2. Request bodies
 # ============================================================
 
+
 class TextBody(BaseModel):
     text: str | None = None
 
@@ -158,6 +161,7 @@ class CreateProject(BaseModel):
 
 class ProjectOwner(BaseModel):
     """account_id null unlinks the project."""
+
     account_id: int | None = None
 
 
@@ -168,6 +172,7 @@ class AddNode(BaseModel):
 
 class ImportOutline(BaseModel):
     """Pasted outline `text`, or an already-parsed `nodes` tree."""
+
     text: str | None = None
     nodes: list | None = None
     parent_id: str | None = None
@@ -210,6 +215,7 @@ def _text(body: TextBody) -> str:
 # ============================================================
 # 3. Reading
 # ============================================================
+
 
 @app.get("/api/projects")
 def get_projects() -> list:
@@ -261,15 +267,20 @@ def get_saved_trees(project_id: int) -> list:
 # 4. Projects
 # ============================================================
 
+
 @app.post("/api/projects")
-def post_create_project(body: Annotated[CreateProject, Body(default_factory=CreateProject)]) -> dict:
+def post_create_project(
+    body: Annotated[CreateProject, Body(default_factory=CreateProject)],
+) -> dict:
     # Empty text is allowed: create_project() picks `New project N`.
     account_id = str(body.account_id) if body.account_id is not None else ""
     return project_view(create_project((body.text or "").strip(), account_id))
 
 
 @app.post("/api/projects/{project_id}/name")
-def post_rename_project(project_id: int, body: Annotated[TextBody, Body(default_factory=TextBody)]) -> dict:
+def post_rename_project(
+    project_id: int, body: Annotated[TextBody, Body(default_factory=TextBody)]
+) -> dict:
     record = rename_project(project_id, _text(body))
     if record is None:
         raise fail(404, "no such project")
@@ -300,7 +311,9 @@ def post_delete_project(project_id: int) -> dict:
 
 
 @app.post("/api/projects/{project_id}/user")
-def post_project_owner(project_id: int, body: Annotated[ProjectOwner, Body(default_factory=ProjectOwner)]) -> dict:
+def post_project_owner(
+    project_id: int, body: Annotated[ProjectOwner, Body(default_factory=ProjectOwner)]
+) -> dict:
     record = set_project_user(project_id, body.account_id)
     if record is None:
         raise fail(404, "no such project or user")
@@ -312,43 +325,66 @@ def post_project_owner(project_id: int, body: Annotated[ProjectOwner, Body(defau
 # ============================================================
 # No model call in any of these.
 
+
 @app.post("/api/projects/{project_id}/map")
-def post_add_node(project_id: int, body: Annotated[AddNode, Body(default_factory=AddNode)]) -> dict:
+def post_add_node(
+    project_id: int, body: Annotated[AddNode, Body(default_factory=AddNode)]
+) -> dict:
     """One node the user named."""
     latest = _load_project(project_id)
-    return _map_change(lambda: add_map_node(
-        latest, body.label or "", parent_id=_clean(body.parent_id),
-    ))
+    return _map_change(
+        lambda: add_map_node(
+            latest,
+            body.label or "",
+            parent_id=_clean(body.parent_id),
+        )
+    )
 
 
 @app.post("/api/projects/{project_id}/map/import")
-def post_import_outline(project_id: int, body: Annotated[ImportOutline, Body(default_factory=ImportOutline)]) -> dict:
+def post_import_outline(
+    project_id: int, body: Annotated[ImportOutline, Body(default_factory=ImportOutline)]
+) -> dict:
     latest = _load_project(project_id)
-    return _map_change(lambda: import_map_outline(
-        latest,
-        text=(body.text or "") if body.nodes is None else None,
-        parent_id=_clean(body.parent_id),
-        unwrap=body.unwrap,
-        forest=body.nodes,
-    ))
+    return _map_change(
+        lambda: import_map_outline(
+            latest,
+            text=(body.text or "") if body.nodes is None else None,
+            parent_id=_clean(body.parent_id),
+            unwrap=body.unwrap,
+            forest=body.nodes,
+        )
+    )
 
 
 @app.post("/api/projects/{project_id}/map/folder")
-def post_add_folder(project_id: int, body: Annotated[AddFolder, Body(default_factory=AddFolder)]) -> dict:
+def post_add_folder(
+    project_id: int, body: Annotated[AddFolder, Body(default_factory=AddFolder)]
+) -> dict:
     """One folder on this computer becomes nodes."""
     latest = _load_project(project_id)
-    return _map_change(lambda: import_map_folder(
-        latest, body.path or "", parent_id=_clean(body.parent_id),
-    ))
+    return _map_change(
+        lambda: import_map_folder(
+            latest,
+            body.path or "",
+            parent_id=_clean(body.parent_id),
+        )
+    )
 
 
 @app.post("/api/projects/{project_id}/map/insert-tree")
-def post_insert_tree(project_id: int, body: Annotated[InsertTree, Body(default_factory=InsertTree)]) -> dict:
+def post_insert_tree(
+    project_id: int, body: Annotated[InsertTree, Body(default_factory=InsertTree)]
+) -> dict:
     """A saved tree becomes new nodes (fresh ids)."""
     latest = _load_project(project_id)
-    return _map_change(lambda: insert_saved_tree(
-        latest, body.tree_id or "", _clean(body.parent_id),
-    ))
+    return _map_change(
+        lambda: insert_saved_tree(
+            latest,
+            body.tree_id or "",
+            _clean(body.parent_id),
+        )
+    )
 
 
 @app.post("/api/projects/{project_id}/map/{node_id}/remove")
@@ -367,7 +403,11 @@ def post_move_node(project_id: int, node_id: str, direction: str) -> dict:
 
 
 @app.post("/api/projects/{project_id}/map/{node_id}/rename")
-def post_rename_node(project_id: int, node_id: str, body: Annotated[TextBody, Body(default_factory=TextBody)]) -> dict:
+def post_rename_node(
+    project_id: int,
+    node_id: str,
+    body: Annotated[TextBody, Body(default_factory=TextBody)],
+) -> dict:
     """A new label for one node; its id stays."""
     text = _text(body)
     latest = _load_project(project_id)
@@ -375,11 +415,16 @@ def post_rename_node(project_id: int, node_id: str, body: Annotated[TextBody, Bo
 
 
 @app.post("/api/parse-outline-preview")
-def post_outline_preview(body: Annotated[OutlinePreview, Body(default_factory=OutlinePreview)]) -> dict:
+def post_outline_preview(
+    body: Annotated[OutlinePreview, Body(default_factory=OutlinePreview)],
+) -> dict:
     """The pasted text read both ways (title line dropped / kept). Nothing
     is saved; no project needed."""
     text = body.text or ""
-    return {"stripped": parse_outline(text, unwrap=True), "kept": parse_outline(text, unwrap=False)}
+    return {
+        "stripped": parse_outline(text, unwrap=True),
+        "kept": parse_outline(text, unwrap=False),
+    }
 
 
 @app.post("/api/choose-folder")
@@ -394,6 +439,7 @@ def post_choose_folder() -> dict:
 # ============================================================
 # 6. Saved trees
 # ============================================================
+
 
 @app.post("/api/projects/{project_id}/map/{node_id}/save-tree")
 def post_save_tree(project_id: int, node_id: str) -> dict:
@@ -417,8 +463,11 @@ def post_delete_saved_tree(tree_id: str) -> dict:
 # 7. Chat
 # ============================================================
 
+
 @app.post("/api/projects/{project_id}/chat")
-def post_chat(project_id: int, body: Annotated[ChatMessage, Body(default_factory=ChatMessage)]) -> dict:
+def post_chat(
+    project_id: int, body: Annotated[ChatMessage, Body(default_factory=ChatMessage)]
+) -> dict:
     note = (body.text or "").strip()
     if not note:
         raise fail(400, "empty text")
@@ -436,7 +485,9 @@ def post_chat(project_id: int, body: Annotated[ChatMessage, Body(default_factory
         # a fixed message, the terminal gets the real error.
         print(f"(debug: {e})")
         # ollama raises the builtin ConnectionError when nothing listens.
-        raise fail(503, _MODEL_UNREACHABLE if isinstance(e, ConnectionError) else _MODEL_FAILED) from e
+        raise fail(
+            503, _MODEL_UNREACHABLE if isinstance(e, ConnectionError) else _MODEL_FAILED
+        ) from e
     return project_view(
         result["record"],
         select=result.get("select"),
@@ -448,13 +499,18 @@ def post_chat(project_id: int, body: Annotated[ChatMessage, Body(default_factory
 # 8. Accounts
 # ============================================================
 
+
 @app.post("/api/accounts")
-def post_create_account(body: Annotated[TextBody, Body(default_factory=TextBody)]) -> dict:
+def post_create_account(
+    body: Annotated[TextBody, Body(default_factory=TextBody)],
+) -> dict:
     return account_view(save_account(_text(body)))
 
 
 @app.post("/api/accounts/{account_id}/rename")
-def post_rename_account(account_id: int, body: Annotated[RenameAccount, Body(default_factory=RenameAccount)]) -> dict:
+def post_rename_account(
+    account_id: int, body: Annotated[RenameAccount, Body(default_factory=RenameAccount)]
+) -> dict:
     if body.text is None:
         raise fail(400, "missing text")
     return _account_or_404(rename_account(account_id, body.text))
@@ -478,6 +534,7 @@ def post_delete_account(account_id: int) -> dict:
 # ============================================================
 # 9. Page files
 # ============================================================
+
 
 @app.get("/{path:path}", include_in_schema=False)
 def get_page_file(path: str) -> FileResponse:
@@ -503,6 +560,7 @@ def post_unknown(path: str) -> None:
 # ============================================================
 # 10. Helpers
 # ============================================================
+
 
 def _load_project(project_id: int) -> dict:
     """The project's latest record, or 404."""

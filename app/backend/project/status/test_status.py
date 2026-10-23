@@ -22,8 +22,12 @@ NOW = datetime(2026, 9, 25, 20, 0, tzinfo=UTC).astimezone()
 
 def line(feedback, at, event=None, focus=None, steps=None, name="House", **extra):
     record = {
-        "project_id": 7, "name": name, "account_id": 3, "feedback": feedback,
-        "created_at": at, "plan": {"progression": {"steps": steps or []}},
+        "project_id": 7,
+        "name": name,
+        "account_id": 3,
+        "feedback": feedback,
+        "created_at": at,
+        "plan": {"progression": {"steps": steps or []}},
     }
     if event:
         record["event"] = event
@@ -35,9 +39,21 @@ def line(feedback, at, event=None, focus=None, steps=None, name="House", **extra
 
 TAPE = [
     {"feedback": None, "event": "created", "created_at": "2026-09-20T10:00:00"},
-    {"feedback": "Imported 1 step(s)", "event": "pasted", "created_at": "2026-09-20T10:05:00"},
-    {"feedback": "Hello Note: hi", "event": "chat", "created_at": "2026-09-20T11:00:00"},
-    {"feedback": "Renamed: A → B", "event": "renamed", "created_at": "2026-09-20T12:00:00"},
+    {
+        "feedback": "Imported 1 step(s)",
+        "event": "pasted",
+        "created_at": "2026-09-20T10:05:00",
+    },
+    {
+        "feedback": "Hello Note: hi",
+        "event": "chat",
+        "created_at": "2026-09-20T11:00:00",
+    },
+    {
+        "feedback": "Renamed: A → B",
+        "event": "renamed",
+        "created_at": "2026-09-20T12:00:00",
+    },
 ]
 
 
@@ -46,11 +62,30 @@ def test_build_status() -> None:
     history = [
         line(None, "2026-09-24T09:00:00.000+00:00", "created"),
         line("Added step: Rooms", "2026-09-24T09:01:00.000+00:00", "node_added"),
-        line("Added step under Rooms: Kitchen", "2026-09-25T10:00:00.000+00:00", "node_added"),
-        line("Added step under Rooms: Bath", "2026-09-25T10:01:00.000+00:00", "node_added"),
+        line(
+            "Added step under Rooms: Kitchen",
+            "2026-09-25T10:00:00.000+00:00",
+            "node_added",
+        ),
+        line(
+            "Added step under Rooms: Bath",
+            "2026-09-25T10:01:00.000+00:00",
+            "node_added",
+        ),
         line("Ok. Note: hi", "2026-09-25T11:00:00.000+00:00", "chat"),
-        line("Ok. Note: and this?", "2026-09-25T11:01:00.000+00:00", "chat", focus="Kitchen"),
-        line("Renamed: House → Home", "2026-09-25T12:00:00.000+00:00", "renamed", steps=tree, name="Home"),
+        line(
+            "Ok. Note: and this?",
+            "2026-09-25T11:01:00.000+00:00",
+            "chat",
+            focus="Kitchen",
+        ),
+        line(
+            "Renamed: House → Home",
+            "2026-09-25T12:00:00.000+00:00",
+            "renamed",
+            steps=tree,
+            name="Home",
+        ),
     ]
     status = build_status(history, now=NOW)
 
@@ -81,10 +116,13 @@ def test_build_status() -> None:
 
 def test_quiet_days_count_as_zero() -> None:
     # Quiet days between first change and now are listed as 0.
-    gap = build_status([
-        line(None, "2026-09-20T10:00:00.000+00:00", "created"),
-        line("Added step: A", "2026-09-20T10:05:00.000+00:00", "node_added"),
-    ], now=NOW)
+    gap = build_status(
+        [
+            line(None, "2026-09-20T10:00:00.000+00:00", "created"),
+            line("Added step: A", "2026-09-20T10:05:00.000+00:00", "node_added"),
+        ],
+        now=NOW,
+    )
     days = [(h["day"], h["changes"]) for h in gap["history"]]
     assert days[0] == ("Today", 0), days
     assert days[-1] == ("20 Sep", 1), days
@@ -93,22 +131,45 @@ def test_quiet_days_count_as_zero() -> None:
 
 def test_old_timestamps_without_offset() -> None:
     # Older timestamps (local time, no offset) still count; chat excluded.
-    old = build_status([
-        {"project_id": 1, "name": "Old", "feedback": None, "event": "created",
-         "created_at": "2026-09-20T10:00:00"},
-        {"project_id": 1, "name": "Old", "feedback": "Imported 1 step(s)",
-         "event": "pasted", "created_at": "2026-09-20T10:05:00", "plan": {}},
-        {"project_id": 1, "name": "Old", "feedback": "Hello Note: hi",
-         "event": "chat", "created_at": "2026-09-20T11:00:00"},
-    ], now=NOW)
+    old = build_status(
+        [
+            {
+                "project_id": 1,
+                "name": "Old",
+                "feedback": None,
+                "event": "created",
+                "created_at": "2026-09-20T10:00:00",
+            },
+            {
+                "project_id": 1,
+                "name": "Old",
+                "feedback": "Imported 1 step(s)",
+                "event": "pasted",
+                "created_at": "2026-09-20T10:05:00",
+                "plan": {},
+            },
+            {
+                "project_id": 1,
+                "name": "Old",
+                "feedback": "Hello Note: hi",
+                "event": "chat",
+                "created_at": "2026-09-20T11:00:00",
+            },
+        ],
+        now=NOW,
+    )
     assert old["history"][-1]["changes"] == 1, old["history"]
 
 
 def test_created_only() -> None:
     # A project that was only created has had no changes yet, but its
     # first day still starts the pulse.
-    fresh = build_status([line(None, "2026-09-25T09:00:00.000+00:00", "created")], now=NOW)
-    assert [(h["day"], h["changes"]) for h in fresh["history"]] == [("Today", 0)], fresh["history"]
+    fresh = build_status(
+        [line(None, "2026-09-25T09:00:00.000+00:00", "created")], now=NOW
+    )
+    assert [(h["day"], h["changes"]) for h in fresh["history"]] == [("Today", 0)], (
+        fresh["history"]
+    )
     fresh_rows = [row["label"] for row in fresh["summary"]]
     assert "Created" in fresh_rows and "Last change" not in fresh_rows, fresh_rows
 
@@ -138,5 +199,7 @@ def test_changes_on_selected_day() -> None:
         "(1 imported, 1 renamed). Each one, newest first:"
     ), picked
     assert len(picked) == 4
-    assert changes_on_day_text(TAPE, "2026-01-01", now=NOW).endswith("none were saved that day.")
+    assert changes_on_day_text(TAPE, "2026-01-01", now=NOW).endswith(
+        "none were saved that day."
+    )
     assert day_name("2026-09-20", NOW) == "20 Sep"

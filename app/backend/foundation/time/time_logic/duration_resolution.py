@@ -126,7 +126,9 @@ def resolve_duration(duration: str | None, hemisphere: str | None = None) -> str
         end_date = _length_end_date(number, unit)
         if end_date is not None:
             today = _now().date()
-            return f"{duration} (resolved: {today.isoformat()} to {end_date.isoformat()})"
+            return (
+                f"{duration} (resolved: {today.isoformat()} to {end_date.isoformat()})"
+            )
 
     return duration
 
@@ -134,7 +136,9 @@ def resolve_duration(duration: str | None, hemisphere: str | None = None) -> str
 # 3. Span resolution
 
 
-def resolve_span(duration: str | None, hemisphere: str | None = None) -> tuple[datetime, datetime] | None:
+def resolve_span(
+    duration: str | None, hemisphere: str | None = None
+) -> tuple[datetime, datetime] | None:
     """
     The (start, end) datetime span `duration` resolves to, or None
     if nothing grounds it in a real start and end. `start` is `now`
@@ -157,7 +161,9 @@ def resolve_span(duration: str | None, hemisphere: str | None = None) -> tuple[d
         if start_hour < end_hour:
             end_dt = datetime.combine(target_date, midnight.replace(hour=end_hour))
         else:
-            end_dt = datetime.combine(target_date + timedelta(days=1), midnight.replace(hour=end_hour))
+            end_dt = datetime.combine(
+                target_date + timedelta(days=1), midnight.replace(hour=end_hour)
+            )
         return start_dt, end_dt
 
     clock_match = _matched_clock_time(duration)
@@ -194,7 +200,9 @@ def resolve_span(duration: str | None, hemisphere: str | None = None) -> tuple[d
     if weekday_match is not None:
         _, number, prefix = weekday_match
         target_date = _weekday_name_date(number, prefix)
-        return _now(), datetime.combine(target_date + timedelta(days=1), datetime.min.time())
+        return _now(), datetime.combine(
+            target_date + timedelta(days=1), datetime.min.time()
+        )
 
     fraction_match = _matched_named_fraction(duration)
     if fraction_match is not None:
@@ -209,7 +217,9 @@ def resolve_span(duration: str | None, hemisphere: str | None = None) -> tuple[d
             return _now(), end_time
         end_date = _length_end_date(number, unit)
         if end_date is not None:
-            return _now(), datetime.combine(end_date + timedelta(days=1), datetime.min.time())
+            return _now(), datetime.combine(
+                end_date + timedelta(days=1), datetime.min.time()
+            )
 
     return None
 
@@ -235,7 +245,9 @@ def describe_duration(duration: str | None, hemisphere: str | None = None) -> st
     if clock_match is not None:
         hour, minute = clock_match
         target = _clock_time_date(duration, hour, minute)
-        return f'given, resolved by code: clock time = {target.strftime("%Y-%m-%d %H:%M")}'
+        return (
+            f"given, resolved by code: clock time = {target.strftime('%Y-%m-%d %H:%M')}"
+        )
     period_match = _matched_period_phrase(duration)
     if period_match:
         phrase, (start_date, end_date) = period_match

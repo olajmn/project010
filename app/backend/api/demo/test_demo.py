@@ -63,8 +63,17 @@ def clock(tmp_path, monkeypatch) -> Clock:
     clock, the password "secret", and sandboxes copied from a one-account
     seed into a temporary folder."""
     clock = Clock()
-    monkeypatch.setattr(g, "sessions", Sessions(
-        idle=30 * 60, max_age=8 * 60 * 60, limit=2, clock=clock, on_end=g._remove_sandbox))
+    monkeypatch.setattr(
+        g,
+        "sessions",
+        Sessions(
+            idle=30 * 60,
+            max_age=8 * 60 * 60,
+            limit=2,
+            clock=clock,
+            on_end=g._remove_sandbox,
+        ),
+    )
     monkeypatch.setattr(g, "login_failures", RateLimit(3, 60, clock))
     monkeypatch.setattr(g, "talk_per_session", RateLimit(2, 60, clock))
     monkeypatch.setattr(g, "talk_per_ip", RateLimit(10, 60, clock))
@@ -81,7 +90,9 @@ def clock(tmp_path, monkeypatch) -> Clock:
 
 
 def login(password="secret", ip="1.2.3.4"):
-    request = FakeRequest("/api/login", json.dumps({"password": password}).encode(), ip=ip)
+    request = FakeRequest(
+        "/api/login", json.dumps({"password": password}).encode(), ip=ip
+    )
     assert g.guard(request, "POST") is True
     cookie = request.sent_headers.get("Set-Cookie", "")
     token = cookie.split(";")[0].split("=", 1)[1] if request.status == 200 else None
@@ -151,8 +162,13 @@ def test_login_sets_a_locked_down_cookie(clock) -> None:
     request, token = login()
     assert request.status == 200 and token
     cookie = request.sent_headers["Set-Cookie"]
-    for part in ("HttpOnly", "SameSite=Strict", "Path=/", "Secure",
-                 f"Max-Age={settings.MAX_SECONDS}"):
+    for part in (
+        "HttpOnly",
+        "SameSite=Strict",
+        "Path=/",
+        "Secure",
+        f"Max-Age={settings.MAX_SECONDS}",
+    ):
         assert part in cookie, part
 
 
@@ -167,8 +183,14 @@ def test_session_passes_requests_on(clock) -> None:
     assert g.guard(FakeRequest("/api/projects", cookie=token), "GET") is False
     assert g.guard(FakeRequest("/", cookie=token), "GET") is False
     assert g.guard(FakeRequest("/api/log?offset=50", cookie=token), "GET") is False
-    assert g.guard(FakeRequest("/api/projects/1/map", b"{}", cookie=token), "POST") is False
-    assert g.guard(FakeRequest("/api/projects/1/delete", b"", cookie=token), "POST") is False
+    assert (
+        g.guard(FakeRequest("/api/projects/1/map", b"{}", cookie=token), "POST")
+        is False
+    )
+    assert (
+        g.guard(FakeRequest("/api/projects/1/delete", b"", cookie=token), "POST")
+        is False
+    )
 
 
 def test_routes_that_reach_the_server_are_blocked(clock) -> None:
@@ -184,8 +206,9 @@ def test_body_size_limits(clock) -> None:
     assert guarded("/api/projects/1/map/import", big, cookie=token).status == 413
     long_chat = b"x" * (settings.CHAT_BODY_MAX_BYTES + 1)
     assert guarded("/api/projects/1/chat", long_chat, cookie=token).status == 413
-    request = guarded("/api/projects/1/map", b"{}", cookie=token,
-                      headers={"Content-Length": "abc"})
+    request = guarded(
+        "/api/projects/1/map", b"{}", cookie=token, headers={"Content-Length": "abc"}
+    )
     assert request.status == 400
 
 
@@ -193,10 +216,16 @@ def test_chat_rate_limit(clock) -> None:
     # 2 a minute per session here, then 429; a minute later, fine.
     _, token = login()
     for _ in range(2):
-        assert g.guard(FakeRequest("/api/projects/1/chat", CHAT, cookie=token), "POST") is False
+        assert (
+            g.guard(FakeRequest("/api/projects/1/chat", CHAT, cookie=token), "POST")
+            is False
+        )
     assert guarded("/api/projects/1/chat", CHAT, cookie=token).status == 429
     clock.now += 60
-    assert g.guard(FakeRequest("/api/projects/1/chat", CHAT, cookie=token), "POST") is False
+    assert (
+        g.guard(FakeRequest("/api/projects/1/chat", CHAT, cookie=token), "POST")
+        is False
+    )
 
 
 def test_session_cap(clock) -> None:
@@ -306,7 +335,8 @@ def test_clear_all_only_touches_sandboxes(clock) -> None:
     keep.mkdir()
     sandboxes.clear_all()
     assert keep.exists() and not any(
-        p for p in sandboxes.ROOT.iterdir() if p.name != "not-a-sandbox")
+        p for p in sandboxes.ROOT.iterdir() if p.name != "not-a-sandbox"
+    )
 
 
 @pytest.mark.parametrize("bad", ("../x", "abc", "/etc"))

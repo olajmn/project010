@@ -160,7 +160,9 @@ def _clock_time_date(duration: str, hour: int, minute: int) -> datetime:
     combination DAY_SEGMENTS already uses for "tomorrow evening".
     """
     target_date = _now().date() + timedelta(days=_matched_day_offset(duration))
-    return datetime.combine(target_date, datetime.min.time().replace(hour=hour, minute=minute))
+    return datetime.combine(
+        target_date, datetime.min.time().replace(hour=hour, minute=minute)
+    )
 
 
 # 3. Deadlines & calendar periods
@@ -203,8 +205,12 @@ def _period_range(unit: str, offset: int) -> tuple[date, date]:
         return start, start.replace(day=calendar.monthrange(start.year, start.month)[1])
     if unit == "year":
         year = today.year + offset
-        return date(year, 1, 1), date(year, MONTHS_PER_YEAR, calendar.monthrange(year, MONTHS_PER_YEAR)[1])
-    raise ValueError(f"Unknown period unit: {unit!r}")  # pragma: no cover - PERIOD_PHRASES is the only caller
+        return date(year, 1, 1), date(
+            year, MONTHS_PER_YEAR, calendar.monthrange(year, MONTHS_PER_YEAR)[1]
+        )
+    raise ValueError(
+        f"Unknown period unit: {unit!r}"
+    )  # pragma: no cover - PERIOD_PHRASES is the only caller
 
 
 def _matched_month_name(duration: str) -> tuple[str, int] | None:
@@ -270,7 +276,11 @@ def _weekday_name_date(number: int, prefix: str | None) -> date:
     if prefix is None:
         days_ahead = (number - today.isoweekday()) % DAYS_PER_WEEK
         return today + timedelta(days=days_ahead)
-    week_start = today - timedelta(days=today.weekday()) + timedelta(weeks=WEEKDAY_PREFIXES[prefix])
+    week_start = (
+        today
+        - timedelta(days=today.weekday())
+        + timedelta(weeks=WEEKDAY_PREFIXES[prefix])
+    )
     return week_start + timedelta(days=number - 1)
 
 
@@ -326,7 +336,9 @@ def _season_occurrence(season: str, hemisphere: str, year: int) -> tuple[date, d
     return start, end
 
 
-def _season_range(season: str, hemisphere: str, prefix: str | None) -> tuple[date, date]:
+def _season_range(
+    season: str, hemisphere: str, prefix: str | None
+) -> tuple[date, date]:
     """
     The (start, end) date range for `season` in `hemisphere`.
 
@@ -343,7 +355,9 @@ def _season_range(season: str, hemisphere: str, prefix: str | None) -> tuple[dat
     """
     today = _now().date()
     if prefix is not None:
-        return _season_occurrence(season, hemisphere, today.year + WEEKDAY_PREFIXES[prefix])
+        return _season_occurrence(
+            season, hemisphere, today.year + WEEKDAY_PREFIXES[prefix]
+        )
     for candidate_year in (today.year - 1, today.year):
         start, end = _season_occurrence(season, hemisphere, candidate_year)
         if end >= today:
@@ -384,7 +398,9 @@ def _named_fraction_end(unit: str, value: int) -> datetime:
         return now + timedelta(seconds=value)
     if unit == "day":
         return now + timedelta(hours=value)
-    raise ValueError(f"Unknown fraction unit: {unit!r}")  # pragma: no cover - NAMED_FRACTION_RE is the only caller
+    raise ValueError(
+        f"Unknown fraction unit: {unit!r}"
+    )  # pragma: no cover - NAMED_FRACTION_RE is the only caller
 
 
 def _matched_length(duration: str) -> tuple[int, str] | None:

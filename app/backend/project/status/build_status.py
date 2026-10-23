@@ -115,7 +115,8 @@ def changes_on_day_text(
     model when the user has selected that day."""
     now = now or datetime.now().astimezone()
     work = [
-        e for e in _work_events(history)
+        e
+        for e in _work_events(history)
         if (when := _event_when(e.get("at"))) and when.date().isoformat() == day
     ][-limit:]
     heading = f"The user has selected the changes on {day_name(day, now)}"
@@ -123,14 +124,16 @@ def changes_on_day_text(
         return heading + ": none were saved that day."
     # The count leads, so a summary covers every kind of change, not
     # only the ones that stand out in a long list.
-    return "\n".join([
-        f"{heading}: {_tally(work)}. Each one, newest first:",
-        *_change_lines(work, now),
-    ])
+    return "\n".join(
+        [
+            f"{heading}: {_tally(work)}. Each one, newest first:",
+            *_change_lines(work, now),
+        ]
+    )
 
 
 def day_name(day: str, now: datetime | None = None) -> str:
-    """"27 Sep" for a YYYY-MM-DD day; the text itself when it is not one.
+    """ "27 Sep" for a YYYY-MM-DD day; the text itself when it is not one.
     Absolute on purpose: it is stored in the chat history, where "Today"
     would go stale."""
     now = now or datetime.now().astimezone()
@@ -228,12 +231,14 @@ def _change_pulse(
     for d in shown_dates:
         n = counts.get(d, 0)
         when = datetime(d.year, d.month, d.day, tzinfo=now.tzinfo)
-        pulse.append({
-            "day": _day(when, now),
-            "date": d.isoformat(),
-            "text": "1 change" if n == 1 else f"{n} changes",
-            "changes": n,
-        })
+        pulse.append(
+            {
+                "day": _day(when, now),
+                "date": d.isoformat(),
+                "text": "1 change" if n == 1 else f"{n} changes",
+                "changes": n,
+            }
+        )
     return pulse, earlier
 
 
@@ -284,7 +289,9 @@ def _map_size(steps: list) -> tuple[int, int]:
         step, level = stack.pop()
         count += 1
         depth = max(depth, level)
-        stack.extend((c, level + 1) for c in step.get("children") or [] if isinstance(c, dict))
+        stack.extend(
+            (c, level + 1) for c in step.get("children") or [] if isinstance(c, dict)
+        )
     return count, depth
 
 
@@ -304,7 +311,7 @@ def _event_when(at: str | None) -> datetime | None:
 
 
 def _day(when: datetime | None, now: datetime) -> str:
-    """"Today", "Yesterday", or a date."""
+    """ "Today", "Yesterday", or a date."""
     if when is None:
         return "Unknown time"
     days = (now.date() - when.date()).days
@@ -316,5 +323,5 @@ def _day(when: datetime | None, now: datetime) -> str:
 
 
 def _date(when: datetime, now: datetime) -> str:
-    """"25 Sep", with the year when it is not this year."""
+    """ "25 Sep", with the year when it is not this year."""
     return f"{when.day} {when:%b}" + ("" if when.year == now.year else f" {when.year}")

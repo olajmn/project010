@@ -141,9 +141,7 @@ def import_map_outline(
         progression["steps"] = steps
 
     mint = _id_minter(plan)
-    new_steps = [
-        step.to_dict() for step in from_nested_labels(forest, mint)
-    ]
+    new_steps = [step.to_dict() for step in from_nested_labels(forest, mint)]
     # Every imported node, not just the top level: one paste of a
     # 95-node tree is one change, but it brought in 95 nodes.
     imported = len(new_steps) + sum(_count_below(s) for s in new_steps)
@@ -159,10 +157,7 @@ def import_map_outline(
             children = []
             parent["children"] = children
         siblings = children
-        feedback = (
-            f"Imported {what} under "
-            f"{parent.get('label') or parent_id}"
-        )
+        feedback = f"Imported {what} under {parent.get('label') or parent_id}"
     else:
         siblings = steps
         feedback = f"Imported {what}"
@@ -220,7 +215,8 @@ def remove_map_node(latest: dict, step_id: str) -> dict:
     below = _count_below(step)
     feedback = (
         f"Removed step under {ancestors[-1]}: {removed_label}"
-        if ancestors else f"Removed step: {removed_label}"
+        if ancestors
+        else f"Removed step: {removed_label}"
     )
     if below:
         feedback += f" (and {below} under it)"
@@ -268,7 +264,8 @@ def move_map_node(latest: dict, step_id: str, direction: str) -> dict:
     where = "above" if direction == "up" else "below"
     feedback = (
         f"Moved step under {path[-2].get('label') or ''}: {label} {where} {other}"
-        if len(path) > 1 else f"Moved step: {label} {where} {other}"
+        if len(path) > 1
+        else f"Moved step: {label} {where} {other}"
     )
 
     return save_plan(

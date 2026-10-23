@@ -22,11 +22,19 @@ def _project(project_id: int, account: int | None, steps: list) -> dict:
 
 
 RECIPE = {
-    "id": "p1", "label": "Pasta Bolognese", "resolved": True, "ordered": False,
+    "id": "p1",
+    "label": "Pasta Bolognese",
+    "resolved": True,
+    "ordered": False,
     "children": [
-        {"id": "p2", "label": "Ingredients", "path": "/tmp/x", "children": [
-            {"id": "p3", "label": "Pasta", "children": []},
-        ]},
+        {
+            "id": "p2",
+            "label": "Ingredients",
+            "path": "/tmp/x",
+            "children": [
+                {"id": "p3", "label": "Pasta", "children": []},
+            ],
+        },
         {"id": "p4", "label": "Method", "children": []},
     ],
 }
@@ -39,7 +47,9 @@ def library(tmp_path, monkeypatch):
     instead of writing it."""
     monkeypatch.setattr(store, "SAVED_TREES_FILE", tmp_path / "saved_trees.json")
     monkeypatch.setattr(
-        edit_map, "save_plan", lambda name, plan, **kw: {"name": name, "plan": plan, **kw},
+        edit_map,
+        "save_plan",
+        lambda name, plan, **kw: {"name": name, "plan": plan, **kw},
     )
 
 
@@ -66,9 +76,19 @@ def test_library_is_per_account(saved) -> None:
 def test_insert_under_a_node(saved) -> None:
     # Under a node that already has the same label: fresh ids, numbered
     # top label, `ordered` kept.
-    target = _project(3, 7, [{"id": "p5", "label": "Recipes", "children": [
-        {"id": "p6", "label": "Pasta Bolognese", "children": []},
-    ]}])
+    target = _project(
+        3,
+        7,
+        [
+            {
+                "id": "p5",
+                "label": "Recipes",
+                "children": [
+                    {"id": "p6", "label": "Pasta Bolognese", "children": []},
+                ],
+            }
+        ],
+    )
     record = insert_saved_tree(target, "t1", "p5")
     recipes = record["plan"]["progression"]["steps"][0]["children"]
     inserted = recipes[-1]

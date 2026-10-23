@@ -10,9 +10,7 @@ No model.
 from backend.project.node import find_path, steps_of
 from backend.project.panes.chat.commands.result import CommandResult
 
-_TOGGLED = (
-    "Map switched between node ids and names. Type /id again to switch back."
-)
+_TOGGLED = "Map switched between node ids and names. Type /id again to switch back."
 
 
 def run(

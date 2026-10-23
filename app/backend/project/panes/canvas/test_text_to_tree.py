@@ -50,10 +50,13 @@ BOX_DRAWING = (
     "    └── Draft outline\n"
 )
 BOX_DRAWING_TREE = [
-    ("mfoaiejf", [
-        ("Research", [("List sources", []), ("Read summaries", [])]),
-        ("Draft outline", []),
-    ]),
+    (
+        "mfoaiejf",
+        [
+            ("Research", [("List sources", []), ("Read summaries", [])]),
+            ("Draft outline", []),
+        ],
+    ),
 ]
 
 # A genuinely meaningful two-level chain (not just decorative wrapper
@@ -71,7 +74,9 @@ MEANINGFUL_NESTING_TREE = [
 # Flat list, no nesting at all.
 FLAT = "- One\n- Two\n- Three\n"
 FLAT_TREE = [
-    ("One", []), ("Two", []), ("Three", []),
+    ("One", []),
+    ("Two", []),
+    ("Three", []),
 ]
 
 # Tabs for indentation instead of spaces.
@@ -82,14 +87,19 @@ TABS_TREE = [
 ]
 
 
-@pytest.mark.parametrize("text, tree", [
-    pytest.param(MARKDOWN, MARKDOWN_TREE, id="markdown"),
-    pytest.param(NUMBERED, NUMBERED_TREE, id="numbered"),
-    pytest.param(BOX_DRAWING, BOX_DRAWING_TREE, id="box_drawing"),
-    pytest.param(MEANINGFUL_NESTING, MEANINGFUL_NESTING_TREE, id="meaningful_nesting"),
-    pytest.param(FLAT, FLAT_TREE, id="flat"),
-    pytest.param(TABS, TABS_TREE, id="tabs"),
-])
+@pytest.mark.parametrize(
+    "text, tree",
+    [
+        pytest.param(MARKDOWN, MARKDOWN_TREE, id="markdown"),
+        pytest.param(NUMBERED, NUMBERED_TREE, id="numbered"),
+        pytest.param(BOX_DRAWING, BOX_DRAWING_TREE, id="box_drawing"),
+        pytest.param(
+            MEANINGFUL_NESTING, MEANINGFUL_NESTING_TREE, id="meaningful_nesting"
+        ),
+        pytest.param(FLAT, FLAT_TREE, id="flat"),
+        pytest.param(TABS, TABS_TREE, id="tabs"),
+    ],
+)
 def test_outline(text, tree) -> None:
     assert labels(parse_outline(text)) == tree
 

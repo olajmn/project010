@@ -63,10 +63,14 @@ def thread_messages(history: list[dict]) -> list[dict]:
         elif day:
             extra["focus_day"] = day
         created_at = record.get("created_at")
-        messages.append({
-            "role": "user", "text": note,
-            **_at(record.get("sent_at") or created_at), **extra,
-        })
+        messages.append(
+            {
+                "role": "user",
+                "text": note,
+                **_at(record.get("sent_at") or created_at),
+                **extra,
+            }
+        )
         messages.append({"role": "agent", "text": reply, **_at(created_at), **extra})
     return messages
 
@@ -88,7 +92,7 @@ def _rename_note(record: dict, talked_about: set[str]) -> dict | None:
     feedback = record.get("feedback") or ""
     if step not in talked_about or not feedback.startswith(_RENAME_PREFIX):
         return None
-    old, sep, new = feedback[len(_RENAME_PREFIX):].partition(_RENAME_ARROW)
+    old, sep, new = feedback[len(_RENAME_PREFIX) :].partition(_RENAME_ARROW)
     if not sep:
         return None
     return {

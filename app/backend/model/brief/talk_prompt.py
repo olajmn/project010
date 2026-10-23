@@ -33,10 +33,10 @@ BEHAVIOR = (
     "of how it is displayed (map, nodes, tree, labels, levels).\n"
     "- Speak about the project itself, not about what you were given: never "
     "mention the background, the system, the data, or the current view. "
-    "Say \"the project doesn't say\" rather than \"the system does not "
-    "record\".\n"
+    'Say "the project doesn\'t say" rather than "the system does not '
+    'record".\n'
     "- Do not end with a menu of options or an offer of further help.\n"
-    "- A remark that is not a question (thanks, a compliment, \"ok\") gets "
+    '- A remark that is not a question (thanks, a compliment, "ok") gets '
     "one short sentence back: no summary of the project, no question.\n"
     "- Plain text only: no markdown, no bullet lists, no bold, no "
     "backticks, no headings."
