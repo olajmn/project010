@@ -95,7 +95,14 @@ from backend.storage.accounts_persistence import (
 # 1. App and errors
 # ============================================================
 
-app = FastAPI(title="project010", redoc_url=None)
+# The route reference (/docs, /openapi.json) is for local work; the
+# public demo shows nothing before login.
+app = FastAPI(
+    title="project010",
+    redoc_url=None,
+    docs_url=None if demo.ENABLED else "/docs",
+    openapi_url=None if demo.ENABLED else "/openapi.json",
+)
 
 
 
