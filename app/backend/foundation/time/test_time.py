@@ -6,24 +6,32 @@
 
 from datetime import datetime, timedelta
 
+import pytest
+
 from backend.foundation.time import day_windows, freeze_duration, now, week_windows
 from backend.foundation.time.time_logic.frozen_duration import DAYS_PER_WEEK
 
 # 1. now() checks
 
 
-def test_time() -> None:
+def test_now_is_naive_system_time() -> None:
     result = now()
     assert isinstance(result, datetime), f"now() returned {type(result)}, expected datetime"
     assert result.tzinfo is None, f"now() returned a timezone-aware datetime: {result!r}"
     real_now = datetime.now()
     assert abs(real_now - result) < timedelta(seconds=5), f"now() = {result}, system clock = {real_now}"
-    print("OK - now() returns a naive datetime matching the real system clock")
 
-    # 2. week_windows() / day_windows() checks
 
+# 2. week_windows() / day_windows() checks
+
+
+def _month_windows():
     month = freeze_duration("1 month")
-    windows = week_windows(month)
+    return month, week_windows(month)
+
+
+def test_month_is_week_grain() -> None:
+    month, windows = _month_windows()
     assert windows is not None, "1 month must be week grain"
     # N is round(calendar days / 7), and the span's calendar days depend on
     # today's date (a 31-day month counts 32 days, which rounds to 5).
@@ -33,24 +41,21 @@ def test_time() -> None:
     # raw freeze instant's clock time.
     assert datetime.fromisoformat(windows[0]["start"]).date() == datetime.fromisoformat(month["start"]).date()
     assert datetime.fromisoformat(windows[-1]["end"]) == datetime.fromisoformat(month["end"])
-    print(f"OK - week_windows('1 month') → {len(windows)} weeks "
-          f"({windows[0]['start_label']}–{windows[-1]['end_label']})")
 
-    four = freeze_duration("4 weeks")
-    assert len(week_windows(four)) == 4
-    six = freeze_duration("6 weeks")
-    assert len(week_windows(six)) == 6
-    print("OK - week_windows respects N weeks as N candles")
 
-    hour = freeze_duration("2 hours")
-    assert week_windows(hour) is None
-    print("OK - week_windows('2 hours') is None (session grain)")
+@pytest.mark.parametrize("weeks", (4, 6))
+def test_n_weeks_give_n_windows(weeks) -> None:
+    assert len(week_windows(freeze_duration(f"{weeks} weeks"))) == weeks
 
-    year = freeze_duration("1 year")
-    assert week_windows(year) is None
-    print("OK - week_windows('1 year') is None (year grain not built here)")
 
-    # Days are consecutive calendar dates - no skipped weekdays.
+@pytest.mark.parametrize("span", ("2 hours", "1 year"))
+def test_session_and_year_are_not_week_grain(span) -> None:
+    assert week_windows(freeze_duration(span)) is None
+
+
+def test_days_are_consecutive() -> None:
+    # Consecutive calendar dates - no skipped weekdays.
+    _, windows = _month_windows()
     for w in windows[:-1]:
         days = day_windows(w)
         assert len(days) == DAYS_PER_WEEK, f"full week should have {DAYS_PER_WEEK} days, got {len(days)}"
@@ -65,8 +70,3 @@ def test_time() -> None:
         d0 = datetime.fromisoformat(last_days[i]["start"]).date()
         d1 = datetime.fromisoformat(last_days[i + 1]["start"]).date()
         assert d1 - d0 == timedelta(days=1)
-
-    first = day_windows(windows[0])
-    print(f"OK - day_windows() consecutive calendar days "
-          f"(week 1: {first[0]['start_label']} … {first[-1]['start_label']}; "
-          f"last week: {len(last_days)} days)")

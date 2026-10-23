@@ -32,7 +32,15 @@ def line(feedback, at, event=None, focus=None, steps=None, name="House", **extra
     return record
 
 
-def test_status() -> None:
+TAPE = [
+    {"feedback": None, "event": "created", "created_at": "2026-09-20T10:00:00"},
+    {"feedback": "Imported 1 step(s)", "event": "pasted", "created_at": "2026-09-20T10:05:00"},
+    {"feedback": "Hello Note: hi", "event": "chat", "created_at": "2026-09-20T11:00:00"},
+    {"feedback": "Renamed: A → B", "event": "renamed", "created_at": "2026-09-20T12:00:00"},
+]
+
+
+def test_build_status() -> None:
     tree = [{"label": "Rooms", "children": [{"label": "Kitchen"}, {"label": "Bath"}]}]
     history = [
         line(None, "2026-09-24T09:00:00.000+00:00", "created"),
@@ -66,7 +74,11 @@ def test_status() -> None:
     assert text.startswith("Project: Home\nCreated: 24 Sep 2026")
     assert "Last change:" in text
     assert "changes" not in text  # the day pulse is for the panel only
+    # Each pulse row carries a fixed date to select it by.
+    assert all("date" in row for row in status["history"])
 
+
+def test_quiet_days_count_as_zero() -> None:
     # Quiet days between first change and now are listed as 0.
     gap = build_status([
         line(None, "2026-09-20T10:00:00.000+00:00", "created"),
@@ -77,6 +89,8 @@ def test_status() -> None:
     assert days[-1] == ("20 Sep", 1), days
     assert sum(1 for _, n in days if n == 0) >= 1
 
+
+def test_old_timestamps_without_offset() -> None:
     # Older timestamps (local time, no offset) still count; chat excluded.
     old = build_status([
         {"project_id": 1, "name": "Old", "feedback": None, "event": "created",
@@ -88,6 +102,8 @@ def test_status() -> None:
     ], now=NOW)
     assert old["history"][-1]["changes"] == 1, old["history"]
 
+
+def test_created_only() -> None:
     # A project that was only created has had no changes yet, but its
     # first day still starts the pulse.
     fresh = build_status([line(None, "2026-09-25T09:00:00.000+00:00", "created")], now=NOW)
@@ -95,34 +111,31 @@ def test_status() -> None:
     fresh_rows = [row["label"] for row in fresh["summary"]]
     assert "Created" in fresh_rows and "Last change" not in fresh_rows, fresh_rows
 
+
+def test_empty_history() -> None:
     assert build_status([]) == {"summary": [], "history": [], "earlier": 0}
 
+
+def test_recent_changes() -> None:
     # Recent changes: what each one was, newest first, chat left out.
-    tape = [
-        {"feedback": None, "event": "created", "created_at": "2026-09-20T10:00:00"},
-        {"feedback": "Imported 1 step(s)", "event": "pasted", "created_at": "2026-09-20T10:05:00"},
-        {"feedback": "Hello Note: hi", "event": "chat", "created_at": "2026-09-20T11:00:00"},
-        {"feedback": "Renamed: A → B", "event": "renamed", "created_at": "2026-09-20T12:00:00"},
-    ]
-    recent = recent_changes_text(tape, now=NOW).splitlines()
+    recent = recent_changes_text(TAPE, now=NOW).splitlines()
     assert recent[0] == "Recent changes (newest first):"
     assert recent[1].endswith("— Renamed: A → B"), recent
     assert recent[2].endswith("— Imported 1 step(s)")
     assert recent[3].endswith("— Created")
     assert len(recent) == 4
-    assert len(recent_changes_text(tape, now=NOW, limit=1).splitlines()) == 2
-    assert recent_changes_text(tape[2:3], now=NOW) == ""
+    assert len(recent_changes_text(TAPE, now=NOW, limit=1).splitlines()) == 2
+    assert recent_changes_text(TAPE[2:3], now=NOW) == ""
 
-    # A selected day: every change that local day, and a fixed date on
-    # each pulse row to select it by.
+
+def test_changes_on_selected_day() -> None:
+    # A selected day: every change that local day.
     day = _local_day("2026-09-20T12:00:00")
-    picked = changes_on_day_text(tape, day, now=NOW).splitlines()
+    picked = changes_on_day_text(TAPE, day, now=NOW).splitlines()
     assert picked[0] == (
         "The user has selected the changes on 20 Sep: 2 changes "
         "(1 imported, 1 renamed). Each one, newest first:"
     ), picked
     assert len(picked) == 4
-    assert changes_on_day_text(tape, "2026-01-01", now=NOW).endswith("none were saved that day.")
+    assert changes_on_day_text(TAPE, "2026-01-01", now=NOW).endswith("none were saved that day.")
     assert day_name("2026-09-20", NOW) == "20 Sep"
-    assert all("date" in row for row in status["history"])
-    print("OK - project status day pulse / recent changes")

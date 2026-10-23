@@ -12,6 +12,8 @@ decimal/zero operands and division by zero, not exhaustive coverage.
 #
 #  2. Division by zero
 
+import pytest
+
 from backend.foundation.math import add, divide, multiply, subtract
 
 # 1. Basic arithmetic cases
@@ -53,33 +55,31 @@ DIVIDE_CASES = (
 )
 
 
-def test_math() -> None:
-    for a, b, expected in ADD_CASES:
-        result = add(a, b)
-        assert result == expected, f"add({a}, {b}) = {result}, expected {expected}"
+@pytest.mark.parametrize("a, b, expected", ADD_CASES)
+def test_add(a, b, expected) -> None:
+    assert add(a, b) == expected
 
-    for a, b, expected in SUBTRACT_CASES:
-        result = subtract(a, b)
-        assert result == expected, f"subtract({a}, {b}) = {result}, expected {expected}"
 
-    for a, b, expected in MULTIPLY_CASES:
-        result = multiply(a, b)
-        assert result == expected, f"multiply({a}, {b}) = {result}, expected {expected}"
+@pytest.mark.parametrize("a, b, expected", SUBTRACT_CASES)
+def test_subtract(a, b, expected) -> None:
+    assert subtract(a, b) == expected
 
-    for a, b, expected in DIVIDE_CASES:
-        result = divide(a, b)
-        assert result == expected, f"divide({a}, {b}) = {result}, expected {expected}"
 
-    # 2. Division by zero
+@pytest.mark.parametrize("a, b, expected", MULTIPLY_CASES)
+def test_multiply(a, b, expected) -> None:
+    assert multiply(a, b) == expected
 
-    # Positive, negative, and zero dividend - must always raise, never
-    # return 0/None/infinity.
-    for a in (5, -5, 0):
-        try:
-            divide(a, 0)
-            raise AssertionError(f"divide({a}, 0) did not raise ZeroDivisionError")
-        except ZeroDivisionError:
-            pass
 
-    total_cases = len(ADD_CASES) + len(SUBTRACT_CASES) + len(MULTIPLY_CASES) + len(DIVIDE_CASES) + 3
-    print(f"OK - {total_cases} case(s) passed (including 3 division-by-zero case(s))")
+@pytest.mark.parametrize("a, b, expected", DIVIDE_CASES)
+def test_divide(a, b, expected) -> None:
+    assert divide(a, b) == expected
+
+
+# 2. Division by zero
+
+# Positive, negative, and zero dividend - must always raise, never
+# return 0/None/infinity.
+@pytest.mark.parametrize("a", (5, -5, 0))
+def test_divide_by_zero_raises(a) -> None:
+    with pytest.raises(ZeroDivisionError):
+        divide(a, 0)

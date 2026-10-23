@@ -1,7 +1,6 @@
 """Checks for saved trees — no model call, no writes to data/."""
 
-import tempfile
-from pathlib import Path
+import pytest
 
 import backend.project.panes.canvas.edit_map as edit_map
 import backend.storage.saved_trees_persistence as store
@@ -22,32 +21,35 @@ def _project(project_id: int, account: int | None, steps: list) -> dict:
     }
 
 
-def test_saved_trees() -> None:
-    real_file, real_save = store.SAVED_TREES_FILE, edit_map.save_plan
-    with tempfile.TemporaryDirectory() as tmp:
-        store.SAVED_TREES_FILE = Path(tmp) / "saved_trees.json"
-        edit_map.save_plan = lambda name, plan, **kw: {"name": name, "plan": plan, **kw}
-        try:
-            _check()
-        finally:
-            store.SAVED_TREES_FILE, edit_map.save_plan = real_file, real_save
-    print("OK - saved trees")
+RECIPE = {
+    "id": "p1", "label": "Pasta Bolognese", "resolved": True, "ordered": False,
+    "children": [
+        {"id": "p2", "label": "Ingredients", "path": "/tmp/x", "children": [
+            {"id": "p3", "label": "Pasta", "children": []},
+        ]},
+        {"id": "p4", "label": "Method", "children": []},
+    ],
+}
+SOURCE = _project(1, 7, [RECIPE])
 
 
-def _check() -> None:
-    recipe = {
-        "id": "p1", "label": "Pasta Bolognese", "resolved": True, "ordered": False,
-        "children": [
-            {"id": "p2", "label": "Ingredients", "path": "/tmp/x", "children": [
-                {"id": "p3", "label": "Pasta", "children": []},
-            ]},
-            {"id": "p4", "label": "Method", "children": []},
-        ],
-    }
-    source = _project(1, 7, [recipe])
+@pytest.fixture(autouse=True)
+def library(tmp_path, monkeypatch):
+    """An empty saved-tree file per test; project saves return the record
+    instead of writing it."""
+    monkeypatch.setattr(store, "SAVED_TREES_FILE", tmp_path / "saved_trees.json")
+    monkeypatch.setattr(
+        edit_map, "save_plan", lambda name, plan, **kw: {"name": name, "plan": plan, **kw},
+    )
 
-    # Saved as structure: no id, resolved, or path anywhere.
-    saved = save_tree_from_node(source, "p1")
+
+@pytest.fixture
+def saved() -> dict:
+    return save_tree_from_node(SOURCE, "p1")
+
+
+def test_saved_as_structure(saved) -> None:
+    # No id, resolved, or path anywhere.
     assert saved["id"] == "t1" and saved["name"] == "Pasta Bolognese"
     assert saved["source"] == {"project_id": 1, "step_id": "p1"}
     tree = saved["tree"]
@@ -55,12 +57,15 @@ def _check() -> None:
     flat = repr(tree)
     assert "'id'" not in flat and "resolved" not in flat and "path" not in flat
 
-    # Library is per account.
-    assert [t["id"] for t in saved_trees_for(source)] == ["t1"]
+
+def test_library_is_per_account(saved) -> None:
+    assert [t["id"] for t in saved_trees_for(SOURCE)] == ["t1"]
     assert saved_trees_for(_project(2, 8, [])) == []
 
-    # Insert under a node that already has the same label: fresh ids,
-    # numbered top label, `ordered` kept.
+
+def test_insert_under_a_node(saved) -> None:
+    # Under a node that already has the same label: fresh ids, numbered
+    # top label, `ordered` kept.
     target = _project(3, 7, [{"id": "p5", "label": "Recipes", "children": [
         {"id": "p6", "label": "Pasta Bolognese", "children": []},
     ]}])
@@ -73,18 +78,18 @@ def _check() -> None:
     assert "p1" not in ids and "p2" not in ids and len(set(ids)) == len(ids)
     assert [c["label"] for c in inserted["children"]] == ["Ingredients", "Method"]
 
-    # Top level (no parent) works too.
-    top = insert_saved_tree(target, "t1", None)
+
+def test_insert_at_top_level(saved) -> None:
+    top = insert_saved_tree(_project(3, 7, []), "t1", None)
     assert top["plan"]["progression"]["steps"][-1]["label"] == "Pasta Bolognese"
 
-    # Another account's tree can't be inserted.
-    try:
-        insert_saved_tree(_project(4, 8, []), "t1", None)
-        raise AssertionError("inserted another account's tree")
-    except ValueError:
-        pass
 
-    # Delete retires the id.
+def test_other_accounts_tree_cannot_be_inserted(saved) -> None:
+    with pytest.raises(ValueError):
+        insert_saved_tree(_project(4, 8, []), "t1", None)
+
+
+def test_delete_retires_the_id(saved) -> None:
     remove_saved_tree("t1")
-    assert saved_trees_for(source) == []
-    assert save_tree_from_node(source, "p1")["id"] == "t2"
+    assert saved_trees_for(SOURCE) == []
+    assert save_tree_from_node(SOURCE, "p1")["id"] == "t2"
