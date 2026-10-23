@@ -6,7 +6,7 @@ work in this project. They are general and project-independent — see
 projects.
 
 @global-standards/AI_COLLABORATION_GUIDE.md
-@global-standards/DOCUMENTATION_STYLE_GUIDE.md
+@global-standards/WRITING_STYLE_GUIDE.md
 @global-standards/CODE_STYLE_GUIDE.md
 @global-standards/_CONTENT_HIERARCHY.md
 

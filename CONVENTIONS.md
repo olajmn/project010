@@ -16,7 +16,7 @@ Technical standards for this codebase. Applies going forward.
 
 ## Language
 
-- English also applies to code, not just `docs/` (see `global-standards/DOCUMENTATION_STYLE_GUIDE.md` §1): variable/function names, comments, docstrings, log/print strings, and prompts embedded in code must all be in English.
+- English also applies to code, not just `docs/` (see `global-standards/WRITING_STYLE_GUIDE.md` §1): variable/function names, comments, docstrings, log/print strings, and prompts embedded in code must all be in English.
 - Live conversation with the assistant while working on the project can still happen in Norwegian — this rule covers files that get committed, not the chat itself.
 
 ## Interface style
@@ -31,7 +31,7 @@ Technical standards for this codebase. Applies going forward.
 
 ## Code documentation
 
-Source-code Contents (what a file's navigation block should contain, and when one is warranted) is defined in `global-standards/CODE_STYLE_GUIDE.md` §1-§2, not restated here. Document-oriented Contents is `global-standards/DOCUMENTATION_STYLE_GUIDE.md`'s job; `global-standards/_CONTENT_HIERARCHY.md` covers heading-hierarchy notation where that level of detail is needed. This project has no Contents rule of its own beyond those.
+Source-code Contents (what a file's navigation block should contain, and when one is warranted) is defined in `global-standards/CODE_STYLE_GUIDE.md` §1-§2, not restated here. Document-oriented Contents is `global-standards/WRITING_STYLE_GUIDE.md`'s job; `global-standards/_CONTENT_HIERARCHY.md` covers heading-hierarchy notation where that level of detail is needed. This project has no Contents rule of its own beyond those.
 
 ## New code placement
 

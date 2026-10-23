@@ -59,7 +59,7 @@ Re-run `tools/project_check.py` before a consequential change, or once meaningfu
 
 If your changes alter what's true about the project, update
 `docs/04-current-state.md` before ending the session (see
-`global-standards/AI_COLLABORATION_GUIDE.md` §9 for why a stale one is
+`global-standards/AI_COLLABORATION_GUIDE.md` §8 for why a stale one is
 worse than none).
 
 If the session added or leaned on a **second path** beside an old one
