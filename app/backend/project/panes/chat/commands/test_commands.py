@@ -1,7 +1,4 @@
-"""Checks for slash-command dispatch — no model call. Run from app/:
-
-    .venv/bin/python -m backend.project.panes.chat.commands.test_commands
-"""
+"""Checks for slash-command dispatch — no model call."""
 
 from backend.project.panes.chat.commands import try_command
 from backend.project.panes.chat.commands import add as add_mod
@@ -101,7 +98,3 @@ def test_commands() -> None:
     assert dup.reply.endswith(": hey3 (2)."), dup.reply
 
     print("OK - try_command dispatch")
-
-
-if __name__ == "__main__":
-    test_commands()

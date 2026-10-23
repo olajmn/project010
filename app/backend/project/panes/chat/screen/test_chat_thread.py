@@ -1,6 +1,4 @@
-"""thread_messages() only - no model call. Run from app/:
-    .venv/bin/python -m backend.project.panes.chat.screen.test_chat_thread
-"""
+"""thread_messages() only - no model call."""
 
 from backend.project.panes.chat.screen.chat_thread import thread_messages
 
@@ -66,7 +64,3 @@ def test_chat_thread() -> None:
     assert len(renamed) == 3
 
     print("OK - thread_messages() shows chat turns and renames of talked-about nodes")
-
-
-if __name__ == "__main__":
-    test_chat_thread()

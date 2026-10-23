@@ -1,7 +1,5 @@
 """Checks for openrouter.chat() and the provider switch in client.py - no
-network, no real key, no model call. Run from app/:
-
-    .venv/bin/python -m backend.model.test_openrouter
+network, no real key, no model call.
 """
 
 import importlib
@@ -109,7 +107,3 @@ def test_openrouter() -> None:
     check_openrouter()
     check_provider_switch()
     print("OK - openrouter.chat / TALK_PROVIDER switch")
-
-
-if __name__ == "__main__":
-    test_openrouter()

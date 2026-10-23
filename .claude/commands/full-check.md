@@ -10,10 +10,8 @@ report, then offer fixes.
    is stale, the `app/backend/` tree, an import smoke test, pyflakes,
    stale code-path mentions, modules with no inbound import, and
    `docs_check.py` / `docs_lint.py`.
-3. **Every test suite**: each `test_*.py` under `app/backend/` (find them
-   with `find backend -name 'test_*.py'` from `app/`), run from `app/` as
-   `.venv/bin/python -m backend.<path>.test_<name>`. Don't rely on a
-   fixed list — new suites get added.
+3. **Tests**: `.venv/bin/python -m pytest -q` from `app/` — runs every
+   `test_*` function under `app/backend/` (`app/pytest.ini`).
 4. **UI type check**: `npx tsc --noEmit` from `app/ui/` (no output means
    no type errors; nothing is written to `ui/dist/`).
 5. **Review** — look for what the scripts cannot see. Spot-check with

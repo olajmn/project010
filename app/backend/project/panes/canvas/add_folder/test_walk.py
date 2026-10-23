@@ -1,7 +1,4 @@
-"""Checks for folder_tree(). Run from app/:
-
-    .venv/bin/python -m backend.project.panes.canvas.add_folder.test_walk
-"""
+"""Checks for folder_tree()."""
 
 import tempfile
 from pathlib import Path
@@ -38,7 +35,3 @@ def test_walk() -> None:
         raise AssertionError("missing folder should fail")
 
     print("OK - folder_tree")
-
-
-if __name__ == "__main__":
-    test_walk()

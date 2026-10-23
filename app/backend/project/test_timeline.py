@@ -1,7 +1,5 @@
 """Checks for event_name() / to_event() / all_events() paging - no files,
-no model. Run from app/:
-
-    .venv/bin/python -m backend.project.test_timeline
+no model.
 """
 
 import backend.project.timeline as timeline
@@ -49,7 +47,3 @@ def test_timeline() -> None:
     assert texts(timeline.all_events(limit=2, offset=4)) == ["Added step: 1"]
     assert timeline.all_events(limit=2, offset=9) == []
     print("OK - timeline events and paging")
-
-
-if __name__ == "__main__":
-    test_timeline()

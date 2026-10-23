@@ -1,7 +1,5 @@
 """Checks for build_status / status_text day-change pulse - no files, no
-model. Run from app/:
-
-    .venv/bin/python -m backend.project.status.test_status
+model.
 """
 
 from datetime import datetime, timezone
@@ -128,7 +126,3 @@ def test_status() -> None:
     assert day_name("2026-09-20", NOW) == "20 Sep"
     assert all("date" in row for row in status["history"])
     print("OK - project status day pulse / recent changes")
-
-
-if __name__ == "__main__":
-    test_status()

@@ -1,7 +1,4 @@
-"""Checks for build_messages() / past_turns() - no model call. Run from app/:
-
-    .venv/bin/python -m backend.model.brief.test_conversation
-"""
+"""Checks for build_messages() / past_turns() - no model call."""
 
 from backend.model.brief.conversation import (
     MAX_TURNS,
@@ -91,7 +88,3 @@ def test_conversation() -> None:
     assert past_turns(talk, {"p1": "Beds"})[0]["content"] == "[about: Beds] what is this"
 
     print("OK - build_messages / past_turns / background / selected day / renamed node")
-
-
-if __name__ == "__main__":
-    test_conversation()

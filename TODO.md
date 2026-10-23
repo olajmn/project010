@@ -11,10 +11,10 @@ next.
 
 ## Active
 
-64. **pytest as the test runner** (Step) — each suite runs as its own
-    module today (`python -m backend.<path>.test_<name>`). Run the
-    existing suites under pytest first, with as little rewriting as
-    possible. Then fill the gaps: no tests for
+64. **pytest as the test runner** (Step) — the tests run under pytest
+    (`python -m pytest` from `app/`), but each file is still one large
+    `test_<name>()`, so the first failing assert hides the rest. Left:
+    split them into smaller tests, then fill the gaps: no tests for
     `requests_from_browser.py`, and `edit_map.py` is covered only for
     the saved text of remove, import, move, and rename.
 65. **FastAPI for the API layer** (Step, after 64) — replace

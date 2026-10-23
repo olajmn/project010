@@ -1,8 +1,6 @@
 """Checks for demo mode: sessions, rate limits, guard(), and sandboxes -
 a fake request, a fake clock, and temporary folders; no server, no real
-data, no model. Run from app/:
-
-    .venv/bin/python -m backend.api.demo.test_demo
+data, no model.
 """
 
 import io
@@ -283,7 +281,3 @@ def test_demo() -> None:
             check_sandboxes()
         sandboxes.use(None)
     print("OK - demo sessions / rate limits / guard / sandboxes")
-
-
-if __name__ == "__main__":
-    test_demo()

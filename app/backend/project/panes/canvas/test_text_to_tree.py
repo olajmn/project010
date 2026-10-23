@@ -1,9 +1,4 @@
-"""
-Small, direct checks for text_to_tree.py's most important edge cases.
-
-Run from app/:
-    .venv/bin/python -m backend.project.panes.canvas.test_text_to_tree
-"""
+"""Small, direct checks for text_to_tree.py's most important edge cases."""
 
 from backend.project.panes.canvas.text_to_tree import parse_outline
 
@@ -90,7 +85,3 @@ def test_text_to_tree() -> None:
     assert parse_outline("   \n\n\t\n") == []
 
     print("OK - 7 outline case(s) passed")
-
-
-if __name__ == "__main__":
-    test_text_to_tree()

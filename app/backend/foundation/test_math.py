@@ -1,9 +1,6 @@
 """
 Small, direct checks for math.py's four operations. Covers positive/negative/
 decimal/zero operands and division by zero, not exhaustive coverage.
-
-Run from the project root:
-    .venv/bin/python -m backend.foundation.test_math
 """
 
 # Contents
@@ -86,7 +83,3 @@ def test_math() -> None:
 
     total_cases = len(ADD_CASES) + len(SUBTRACT_CASES) + len(MULTIPLY_CASES) + len(DIVIDE_CASES) + 3
     print(f"OK - {total_cases} case(s) passed (including 3 division-by-zero case(s))")
-
-
-if __name__ == "__main__":
-    test_math()

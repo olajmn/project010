@@ -9,11 +9,11 @@ From `app/`, with its own `.venv/` (`ollama` is only installed there):
 | What | Command |
 |---|---|
 | Start the app | `.venv/bin/python -m server` → http://localhost:8000/ |
-| One test suite | `.venv/bin/python -m backend.<path>.test_<name>` |
+| Tests | `.venv/bin/python -m pytest` (one file: add its path, e.g. `backend/project/test_timeline.py`) |
 | Build the UI | `cd ui && npm run build` (TypeScript → `ui/dist/`) |
 | Project checks | from the root: `app/.venv/bin/python3 -m tools.project_check` |
 
-`/full-check` runs the checks and every test suite in one go.
+`/full-check` runs the checks and the tests in one go.
 
 `HOST` (default `localhost`) and `PORT` (default `8000`) can be set in the
 environment; locally neither is needed.

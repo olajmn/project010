@@ -1,9 +1,4 @@
-"""
-Small, direct checks for now(), week_windows(), and day_windows().
-
-Run from app/:
-    .venv/bin/python -m backend.foundation.time.test_time
-"""
+"""Small, direct checks for now(), week_windows(), and day_windows()."""
 
 # Contents
 #  1. now() checks
@@ -75,7 +70,3 @@ def test_time() -> None:
     print(f"OK - day_windows() consecutive calendar days "
           f"(week 1: {first[0]['start_label']} … {first[-1]['start_label']}; "
           f"last week: {len(last_days)} days)")
-
-
-if __name__ == "__main__":
-    test_time()

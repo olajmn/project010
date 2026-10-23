@@ -1,7 +1,5 @@
 """The saved text of remove_map_node(), import_map_outline(),
-move_map_node() and rename_map_node() - no files, no model. Run from app/:
-
-    .venv/bin/python -m backend.project.panes.canvas.test_edit_map
+move_map_node() and rename_map_node() - no files, no model.
 """
 
 import backend.project.panes.canvas.edit_map as edit_map
@@ -91,7 +89,3 @@ def test_edit_map() -> None:
             continue
         raise AssertionError(f"rename {step_id} to {label!r} should fail")
     print("OK - remove / import / move / rename map node saved text")
-
-
-if __name__ == "__main__":
-    test_edit_map()

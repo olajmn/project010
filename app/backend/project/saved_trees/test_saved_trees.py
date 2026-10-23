@@ -1,7 +1,4 @@
-"""Checks for saved trees — no model call, no writes to data/. Run from app/:
-
-    .venv/bin/python -m backend.project.saved_trees.test_saved_trees
-"""
+"""Checks for saved trees — no model call, no writes to data/."""
 
 import tempfile
 from pathlib import Path
@@ -91,7 +88,3 @@ def _check() -> None:
     remove_saved_tree("t1")
     assert saved_trees_for(source) == []
     assert save_tree_from_node(source, "p1")["id"] == "t2"
-
-
-if __name__ == "__main__":
-    test_saved_trees()

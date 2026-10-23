@@ -8,9 +8,6 @@ Runs entirely against a temporary directory, never the real data/ -
 this module patches path constants on project_persistence /
 accounts_persistence / paths for the duration of the run and restores
 them afterward.
-
-Run from app/:
-    .venv/bin/python -m backend.storage.test_storage
 """
 
 import shutil
@@ -156,7 +153,3 @@ def test_storage() -> None:
         for key, value in _original_ap.items():
             setattr(ap, key, value)
         shutil.rmtree(_tmp_dir, ignore_errors=True)
-
-
-if __name__ == "__main__":
-    test_storage()
