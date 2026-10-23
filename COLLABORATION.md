@@ -2,14 +2,13 @@
 
 How an AI coding session should work with this project — not what the project is (see `docs/00-project-brief.md`) or how code should look (see `CONVENTIONS.md`).
 
-This is the project-specific instance of `global-standards/AI_COLLABORATION_GUIDE.md`'s general model: that guide describes how an AI session should establish and verify understanding of any software project; this file says concretely which documents and tools do that job here.
+This is the project-specific instance of `global-standards/AI_COLLABORATION_GUIDE.md`'s general model.
 
 ## Contents
 
 - Docs
 - Tools
 - Before finishing
-- New code placement
 - Documentation tooling
 - Meta-coherence
 
@@ -29,11 +28,7 @@ Different questions about this project are answered by different documents, with
 | What happened, and when? | `docs/05-decisions.md` and git history | Accurate for its date — not for today |
 | What might happen? | `TODO.md` § Ideas | Not decided, not built |
 
-When judging the reliability of a specific piece of project information, keep fact, hypothesis, decision, and open question separate — see `global-standards/AI_COLLABORATION_GUIDE.md` §5 for the general model.
-
-An idea in `TODO.md` § Ideas, or anything marked open elsewhere, is not a decision — only `docs/05-decisions.md` holds settled ones, no matter how thorough the speculative version reads.
-
-If a decision in `docs/05-decisions.md` seems wrong, say why and flag it explicitly, rather than quietly working around it.
+Keep fact, hypothesis, decision, and open question separate (`global-standards/AI_COLLABORATION_GUIDE.md` §5). Only `docs/05-decisions.md` holds settled decisions. If one seems wrong, say why and flag it explicitly, rather than quietly working around it.
 
 ## Tools
 
@@ -66,14 +61,6 @@ If the session added or leaned on a **second path** beside an old one
 (two ways of doing the same thing), also update root `TODO.md`
 § Parallel paths — dual code is fine; unnamed dual code is how the base
 turns into a mess.
-
-## New code placement
-
-When implementing something new in a session, **prefer** a new file
-(or small folder) for a real new capability, then wire it with a thin
-import — see `CONVENTIONS.md` § New code placement. Prefer, don’t force:
-same-concern fixes and small extensions stay put; don’t invent micro-files
-for ceremony or park a large new feature in an unrelated open module.
 
 ## Documentation tooling
 

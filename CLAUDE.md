@@ -2,8 +2,7 @@
 
 The following reusable standards apply to all source code and documentation
 work in this project. They are general and project-independent — see
-`global-standards/` for the standalone copies, which can be reused in other
-projects.
+`global-standards/` for the standalone copies.
 
 @global-standards/AI_COLLABORATION_GUIDE.md
 @global-standards/WRITING_STYLE_GUIDE.md
@@ -16,5 +15,5 @@ settled decisions, the project-specific files below take precedence:
 @CONVENTIONS.md
 @COLLABORATION.md
 
-Apply the standards above to new and modified files; do not rewrite existing
-files or restructure the codebase just to conform to them.
+Apply the standards above to new and modified files; do not rewrite
+existing files just to conform to them.

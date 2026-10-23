@@ -7,7 +7,6 @@ Technical standards for this codebase. Applies going forward.
 - Language
 - Interface style
 - Documentation neutrality
-- Code documentation
 - New code placement
 - Project structure
 - Environment
@@ -29,10 +28,6 @@ Technical standards for this codebase. Applies going forward.
 - "The user" as a term still refers to the *product's* end-user where that's the actual subject (e.g. "the data stays on the user's machine") — this rule is about not narrating this project's own build process as a personal story, not about avoiding the word.
 - The exact, checkable patterns this rule means are defined once, in `tools/docs_lint.py` (`_CONFIRMED_PATTERNS`/`REVIEW_PATTERN`) — not restated here. Run it (`python3 tools/docs_lint.py`, from the project root — stdlib only, no `.venv/` needed) rather than checking by eye; update the patterns there, not this paragraph, when a new case turns up.
 
-## Code documentation
-
-Source-code Contents (what a file's navigation block should contain, and when one is warranted) is defined in `global-standards/CODE_STYLE_GUIDE.md` §1-§2, not restated here. Document-oriented Contents is `global-standards/WRITING_STYLE_GUIDE.md`'s job; `global-standards/_CONTENT_HIERARCHY.md` covers heading-hierarchy notation where that level of detail is needed. This project has no Contents rule of its own beyond those.
-
 ## New code placement
 
 **Prefer** giving a **new capability** (feature, helper, pane behavior, policy with its own surface) its **own file** — or a small folder when several closely related files belong together — rather than appending the bulk of it into an existing “nearby” module. This is a default bias for reviewability, not a mandate to split every change.
@@ -41,8 +36,6 @@ Source-code Contents (what a file's navigation block should contain, and when on
 - Prefer a named home that matches the concern (`project/saved_trees/`, `panes/canvas/savedTrees/`) when the boundary is real.
 - Stay in the existing file when the change is clearly the same concern (bugfix, rename, small extension) or would only create a micro-file without a clear boundary.
 - Goal: avoid +500-line dumps into a random open file; do not invent files for ceremony.
-
-This is this project's concrete application of `global-standards/CODE_STYLE_GUIDE.md` §2 (distinct concerns) and §6 (avoid unprompted layers — new files for real boundaries, not ceremony).
 
 ## Project structure
 

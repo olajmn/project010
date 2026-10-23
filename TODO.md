@@ -216,7 +216,7 @@ only). Numbers are stable ids, not rank.
     Related to 34.
 39. **Chat commands that force a SoT pass** (Step, keep in mind) —
     e.g. a chat "full check" that deliberately re-reads `current` (+
-    events) — the product twin of Cursor `/full-check`, for the *user
+    events) — the product twin of this repo's `/full-check`, for the *user
     project* not this repo. Current state panel is mainly for the human;
     the model already gets a slice via `status_text`, but explicit
     commands are optional later. Lives under `panes/chat/commands/`
