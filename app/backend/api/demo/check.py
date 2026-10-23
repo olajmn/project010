@@ -10,6 +10,7 @@ request without a session, which never reaches storage.
 
 # Contents
 #  1. State
+#      - Handler
 #      - _BLOCKED, sessions, limits; sandboxes cleared at start
 #
 #  2. The check
@@ -25,7 +26,7 @@ import hmac
 import json
 import re
 from http.cookies import CookieError, SimpleCookie
-from http.server import BaseHTTPRequestHandler
+from typing import Any, BinaryIO, Protocol
 
 from backend.api.demo import settings
 from backend.api.demo.limits import RateLimit
@@ -35,6 +36,26 @@ from backend.storage import sandboxes
 # ============================================================
 # 1. State
 # ============================================================
+
+
+class Handler(Protocol):
+    """What guard() reads and answers: the shape of the standard library's
+    BaseHTTPRequestHandler, which middleware.py builds from a request."""
+
+    path: str
+    headers: Any
+    client_address: tuple[str, int]
+
+    @property
+    def rfile(self) -> BinaryIO: ...
+    @property
+    def wfile(self) -> BinaryIO: ...
+
+    def send_error(self, code: int, message: str | None = None) -> None: ...
+    def send_response(self, code: int) -> None: ...
+    def send_header(self, name: str, value: str) -> None: ...
+    def end_headers(self) -> None: ...
+
 
 COOKIE = "demo_session"
 LOGIN_PAGE = "/login.html"
@@ -75,7 +96,7 @@ if settings.ENABLED:
 # ============================================================
 
 
-def guard(handler: BaseHTTPRequestHandler, method: str) -> bool:
+def guard(handler: Handler, method: str) -> bool:
     """True when the request was answered here; False lets the API
     answer it as usual."""
     path = handler.path.split("?", 1)[0]
@@ -138,7 +159,7 @@ def guard(handler: BaseHTTPRequestHandler, method: str) -> bool:
 # ============================================================
 
 
-def _login(handler: BaseHTTPRequestHandler) -> None:
+def _login(handler: Handler) -> None:
     ip = client_ip(handler)
     if login_failures.full(ip):
         handler.send_error(429, "Too many wrong passwords. Try again in a few minutes.")
@@ -171,7 +192,7 @@ def _login(handler: BaseHTTPRequestHandler) -> None:
     _send_json(handler, {"ok": True}, _cookie(session.token, settings.MAX_SECONDS))
 
 
-def _logout(handler: BaseHTTPRequestHandler) -> None:
+def _logout(handler: Handler) -> None:
     sessions.end(_token(handler))
     _send_json(handler, {"ok": True}, _cookie("", 0))
 
@@ -181,7 +202,7 @@ def _logout(handler: BaseHTTPRequestHandler) -> None:
 # ============================================================
 
 
-def client_ip(handler: BaseHTTPRequestHandler) -> str:
+def client_ip(handler: Handler) -> str:
     """The visitor's IP: the proxy's header when one is configured,
     otherwise the connection's own address."""
     if settings.CLIENT_IP_HEADER:
@@ -191,7 +212,7 @@ def client_ip(handler: BaseHTTPRequestHandler) -> str:
     return handler.client_address[0]
 
 
-def _token(handler: BaseHTTPRequestHandler) -> str | None:
+def _token(handler: Handler) -> str | None:
     cookie = SimpleCookie()
     try:
         cookie.load(handler.headers.get("Cookie") or "")
@@ -201,7 +222,7 @@ def _token(handler: BaseHTTPRequestHandler) -> str | None:
     return morsel.value if morsel else None
 
 
-def _content_length(handler: BaseHTTPRequestHandler) -> int | None:
+def _content_length(handler: Handler) -> int | None:
     try:
         length = int(handler.headers.get("Content-Length") or 0)
     except ValueError:
@@ -222,7 +243,7 @@ def _cookie(token: str, max_age: int) -> str:
     return "; ".join(parts)
 
 
-def _send_json(handler: BaseHTTPRequestHandler, payload: dict, cookie: str) -> None:
+def _send_json(handler: Handler, payload: dict, cookie: str) -> None:
     body = json.dumps(payload).encode("utf-8")
     handler.send_response(200)
     handler.send_header("Content-Type", "application/json; charset=utf-8")

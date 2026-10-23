@@ -251,7 +251,7 @@ def move_map_node(latest: dict, step_id: str, direction: str) -> dict:
     path = find_path(steps, step_id)
     if path is None:
         raise ValueError(f"step not found: {step_id}")
-    siblings = path[-2].get("children") if len(path) > 1 else steps
+    siblings = path[-2]["children"] if len(path) > 1 else steps
     i = next(n for n, s in enumerate(siblings) if s is path[-1])
     j = i - 1 if direction == "up" else i + 1
     if not 0 <= j < len(siblings):
@@ -304,7 +304,7 @@ def rename_map_node(latest: dict, step_id: str, label: str) -> dict:
     old = (step.get("label") or "").strip()
     if text == old:
         return latest
-    siblings = path[-2].get("children") if len(path) > 1 else steps
+    siblings = path[-2]["children"] if len(path) > 1 else steps
     clash = sibling_label_clash([s for s in siblings if s is not step], text)
     if clash:
         raise ValueError(clash)

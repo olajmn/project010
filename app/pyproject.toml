@@ -18,5 +18,6 @@ ignore = ["E501"]
 python_version = "3.14"
 ignore_missing_imports = true
 files = ["backend", "server.py"]
-# Parked Time code, nothing in the product uses it (TODO.md 66).
-exclude = ["^backend/foundation/"]
+# The app's own code: not the tests (they pass stand-ins on purpose), and
+# not the parked Time code that nothing in the product uses (TODO.md 66).
+exclude = ["^backend/foundation/", "test_[^/]*\\.py$", "conftest\\.py$"]
