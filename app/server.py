@@ -1,27 +1,32 @@
 """
 HTTP process entry for app/ — starts the server that serves ui/ and
-backend.api routes.
+the API.
 
-What each request does lives in backend/api/ (requests_from_browser.py,
-answers_to_browser.py). This file only starts the server.
+What each request does lives in backend/api/ (app.py for the routes,
+answers_to_browser.py for what they send back). This file only starts
+uvicorn with that app.
 
 Run from app/ (this directory), with app/'s own venv:
     .venv/bin/python -m server
-Then open http://localhost:8000/ in a browser.
+Then open http://localhost:8000/ in a browser; every route is listed at
+http://localhost:8000/docs.
 
 HOST is localhost unless set: only this machine can connect. A host
-running the public demo sets HOST=0.0.0.0 behind its HTTPS proxy
-(docs/demo.md).
+running the public demo sets HOST=0.0.0.0 behind its HTTPS proxy, and
+PORT (docs/demo.md).
 """
 
 import os
-from http.server import ThreadingHTTPServer
 
-from backend.api.requests_from_browser import Handler, PORT
+import uvicorn
+
+from backend.api.app import app
 
 HOST = os.environ.get("HOST", "localhost")
+PORT = int(os.environ.get("PORT", "8000"))
 
 
 if __name__ == "__main__":
     print(f"web prototype - http://{HOST}:{PORT}/")
-    ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
+    # No access log: the terminal is for debug lines, as before.
+    uvicorn.run(app, host=HOST, port=PORT, access_log=False)

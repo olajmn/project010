@@ -1,6 +1,5 @@
-"""Demo mode over HTTP: the same checks as test_demo.py, but through a
-running server, so they hold for whichever server runs the demo
-(conftest.py runs each test against both)."""
+"""Demo mode over HTTP: the checks of test_demo.py through the running
+app (conftest.py), middleware included."""
 
 from backend.api.demo import check
 from backend.project.panes.chat import reply as reply_module

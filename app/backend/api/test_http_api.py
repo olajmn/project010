@@ -2,9 +2,8 @@
 checked by status code and JSON. Storage points at a temporary folder;
 the model is never called (slash commands, or a patched send_chat).
 
-The server comes from conftest.py: each test runs against both the
-standard-library Handler and the FastAPI app, so the tests themselves
-hold for any implementation of the same routes (TODO.md 65).
+The server comes from conftest.py; the tests themselves only speak
+HTTP, so they hold for any implementation of the same routes.
 """
 
 import pytest

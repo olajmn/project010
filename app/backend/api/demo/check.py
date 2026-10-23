@@ -1,9 +1,9 @@
 """
 The demo-mode check in front of every request (docs/demo.md).
-requests_from_browser.Handler calls guard() first; when it
-returns True, the request has been answered here (login, logout, 401,
-403, 413, 429, or a redirect to the login page) and Handler does
-nothing more. When it returns False, storage has been pointed at the
+middleware.py calls guard() first, with a handler-shaped view of the
+request; when it returns True, the request has been answered here
+(login, logout, 401, 403, 413, 429, or a redirect to the login page)
+and the API does nothing more. When it returns False, storage has been pointed at the
 visitor's sandbox (backend/storage/sandboxes.py), or at nothing for a
 request without a session, which never reaches storage.
 """
@@ -76,7 +76,7 @@ if settings.ENABLED:
 # ============================================================
 
 def guard(handler: BaseHTTPRequestHandler, method: str) -> bool:
-    """True when the request was answered here; False lets Handler
+    """True when the request was answered here; False lets the API
     answer it as usual."""
     path = handler.path.split("?", 1)[0]
     # Until a session is found, storage points at no sandbox; this thread

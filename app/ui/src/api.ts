@@ -75,8 +75,7 @@ export async function createProject(
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    // The server puts its plain reason in the status line (send_error).
-    throw new Error(res.statusText || `request failed: ${res.status}`);
+    throw new Error(await httpErrorMessage(res));
   }
   return (await res.json()) as ProjectView;
 }
@@ -336,8 +335,7 @@ export async function sendChatMessage(
     body: JSON.stringify(body),
   });
   if (!res.ok) {
-    // The server puts its plain reason in the status line (send_error).
-    throw new Error(res.statusText || `request failed: ${res.status}`);
+    throw new Error(await httpErrorMessage(res));
   }
   return (await res.json()) as ProjectView;
 }

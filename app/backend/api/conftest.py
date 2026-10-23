@@ -1,7 +1,6 @@
 """Shared fixtures for the HTTP tests under backend/api/: the app's server
-on a free port, with storage in a temporary folder. Every HTTP test runs
-against both servers, the standard-library Handler and the FastAPI app,
-until one of them is gone (TODO.md 65).
+(uvicorn with backend/api/app.py) on a free port, with storage in a
+temporary folder.
 """
 
 import json
@@ -10,13 +9,11 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from contextlib import contextmanager
-from http.server import ThreadingHTTPServer
 
 import pytest
 import uvicorn
 
-from backend.api import demo, requests_from_browser
+from backend.api import demo
 from backend.api.app import app
 from backend.api.demo import check, settings
 from backend.api.demo.limits import RateLimit
@@ -69,20 +66,9 @@ class Api:
         return self.request("POST", path, {} if body is None and raw is None else body, raw)
 
 
-@contextmanager
-def _handler_server():
-    """The standard-library server (requests_from_browser.Handler)."""
-    server = ThreadingHTTPServer(("127.0.0.1", 0), requests_from_browser.Handler)
-    thread = threading.Thread(target=server.serve_forever, args=(0.01,), daemon=True)
-    thread.start()
-    yield server.server_address[1]
-    server.shutdown()
-    server.server_close()
-
-
-@contextmanager
-def _fastapi_server():
-    """The FastAPI app (backend/api/app.py) under uvicorn."""
+@pytest.fixture
+def server():
+    """The port of the app running under uvicorn in a thread."""
     sock = socket.socket()
     sock.bind(("127.0.0.1", 0))
     server = uvicorn.Server(uvicorn.Config(app, log_level="warning"))
@@ -94,13 +80,6 @@ def _fastapi_server():
     server.should_exit = True
     thread.join()
     sock.close()
-
-
-@pytest.fixture(params=[_handler_server, _fastapi_server], ids=["handler", "fastapi"])
-def server(request):
-    """The port of a running server; each test runs once per server."""
-    with request.param() as port:
-        yield port
 
 
 @pytest.fixture

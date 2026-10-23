@@ -11,27 +11,18 @@ next.
 
 ## Active
 
-65. **FastAPI for the API layer** (Step) — replace
-    `BaseHTTPRequestHandler` in `api/requests_from_browser.py` route by
-    route: typed path parameters, JSON in and out, and an API reference
-    generated from the routes (there is no written one today). Project
-    and Storage stay as they are ([[03-architecture]] § 3). The demo
-    checks (`api/demo/`) need a new home (middleware or a dependency).
-    `backend/api/test_http_api.py` checks the routes over HTTP and
-    should pass unchanged except for its `api` fixture
-    ([[05-decisions]] #72).
+70. **Ruff and type checking** (Step) — Ruff would replace
+    pyflakes as linter and add a formatter. Measured 2026-10-23: 61
+    findings with its default rules (style and modernization, no
+    bugs), and `ruff format` would change 39 of 84 files. Do it in one
+    commit: pick the rules, fix or ignore the rest, format
+    once, swap pyflakes out of `tools/project_check.py`. Type checking
+    (Pylance or mypy) fits the same step, since FastAPI leans on types.
 
 ## Queue
 
 ### Backend and code
 
-70. **Ruff and type checking** (Step, after 65) — Ruff would replace
-    pyflakes as linter and add a formatter. Measured 2026-10-23: 61
-    findings with its default rules (style and modernization, no
-    bugs), and `ruff format` would change 39 of 84 files. Do it in one
-    commit after 65: pick the rules, fix or ignore the rest, format
-    once, swap pyflakes out of `tools/project_check.py`. Type checking
-    (Pylance or mypy) fits the same step, since FastAPI leans on types.
 66. **Parked Time code: keep, branch, or remove** (Question) —
     `backend/foundation/` (about 1,800 lines) is used by nothing in the
     product ([[04-current-state]]): `week_windows()` / `day_windows()`

@@ -8,7 +8,7 @@ From `app/`, with its own `.venv/` (`ollama` is only installed there):
 
 | What | Command |
 |---|---|
-| Start the app | `.venv/bin/python -m server` → http://localhost:8000/ |
+| Start the app | `.venv/bin/python -m server` → http://localhost:8000/ (every API route: `/docs`) |
 | Tests | `.venv/bin/python -m pytest` (one file: add its path, e.g. `backend/project/test_timeline.py`) |
 | Build the UI | `cd ui && npm run build` (TypeScript → `ui/dist/`) |
 | Project checks | from the root: `app/.venv/bin/python3 -m tools.project_check` |
@@ -71,7 +71,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Current state panel | `project/status/` | `panes/chat/statusPanel/` |
 | Logs and a project's timeline | `project/timeline.py`, `api/activity_log.py` | `settings/logs/` |
 | Archive (restore / delete) | `panes/create/lifecycle.py`, `storage/accounts_persistence.py` | `settings/archive/` |
-| Every HTTP route | `api/requests_from_browser.py` | `api.ts` |
+| Every HTTP route | `api/app.py` (FastAPI) | `api.ts` |
 | Demo mode: login, sessions, limits | `api/demo/` | `demo/`, `ui/login.html` |
 
 Backend paths are under `app/backend/`, UI paths under `app/ui/src/`.
@@ -119,7 +119,8 @@ Everything lives in `app/data/` as plain JSON:
 - No login outside demo mode; accounts are simulated. The server listens
   on localhost unless `HOST` is set.
 - Add folder opens a macOS dialog on the server's machine.
-- No written API reference (`TODO.md` Queue 65 would generate one).
+- The API reference at `/docs` is generated from the routes: paths and
+  body fields, without prose.
 - `backend/foundation/` (time, math) is not used by anything.
 - A node's `resolved` field is stored but nothing sets it; every node
   shows as open.

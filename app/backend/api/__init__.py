@@ -1,9 +1,9 @@
 """
 The door between the browser and the rest of the backend.
 
-requests_from_browser.py - gets each request from the browser (e.g.
-                           "Send was pressed") and runs the right
-                           function for it
+app.py                   - the FastAPI app: gets each request from the
+                           browser (e.g. "Send was pressed") and runs
+                           the right function for it
 answers_to_browser.py    - shapes the data sent back for the screen:
                            project, map tree, chat
 activity_log.py          - the list of every saved change (Settings → Logs)

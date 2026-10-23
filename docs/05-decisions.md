@@ -864,6 +864,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; the tests are plain functions with `assert`. Dropping pytest means calling them from a script again.
 
+## 73. 2026-10-23 — FastAPI replaces the standard-library HTTP server
+
+**Decision:** The API is a FastAPI app, `backend/api/app.py`, run by uvicorn from `server.py`; `requests_from_browser.py` (`BaseHTTPRequestHandler`) is gone. Each route reads the request into a small Pydantic body model, calls Project or Storage as before, and answers with the same views. Errors stay plain text with the reason as the body; the two UI calls that read the reason from the HTTP status line now read the body (`ui/src/api.ts`), as the rest already did. The demo checks run as middleware (`api/demo/middleware.py`) that hands `guard()` a handler-shaped view of the request, so `check.py` and its tests are unchanged. The generated reference of every route is at `/docs`.
+
+**Date:** 2026-10-23
+
+**Alternatives considered:** keeping `BaseHTTPRequestHandler` with a routing table for GET as well (closes the `if/elif`, but no typed bodies or generated reference); Flask (familiar, but no body models or reference without extensions); rewriting `guard()` for FastAPI (more change in the security code than the adapter, for no difference in behavior).
+
+**Why this choice:** The routes had grown to over 30, with request reading, error answers, and routing written by hand. FastAPI does those parts and documents them, and leaves the layers as they were ([[03-architecture]] § 3). The same HTTP tests passed against both servers before the old one was removed (#72).
+
+**Reversible?** Yes, from git: the old handler and the new app answered the same tests. The UI change works with either server.
+
 ## See also
 
 - [[03-architecture]]

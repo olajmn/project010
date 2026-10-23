@@ -18,7 +18,7 @@ starting from scratch.
 visitor gets their own copy of two example projects. How the demo works:
 `docs/demo.md`.
 
-**Built with:** Python (standard-library HTTP server, no framework),
+**Built with:** Python (FastAPI, tests with pytest),
 TypeScript (no framework, no bundler), plain JSON files for storage, and
 a language model through Ollama locally or OpenRouter in the demo.
 

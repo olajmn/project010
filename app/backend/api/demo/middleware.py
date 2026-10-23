@@ -1,8 +1,9 @@
 """
 Demo mode in front of the FastAPI app: runs check.guard() on every
-request, the way requests_from_browser.Handler did. guard() reads and
-answers a handler-shaped object, so _GuardRequest gives it one built
-from the request and turns what it answered into a response.
+request. guard() reads and answers a handler-shaped object (the shape
+of the standard library's BaseHTTPRequestHandler), so _GuardRequest
+gives it one built from the request and turns what it answered into a
+response.
 """
 
 import io

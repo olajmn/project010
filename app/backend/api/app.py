@@ -53,7 +53,7 @@ from backend.api.answers_to_browser import (
     saved_tree_view,
 )
 from backend.api.demo.middleware import demo_guard
-from backend.api.files_to_browser import CONTENT_TYPES, _find_file
+from backend.api.files_to_browser import CONTENT_TYPES, find_file
 from backend.model.client import MODEL_IN_USE, PROVIDER, TEMPERATURE
 from backend.project.panes.canvas.add_folder import choose_folder
 from backend.project.panes.canvas.edit_map import (
@@ -473,7 +473,7 @@ def post_delete_account(account_id: int) -> dict:
 def get_page_file(path: str) -> FileResponse:
     """The UI's own files from app/ui/; "/" opens index.html. Fetched
     again every time, so a rebuilt ui/dist/ module is never stale."""
-    file_path = _find_file(path or "index.html")
+    file_path = find_file(path or "index.html")
     if file_path is None:
         raise fail(404, "Not Found")
     return FileResponse(
