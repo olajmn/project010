@@ -25,7 +25,7 @@ def _project(project_id: int, account: int | None, steps: list) -> dict:
     }
 
 
-def main() -> None:
+def test_saved_trees() -> None:
     real_file, real_save = store.SAVED_TREES_FILE, edit_map.save_plan
     with tempfile.TemporaryDirectory() as tmp:
         store.SAVED_TREES_FILE = Path(tmp) / "saved_trees.json"
@@ -94,4 +94,4 @@ def _check() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    test_saved_trees()

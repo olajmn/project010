@@ -8,7 +8,7 @@ import backend.project.timeline as timeline
 from backend.project.timeline import event_name, to_event
 
 
-def main() -> None:
+def test_timeline() -> None:
     # New lines carry `event`; it wins over the feedback text.
     assert event_name({"event": "renamed", "feedback": "Renamed: a → b"}) == "renamed"
 
@@ -52,4 +52,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    test_timeline()

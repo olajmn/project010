@@ -7,7 +7,7 @@ move_map_node() and rename_map_node() - no files, no model. Run from app/:
 import backend.project.panes.canvas.edit_map as edit_map
 
 
-def main() -> None:
+def test_edit_map() -> None:
     saved: dict = {}
     # Capture what would be saved instead of writing data/.
     edit_map.save_plan = lambda name, plan, **kw: saved.update(kw, plan=plan) or kw
@@ -94,4 +94,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    test_edit_map()

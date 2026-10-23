@@ -10,7 +10,7 @@ from backend.model.brief.conversation import (
 )
 
 
-def main() -> None:
+def test_conversation() -> None:
     latest = {
         "name": "Garden",
         "plan": {"progression": {"steps": [
@@ -94,4 +94,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    test_conversation()

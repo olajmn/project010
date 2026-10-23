@@ -34,7 +34,7 @@ def line(feedback, at, event=None, focus=None, steps=None, name="House", **extra
     return record
 
 
-def main() -> None:
+def test_status() -> None:
     tree = [{"label": "Rooms", "children": [{"label": "Kitchen"}, {"label": "Bath"}]}]
     history = [
         line(None, "2026-09-24T09:00:00.000+00:00", "created"),
@@ -131,4 +131,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    test_status()

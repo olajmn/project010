@@ -7,7 +7,7 @@ from backend.project.panes.chat.commands import try_command
 from backend.project.panes.chat.commands import add as add_mod
 
 
-def main() -> None:
+def test_commands() -> None:
     empty = {
         "name": "Empty",
         "project_id": 1,
@@ -104,4 +104,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    test_commands()

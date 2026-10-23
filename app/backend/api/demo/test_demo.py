@@ -271,7 +271,7 @@ def check_sandboxes() -> None:
     assert paths.data_dir() == paths.DATA_DIR
 
 
-def main() -> None:
+def test_demo() -> None:
     check_sessions_and_limits()
     with tempfile.TemporaryDirectory() as tmp:
         seed = Path(tmp) / "seed"
@@ -286,4 +286,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    test_demo()

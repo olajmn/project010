@@ -9,7 +9,7 @@ from pathlib import Path
 from backend.project.panes.canvas.add_folder.walk import folder_tree
 
 
-def main() -> None:
+def test_walk() -> None:
     with tempfile.TemporaryDirectory() as raw:
         root = Path(raw) / "Sample"
         nested = root / "src"
@@ -41,4 +41,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    test_walk()

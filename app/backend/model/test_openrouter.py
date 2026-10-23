@@ -105,11 +105,11 @@ def check_provider_switch() -> None:
         importlib.reload(client)
 
 
-def main() -> None:
+def test_openrouter() -> None:
     check_openrouter()
     check_provider_switch()
     print("OK - openrouter.chat / TALK_PROVIDER switch")
 
 
 if __name__ == "__main__":
-    main()
+    test_openrouter()

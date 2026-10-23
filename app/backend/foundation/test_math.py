@@ -1,6 +1,5 @@
 """
-Small, direct checks for math.py's four operations - not a test
-framework, just asserts run top to bottom. Covers positive/negative/
+Small, direct checks for math.py's four operations. Covers positive/negative/
 decimal/zero operands and division by zero, not exhaustive coverage.
 
 Run from the project root:
@@ -56,32 +55,38 @@ DIVIDE_CASES = (
     (0, 5, 0),
 )
 
-for a, b, expected in ADD_CASES:
-    result = add(a, b)
-    assert result == expected, f"add({a}, {b}) = {result}, expected {expected}"
 
-for a, b, expected in SUBTRACT_CASES:
-    result = subtract(a, b)
-    assert result == expected, f"subtract({a}, {b}) = {result}, expected {expected}"
+def test_math() -> None:
+    for a, b, expected in ADD_CASES:
+        result = add(a, b)
+        assert result == expected, f"add({a}, {b}) = {result}, expected {expected}"
 
-for a, b, expected in MULTIPLY_CASES:
-    result = multiply(a, b)
-    assert result == expected, f"multiply({a}, {b}) = {result}, expected {expected}"
+    for a, b, expected in SUBTRACT_CASES:
+        result = subtract(a, b)
+        assert result == expected, f"subtract({a}, {b}) = {result}, expected {expected}"
 
-for a, b, expected in DIVIDE_CASES:
-    result = divide(a, b)
-    assert result == expected, f"divide({a}, {b}) = {result}, expected {expected}"
+    for a, b, expected in MULTIPLY_CASES:
+        result = multiply(a, b)
+        assert result == expected, f"multiply({a}, {b}) = {result}, expected {expected}"
 
-# 2. Division by zero
+    for a, b, expected in DIVIDE_CASES:
+        result = divide(a, b)
+        assert result == expected, f"divide({a}, {b}) = {result}, expected {expected}"
 
-# Positive, negative, and zero dividend - must always raise, never
-# return 0/None/infinity.
-for a in (5, -5, 0):
-    try:
-        divide(a, 0)
-        raise AssertionError(f"divide({a}, 0) did not raise ZeroDivisionError")
-    except ZeroDivisionError:
-        pass
+    # 2. Division by zero
 
-total_cases = len(ADD_CASES) + len(SUBTRACT_CASES) + len(MULTIPLY_CASES) + len(DIVIDE_CASES) + 3
-print(f"OK - {total_cases} case(s) passed (including 3 division-by-zero case(s))")
+    # Positive, negative, and zero dividend - must always raise, never
+    # return 0/None/infinity.
+    for a in (5, -5, 0):
+        try:
+            divide(a, 0)
+            raise AssertionError(f"divide({a}, 0) did not raise ZeroDivisionError")
+        except ZeroDivisionError:
+            pass
+
+    total_cases = len(ADD_CASES) + len(SUBTRACT_CASES) + len(MULTIPLY_CASES) + len(DIVIDE_CASES) + 3
+    print(f"OK - {total_cases} case(s) passed (including 3 division-by-zero case(s))")
+
+
+if __name__ == "__main__":
+    test_math()
