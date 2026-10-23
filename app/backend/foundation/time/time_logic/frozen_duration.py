@@ -26,7 +26,10 @@ describe_duration() - nothing here re-implements phrase matching.
 from datetime import datetime, timedelta
 
 from backend.foundation.time.time_logic import now as _now
-from backend.foundation.time.time_logic.duration_resolution import describe_duration, resolve_span
+from backend.foundation.time.time_logic.duration_resolution import (
+    describe_duration,
+    resolve_span,
+)
 
 # 1. Duration freezing
 
@@ -303,7 +306,7 @@ def step_plan(frozen: dict | None, steps: list[str] | None) -> list[dict] | None
     if dated and all(d is not None for d in dated):
         return [
             {"text": text, "start_label": d[0], "end_label": d[1]}
-            for text, d in zip(texts, dated)
+            for text, d in zip(texts, dated, strict=False)
         ]
 
     span = _span_from_frozen(frozen)
@@ -314,7 +317,7 @@ def step_plan(frozen: dict | None, steps: list[str] | None) -> list[dict] | None
     chunk = (end - start) / count
     spans = [(start + chunk * i, start + chunk * (i + 1)) for i in range(count)]
     result = []
-    for (s, e), text in zip(spans, texts):
+    for (s, e), text in zip(spans, texts, strict=False):
         start_label, end_label = _window_labels(s, e)
         result.append({
             "text": text,

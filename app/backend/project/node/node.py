@@ -25,7 +25,7 @@ class Step:
     # not stored here.
     id: str
     label: str
-    children: list["Step"] = field(default_factory=list)
+    children: list[Step] = field(default_factory=list)
 
     # Absolute path when this node was minted from a file or folder.
     # Absent on nodes the user typed or pasted.
@@ -37,17 +37,17 @@ class Step:
     # Whether this step's claim is realized.
     resolved: bool = False
 
-    def add_child(self, step: "Step") -> None:
+    def add_child(self, step: Step) -> None:
         step.label = unique_sibling_label(self.children, step.label)
         self.children.append(step)
 
-    def walk(self) -> Iterator["Step"]:
+    def walk(self) -> Iterator[Step]:
         """Every step in this subtree, depth-first, self first."""
         yield self
         for child in self.children:
             yield from child.walk()
 
-    def find(self, step_id: str) -> "Step | None":
+    def find(self, step_id: str) -> Step | None:
         return next((step for step in self.walk() if step.id == step_id), None)
 
     def to_dict(self) -> dict:
@@ -63,7 +63,7 @@ class Step:
         return data
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Step":
+    def from_dict(cls, data: dict) -> Step:
         """A missing `ordered`/`resolved`/`children` reads as its
         default rather than requiring a migration."""
         return cls(

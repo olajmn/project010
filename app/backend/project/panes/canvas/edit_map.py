@@ -19,13 +19,16 @@ Does not touch the Steps-page scratch tree.
 import copy
 import re
 
-from backend.storage.project_persistence import save_plan
-from backend.project.panes.canvas.add_folder import folder_tree
 from backend.project.node import (
-    Step, find_path, from_nested_labels, sibling_label_clash,
+    Step,
+    find_path,
+    from_nested_labels,
+    sibling_label_clash,
     unique_sibling_label,
 )
+from backend.project.panes.canvas.add_folder import folder_tree
 from backend.project.panes.canvas.text_to_tree import parse_outline
+from backend.storage.project_persistence import save_plan
 
 _ID_NUM = re.compile(r"^p(\d+)$")
 

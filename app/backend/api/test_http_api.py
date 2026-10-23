@@ -101,6 +101,12 @@ def test_bad_json_body(api) -> None:
     assert api.post("/api/projects", raw=b"{not json") == (400, "invalid JSON")
 
 
+def test_missing_body_counts_as_empty(api) -> None:
+    status, view = api.post("/api/projects", raw=b"")
+    assert status == 200 and view["name"] == "New project 1"
+    assert api.post("/api/accounts", raw=b"") == (400, "empty text")
+
+
 def test_archive_restore_delete_project(api, project) -> None:
     pid = project["project_id"]
     status, view = api.post(f"/api/projects/{pid}/cancel")

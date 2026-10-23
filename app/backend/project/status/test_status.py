@@ -2,7 +2,7 @@
 model.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from backend.project.status.build_status import (
     build_status,
@@ -12,11 +12,12 @@ from backend.project.status.build_status import (
     status_text,
 )
 
+
 def _local_day(at: str) -> str:
     return datetime.fromisoformat(at).astimezone().date().isoformat()
 
 
-NOW = datetime(2026, 9, 25, 20, 0, tzinfo=timezone.utc).astimezone()
+NOW = datetime(2026, 9, 25, 20, 0, tzinfo=UTC).astimezone()
 
 
 def line(feedback, at, event=None, focus=None, steps=None, name="House", **extra):

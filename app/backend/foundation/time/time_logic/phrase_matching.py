@@ -50,7 +50,6 @@ import calendar
 import re
 from datetime import date, datetime, timedelta
 
-from backend.foundation.time.time_logic import now as _now
 from backend.foundation.time.time_data.time_segments import (
     CLOCK_12H_RE,
     CLOCK_24H_RE,
@@ -76,6 +75,7 @@ from backend.foundation.time.time_data.time_units import (
     YEARS_PER_DECADE,
     YEARS_PER_MILLENNIUM,
 )
+from backend.foundation.time.time_logic import now as _now
 
 # Which table a NAMED_FRACTION_RE match's unit word belongs to - the
 # single place that dispatch is decided, so _matched_named_fraction()

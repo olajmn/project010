@@ -10,9 +10,9 @@ data/: the `data_dir` fixture points the path constants there.
 
 import pytest
 
+from backend.storage import accounts_persistence as ap
 from backend.storage import paths as storage_paths
 from backend.storage import project_persistence as pp
-from backend.storage import accounts_persistence as ap
 
 
 @pytest.fixture(autouse=True)

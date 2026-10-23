@@ -42,7 +42,7 @@ def _load() -> dict:
     if not path.exists():
         return {"id_hi": 0, "trees": []}
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
     except json.JSONDecodeError as e:
         raise RuntimeError(

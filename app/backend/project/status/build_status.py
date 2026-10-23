@@ -27,7 +27,6 @@ from datetime import date, datetime, timedelta
 from backend.project.node import steps_of
 from backend.project.timeline import to_event
 
-
 # ============================================================
 # 1. Settings
 # ============================================================

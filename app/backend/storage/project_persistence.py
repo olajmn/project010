@@ -53,7 +53,7 @@ def _read_jsonl(path: Path) -> list[dict]:
     """Every non-blank line as one JSON object, oldest first."""
     records: list[dict] = []
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             for line_no, line in enumerate(f, start=1):
                 text = line.strip()
                 if not text:
@@ -122,7 +122,7 @@ def _write_json(path: Path, data: dict) -> None:
 
 
 def _read_json(path: Path) -> dict:
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
     if not isinstance(data, dict):
         raise RuntimeError(f"{path} is not a JSON object.")

@@ -1,0 +1,22 @@
+# Settings for the development tools that read app/: pytest, Ruff, and
+# mypy (docs/05-decisions.md #72, #74). Not packaging metadata.
+
+[tool.pytest.ini_options]
+testpaths = ["backend"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+# Errors, unused code, import order, modern syntax, common pitfalls.
+select = ["E", "F", "I", "UP", "B"]
+# The formatter wraps code; long strings and comments stay unbroken.
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.14"
+ignore_missing_imports = true
+files = ["backend", "server.py"]
+# Parked Time code, nothing in the product uses it (TODO.md 66).
+exclude = ["^backend/foundation/"]

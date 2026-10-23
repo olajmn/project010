@@ -19,17 +19,16 @@ those lines back as events; it writes nothing. Used by Settings → Logs
 #      - all_events()
 #      - to_event()
 
-from backend.storage.project_persistence import (
-    load_current,
-    load_history,
-    record_project_id,
-)
 from backend.project.panes.create.resolver import (
     created_at_key,
     get_history_for_project,
     get_latest_for_all_projects,
 )
-
+from backend.storage.project_persistence import (
+    load_current,
+    load_history,
+    record_project_id,
+)
 
 # ============================================================
 # 1. What happened

@@ -9,8 +9,8 @@ every session that ends, whichever way.
 import secrets
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 
 @dataclass

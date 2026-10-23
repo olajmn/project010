@@ -18,7 +18,6 @@ that's a separate, unbuilt question.
 
 from backend.foundation.time.time_logic.duration_resolution import resolve_span
 
-
 # 1. Relative length comparison
 
 # Fixed, hardcoded ratio thresholds - not read from anywhere, not

@@ -38,7 +38,11 @@ itself matched against typed text.
 
 import re
 
-from backend.foundation.time.time_data.time_units import HOURS_PER_DAY, MINUTES_PER_HOUR, SECONDS_PER_MINUTE
+from backend.foundation.time.time_data.time_units import (
+    HOURS_PER_DAY,
+    MINUTES_PER_HOUR,
+    SECONDS_PER_MINUTE,
+)
 
 # 1. Calendar names
 

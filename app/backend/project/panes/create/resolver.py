@@ -26,7 +26,6 @@ from backend.storage.project_persistence import (
     load_project_history,
 )
 
-
 # Timestamp handling
 
 

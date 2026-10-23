@@ -13,8 +13,6 @@ reload.
 
 from backend.model.brief.conversation import build_messages
 from backend.model.client import send_chat
-from backend.storage.paths import now_utc
-from backend.storage.project_persistence import save_plan
 from backend.project.panes.chat.commands import try_command
 from backend.project.panes.create.resolver import get_history_for_project
 from backend.project.status.build_status import (
@@ -22,6 +20,8 @@ from backend.project.status.build_status import (
     recent_changes_text,
     status_text,
 )
+from backend.storage.paths import now_utc
+from backend.storage.project_persistence import save_plan
 
 
 def reply(

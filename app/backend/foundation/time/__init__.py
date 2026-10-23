@@ -52,6 +52,11 @@ Not used by the app today (TODO.md Queue 66).
 """
 
 from backend.foundation.time.time_logic import now
+from backend.foundation.time.time_logic.duration_resolution import (
+    describe_duration,
+    resolve_duration,
+    resolve_span,
+)
 from backend.foundation.time.time_logic.frozen_duration import (
     broadest_relevant_horizon,
     day_windows,
@@ -62,7 +67,6 @@ from backend.foundation.time.time_logic.frozen_duration import (
 )
 from backend.foundation.time.time_logic.phrase_matching import extract_duration_phrase
 from backend.foundation.time.time_logic.relative_time import relative_length
-from backend.foundation.time.time_logic.duration_resolution import describe_duration, resolve_duration, resolve_span
 
 __all__ = [
     "broadest_relevant_horizon",

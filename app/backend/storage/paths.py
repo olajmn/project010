@@ -8,7 +8,7 @@ stub operator id live here so neither module needs the other for them
 per-account `account_n` high-water mark).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from backend.storage import sandboxes
@@ -37,4 +37,4 @@ def now_utc() -> str:
     ("2026-09-25T18:27:51.305+00:00"), so it means the same moment on any
     machine. Records saved before 2026-09-25 hold local time without an
     offset; resolver.created_at_key() reads both."""
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+    return datetime.now(UTC).isoformat(timespec="milliseconds")

@@ -1,8 +1,8 @@
 """Checks for slash-command dispatch — no model call."""
 
 import backend.project.panes.canvas.edit_map as edit_map
-from backend.project.panes.chat.commands import try_command
 from backend.project.panes.chat.commands import add as add_mod
+from backend.project.panes.chat.commands import try_command
 
 EMPTY = {
     "name": "Empty",

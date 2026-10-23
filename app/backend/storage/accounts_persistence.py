@@ -57,7 +57,7 @@ def _load_all_accounts() -> list[dict]:
     if not path.exists():
         return []
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             accounts = json.load(f)
     except json.JSONDecodeError as e:
         raise RuntimeError(

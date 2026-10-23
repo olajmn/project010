@@ -13,7 +13,6 @@ and CSS from app/ui/. app.py sends them as they are — no data, no model.
 
 from pathlib import Path
 
-
 # ============================================================
 # 1. Settings
 # ============================================================

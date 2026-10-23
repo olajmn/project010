@@ -36,8 +36,9 @@ it as-is. The interactive reference of every route is at /docs.
 #      - _load_project(), _map_change(), _clean(), _day()
 
 from datetime import date
+from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
@@ -72,7 +73,10 @@ from backend.project.panes.create.lifecycle import (
     delete_project,
     restore_project,
 )
-from backend.project.panes.create.project_account import archive_account, set_project_user
+from backend.project.panes.create.project_account import (
+    archive_account,
+    set_project_user,
+)
 from backend.project.panes.create.rename import rename_project
 from backend.project.panes.create.resolver import get_latest_for_project
 from backend.project.saved_trees import (
@@ -89,7 +93,6 @@ from backend.storage.accounts_persistence import (
     restore_account,
     save_account,
 )
-
 
 # ============================================================
 # 1. App and errors
@@ -259,14 +262,14 @@ def get_saved_trees(project_id: int) -> list:
 # ============================================================
 
 @app.post("/api/projects")
-def post_create_project(body: CreateProject = CreateProject()) -> dict:
+def post_create_project(body: Annotated[CreateProject, Body(default_factory=CreateProject)]) -> dict:
     # Empty text is allowed: create_project() picks `New project N`.
     account_id = str(body.account_id) if body.account_id is not None else ""
     return project_view(create_project((body.text or "").strip(), account_id))
 
 
 @app.post("/api/projects/{project_id}/name")
-def post_rename_project(project_id: int, body: TextBody = TextBody()) -> dict:
+def post_rename_project(project_id: int, body: Annotated[TextBody, Body(default_factory=TextBody)]) -> dict:
     record = rename_project(project_id, _text(body))
     if record is None:
         raise fail(404, "no such project")
@@ -297,7 +300,7 @@ def post_delete_project(project_id: int) -> dict:
 
 
 @app.post("/api/projects/{project_id}/user")
-def post_project_owner(project_id: int, body: ProjectOwner = ProjectOwner()) -> dict:
+def post_project_owner(project_id: int, body: Annotated[ProjectOwner, Body(default_factory=ProjectOwner)]) -> dict:
     record = set_project_user(project_id, body.account_id)
     if record is None:
         raise fail(404, "no such project or user")
@@ -310,7 +313,7 @@ def post_project_owner(project_id: int, body: ProjectOwner = ProjectOwner()) -> 
 # No model call in any of these.
 
 @app.post("/api/projects/{project_id}/map")
-def post_add_node(project_id: int, body: AddNode = AddNode()) -> dict:
+def post_add_node(project_id: int, body: Annotated[AddNode, Body(default_factory=AddNode)]) -> dict:
     """One node the user named."""
     latest = _load_project(project_id)
     return _map_change(lambda: add_map_node(
@@ -319,7 +322,7 @@ def post_add_node(project_id: int, body: AddNode = AddNode()) -> dict:
 
 
 @app.post("/api/projects/{project_id}/map/import")
-def post_import_outline(project_id: int, body: ImportOutline = ImportOutline()) -> dict:
+def post_import_outline(project_id: int, body: Annotated[ImportOutline, Body(default_factory=ImportOutline)]) -> dict:
     latest = _load_project(project_id)
     return _map_change(lambda: import_map_outline(
         latest,
@@ -331,7 +334,7 @@ def post_import_outline(project_id: int, body: ImportOutline = ImportOutline()) 
 
 
 @app.post("/api/projects/{project_id}/map/folder")
-def post_add_folder(project_id: int, body: AddFolder = AddFolder()) -> dict:
+def post_add_folder(project_id: int, body: Annotated[AddFolder, Body(default_factory=AddFolder)]) -> dict:
     """One folder on this computer becomes nodes."""
     latest = _load_project(project_id)
     return _map_change(lambda: import_map_folder(
@@ -340,7 +343,7 @@ def post_add_folder(project_id: int, body: AddFolder = AddFolder()) -> dict:
 
 
 @app.post("/api/projects/{project_id}/map/insert-tree")
-def post_insert_tree(project_id: int, body: InsertTree = InsertTree()) -> dict:
+def post_insert_tree(project_id: int, body: Annotated[InsertTree, Body(default_factory=InsertTree)]) -> dict:
     """A saved tree becomes new nodes (fresh ids)."""
     latest = _load_project(project_id)
     return _map_change(lambda: insert_saved_tree(
@@ -364,7 +367,7 @@ def post_move_node(project_id: int, node_id: str, direction: str) -> dict:
 
 
 @app.post("/api/projects/{project_id}/map/{node_id}/rename")
-def post_rename_node(project_id: int, node_id: str, body: TextBody = TextBody()) -> dict:
+def post_rename_node(project_id: int, node_id: str, body: Annotated[TextBody, Body(default_factory=TextBody)]) -> dict:
     """A new label for one node; its id stays."""
     text = _text(body)
     latest = _load_project(project_id)
@@ -372,7 +375,7 @@ def post_rename_node(project_id: int, node_id: str, body: TextBody = TextBody())
 
 
 @app.post("/api/parse-outline-preview")
-def post_outline_preview(body: OutlinePreview = OutlinePreview()) -> dict:
+def post_outline_preview(body: Annotated[OutlinePreview, Body(default_factory=OutlinePreview)]) -> dict:
     """The pasted text read both ways (title line dropped / kept). Nothing
     is saved; no project needed."""
     text = body.text or ""
@@ -385,7 +388,7 @@ def post_choose_folder() -> dict:
     try:
         return {"path": choose_folder()}
     except ValueError as e:
-        raise fail(422, str(e))
+        raise fail(422, str(e)) from e
 
 
 # ============================================================
@@ -399,7 +402,7 @@ def post_save_tree(project_id: int, node_id: str) -> dict:
     try:
         return saved_tree_view(save_tree_from_node(latest, node_id))
     except ValueError as e:
-        raise fail(422, str(e))
+        raise fail(422, str(e)) from e
 
 
 @app.post("/api/saved-trees/{tree_id}/delete")
@@ -407,7 +410,7 @@ def post_delete_saved_tree(tree_id: str) -> dict:
     try:
         return saved_tree_view(remove_saved_tree(tree_id))
     except ValueError as e:
-        raise fail(404, str(e))
+        raise fail(404, str(e)) from e
 
 
 # ============================================================
@@ -415,7 +418,7 @@ def post_delete_saved_tree(tree_id: str) -> dict:
 # ============================================================
 
 @app.post("/api/projects/{project_id}/chat")
-def post_chat(project_id: int, body: ChatMessage = ChatMessage()) -> dict:
+def post_chat(project_id: int, body: Annotated[ChatMessage, Body(default_factory=ChatMessage)]) -> dict:
     note = (body.text or "").strip()
     if not note:
         raise fail(400, "empty text")
@@ -433,7 +436,7 @@ def post_chat(project_id: int, body: ChatMessage = ChatMessage()) -> dict:
         # a fixed message, the terminal gets the real error.
         print(f"(debug: {e})")
         # ollama raises the builtin ConnectionError when nothing listens.
-        raise fail(503, _MODEL_UNREACHABLE if isinstance(e, ConnectionError) else _MODEL_FAILED)
+        raise fail(503, _MODEL_UNREACHABLE if isinstance(e, ConnectionError) else _MODEL_FAILED) from e
     return project_view(
         result["record"],
         select=result.get("select"),
@@ -446,12 +449,12 @@ def post_chat(project_id: int, body: ChatMessage = ChatMessage()) -> dict:
 # ============================================================
 
 @app.post("/api/accounts")
-def post_create_account(body: TextBody = TextBody()) -> dict:
+def post_create_account(body: Annotated[TextBody, Body(default_factory=TextBody)]) -> dict:
     return account_view(save_account(_text(body)))
 
 
 @app.post("/api/accounts/{account_id}/rename")
-def post_rename_account(account_id: int, body: RenameAccount = RenameAccount()) -> dict:
+def post_rename_account(account_id: int, body: Annotated[RenameAccount, Body(default_factory=RenameAccount)]) -> dict:
     if body.text is None:
         raise fail(400, "missing text")
     return _account_or_404(rename_account(account_id, body.text))
@@ -515,7 +518,7 @@ def _map_change(change) -> dict:
     try:
         return project_view(change())
     except ValueError as e:
-        raise fail(422, str(e))
+        raise fail(422, str(e)) from e
 
 
 def _account_or_404(account: dict | None) -> dict:

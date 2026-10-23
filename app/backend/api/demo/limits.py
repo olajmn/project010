@@ -7,7 +7,7 @@ key for a whole-demo cap). A restart clears them.
 import threading
 import time
 from collections import deque
-from typing import Callable
+from collections.abc import Callable
 
 
 class RateLimit:

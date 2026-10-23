@@ -46,7 +46,10 @@ def test_all_events_pages_newest_first(monkeypatch) -> None:
     monkeypatch.setattr(
         timeline, "get_latest_for_all_projects", lambda: [{"project_id": 1, "name": "P"}],
     )
-    texts = lambda events: [e["text"] for e in events]
+
+    def texts(events):
+        return [e["text"] for e in events]
+
     assert texts(timeline.all_events(limit=2)) == ["Added step: 5", "Added step: 4"]
     assert texts(timeline.all_events(limit=2, offset=2)) == ["Added step: 3", "Added step: 2"]
     assert texts(timeline.all_events(limit=2, offset=4)) == ["Added step: 1"]

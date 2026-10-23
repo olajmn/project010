@@ -14,16 +14,15 @@ no product rules.
 #  2. Map tree
 #      - map_tree()
 
-from backend.storage.project_persistence import record_project_id
 from backend.project.node import steps_of
-from backend.project.status.build_status import build_status
 from backend.project.panes.chat.screen.chat_thread import thread_for
 from backend.project.panes.create.resolver import (
     created_at_key,
     get_history_for_project,
     get_latest_for_all_projects,
 )
-
+from backend.project.status.build_status import build_status
+from backend.storage.project_persistence import record_project_id
 
 # ============================================================
 # 1. Project, project list, user

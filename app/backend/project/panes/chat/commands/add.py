@@ -7,8 +7,8 @@ No model. Uses edit_map.add_map_node. Parse:
 - `/add A / B / Child` → walk A → B, add Child under B
 """
 
-from backend.project.panes.canvas.edit_map import add_map_node
 from backend.project.node import find_step, steps_of
+from backend.project.panes.canvas.edit_map import add_map_node
 from backend.project.panes.chat.commands.node_path import (
     args_after_command,
     id_at_path,
