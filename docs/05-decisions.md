@@ -852,6 +852,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; remove the menu item and the route. Saved renames stay ordinary log lines.
 
+## 72. 2026-10-23 — pytest runs the tests; the HTTP API is tested over HTTP
+
+**Decision:** pytest is the test runner (`app/pytest.ini`; `python -m pytest` from `app/`). Each test file holds small `test_*` functions; setup and restore use fixtures, `tmp_path`, and `monkeypatch` instead of hand-written `try/finally`. The HTTP API is tested by `backend/api/test_http_api.py`, which starts the real server on a free port and checks status codes and JSON; only its `api` fixture knows how the server is built.
+
+**Date:** 2026-10-23
+
+**Alternatives considered:** keeping one runnable script per test file (no shared runner, no per-test results, and patches that were never restored leaked between tests once they shared a process); `unittest` (standard library, but more ceremony for the same checks); testing the handler's methods directly (tied to `BaseHTTPRequestHandler`, so a new API layer would need new tests).
+
+**Why this choice:** The first framework added to the project: a development tool, with no change to what the app does or how it runs. The HTTP tests describe the routes as the browser uses them, so the same tests can check a replacement of the API layer (`TODO.md` 65).
+
+**Reversible?** Yes; the tests are plain functions with `assert`. Dropping pytest means calling them from a script again.
+
 ## See also
 
 - [[03-architecture]]

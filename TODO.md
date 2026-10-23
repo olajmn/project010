@@ -11,18 +11,15 @@ next.
 
 ## Active
 
-64. **pytest as the test runner** (Step) — the tests run under pytest
-    (`python -m pytest` from `app/`), but each file is still one large
-    `test_<name>()`, so the first failing assert hides the rest. Left:
-    split them into smaller tests, then fill the gaps: no tests for
-    `requests_from_browser.py`, and `edit_map.py` is covered only for
-    the saved text of remove, import, move, and rename.
-65. **FastAPI for the API layer** (Step, after 64) — replace
+65. **FastAPI for the API layer** (Step) — replace
     `BaseHTTPRequestHandler` in `api/requests_from_browser.py` route by
     route: typed path parameters, JSON in and out, and an API reference
     generated from the routes (there is no written one today). Project
     and Storage stay as they are ([[03-architecture]] § 3). The demo
     checks (`api/demo/`) need a new home (middleware or a dependency).
+    `backend/api/test_http_api.py` checks the routes over HTTP and
+    should pass unchanged except for its `api` fixture
+    ([[05-decisions]] #72).
 
 ## Queue
 
