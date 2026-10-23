@@ -48,7 +48,7 @@ needs to know its internal shape - `from backend.foundation.time import
 resolve_duration` works regardless of which time_logic/time_data/ file actually
 defines it.
 
-Not used by the app today (TODO.md Queue 21).
+Not used by the app today (TODO.md Queue 66).
 """
 
 from backend.foundation.time.time_logic import now

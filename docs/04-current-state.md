@@ -119,7 +119,7 @@ Everything lives in `app/data/` as plain JSON:
 - No login outside demo mode; accounts are simulated. The server listens
   on localhost unless `HOST` is set.
 - Add folder opens a macOS dialog on the server's machine.
-- No written API reference (`TODO.md` Queue 30).
+- No written API reference (`TODO.md` Queue 65 would generate one).
 - `backend/foundation/` (time, math) is not used by anything.
 - A node's `resolved` field is stored but nothing sets it; every node
   shows as open.
