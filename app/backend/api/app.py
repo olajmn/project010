@@ -1,8 +1,8 @@
 """
 The HTTP API as a FastAPI app: which address runs what, and the JSON
-that goes in and out. Each route only reads the request, calls Project
-or Storage, and answers with answers_to_browser.py's views
-(docs/03-architecture.md § 3).
+that goes in and out. Each route only reads the request (its body shape
+from request_bodies.py), calls Project or Storage, and answers with
+answers_to_browser.py's views (docs/03-architecture.md § 3).
 
 Errors are plain text with the reason as the body, because the UI shows
 it as-is. The interactive reference of every route is at /docs.
@@ -12,28 +12,25 @@ it as-is. The interactive reference of every route is at /docs.
 #  1. App and errors
 #      - app, fail(), handlers for HTTPException / validation errors
 #
-#  2. Request bodies
-#      - TextBody, CreateProject, ProjectOwner, AddNode, ImportOutline,
-#        AddFolder, OutlinePreview, InsertTree, ChatMessage, RenameAccount
-#
-#  3. Reading
+#  2. Reading
 #      - projects, archived, accounts, session, model, log, timeline,
 #        saved trees
 #
-#  4. Projects
+#  3. Projects
 #
-#  5. Map
+#  4. Map
 #
-#  6. Saved trees
+#  5. Saved trees
 #
-#  7. Chat
+#  6. Chat
 #
-#  8. Accounts
+#  7. Accounts
 #
-#  9. Page files (last: catches every other GET)
+#  8. Page files (last: catches every other GET)
 #
-# 10. Helpers
-#      - _load_project(), _map_change(), _clean(), _day()
+#  9. Helpers
+#      - _text(), _load_project(), _map_change(), _account_or_404(),
+#        _clean(), _day()
 
 from datetime import date
 from typing import Annotated
@@ -41,7 +38,6 @@ from typing import Annotated
 from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, PlainTextResponse
-from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from backend.api import demo
@@ -55,6 +51,18 @@ from backend.api.answers_to_browser import (
 )
 from backend.api.demo.middleware import demo_guard
 from backend.api.files_to_browser import CONTENT_TYPES, find_file
+from backend.api.request_bodies import (
+    AddFolder,
+    AddNode,
+    ChatMessage,
+    CreateProject,
+    ImportOutline,
+    InsertTree,
+    OutlinePreview,
+    ProjectOwner,
+    RenameAccount,
+    TextBody,
+)
 from backend.model.client import MODEL_IN_USE, PROVIDER, TEMPERATURE
 from backend.project.panes.canvas.add_folder import choose_folder
 from backend.project.panes.canvas.edit_map import (
@@ -146,74 +154,7 @@ def _invalid_request(
 
 
 # ============================================================
-# 2. Request bodies
-# ============================================================
-
-
-class TextBody(BaseModel):
-    text: str | None = None
-
-
-class CreateProject(BaseModel):
-    text: str | None = None
-    account_id: int | None = None
-
-
-class ProjectOwner(BaseModel):
-    """account_id null unlinks the project."""
-
-    account_id: int | None = None
-
-
-class AddNode(BaseModel):
-    label: str | None = None
-    parent_id: str | None = None
-
-
-class ImportOutline(BaseModel):
-    """Pasted outline `text`, or an already-parsed `nodes` tree."""
-
-    text: str | None = None
-    nodes: list | None = None
-    parent_id: str | None = None
-    unwrap: bool = True
-
-
-class AddFolder(BaseModel):
-    path: str | None = None
-    parent_id: str | None = None
-
-
-class OutlinePreview(BaseModel):
-    text: str | None = None
-
-
-class InsertTree(BaseModel):
-    tree_id: str | None = None
-    parent_id: str | None = None
-
-
-class ChatMessage(BaseModel):
-    text: str | None = None
-    focus_label: str | None = None
-    focus_step_id: str | None = None
-    focus_day: str | None = None
-
-
-class RenameAccount(BaseModel):
-    text: str | None = None
-
-
-def _text(body: TextBody) -> str:
-    """The body's non-empty `text`, or 400."""
-    text = (body.text or "").strip()
-    if not text:
-        raise fail(400, "empty text")
-    return text
-
-
-# ============================================================
-# 3. Reading
+# 2. Reading
 # ============================================================
 
 
@@ -264,7 +205,7 @@ def get_saved_trees(project_id: int) -> list:
 
 
 # ============================================================
-# 4. Projects
+# 3. Projects
 # ============================================================
 
 
@@ -321,7 +262,7 @@ def post_project_owner(
 
 
 # ============================================================
-# 5. Map
+# 4. Map
 # ============================================================
 # No model call in any of these.
 
@@ -437,7 +378,7 @@ def post_choose_folder() -> dict:
 
 
 # ============================================================
-# 6. Saved trees
+# 5. Saved trees
 # ============================================================
 
 
@@ -460,7 +401,7 @@ def post_delete_saved_tree(tree_id: str) -> dict:
 
 
 # ============================================================
-# 7. Chat
+# 6. Chat
 # ============================================================
 
 
@@ -496,7 +437,7 @@ def post_chat(
 
 
 # ============================================================
-# 8. Accounts
+# 7. Accounts
 # ============================================================
 
 
@@ -532,7 +473,7 @@ def post_delete_account(account_id: int) -> dict:
 
 
 # ============================================================
-# 9. Page files
+# 8. Page files
 # ============================================================
 
 
@@ -558,8 +499,16 @@ def post_unknown(path: str) -> None:
 
 
 # ============================================================
-# 10. Helpers
+# 9. Helpers
 # ============================================================
+
+
+def _text(body: TextBody) -> str:
+    """The body's non-empty `text`, or 400."""
+    text = (body.text or "").strip()
+    if not text:
+        raise fail(400, "empty text")
+    return text
 
 
 def _load_project(project_id: int) -> dict:
