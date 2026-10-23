@@ -11,13 +11,7 @@ next.
 
 ## Active
 
-70. **Ruff and type checking** (Step) — Ruff would replace
-    pyflakes as linter and add a formatter. Measured 2026-10-23: 61
-    findings with its default rules (style and modernization, no
-    bugs), and `ruff format` would change 39 of 84 files. Do it in one
-    commit: pick the rules, fix or ignore the rest, format
-    once, swap pyflakes out of `tools/project_check.py`. Type checking
-    (Pylance or mypy) fits the same step, since FastAPI leans on types.
+Nothing chosen yet; pick the next item from the Queue.
 
 ## Queue
 

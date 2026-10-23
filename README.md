@@ -18,7 +18,7 @@ starting from scratch.
 visitor gets their own copy of two example projects. How the demo works:
 `docs/demo.md`.
 
-**Built with:** Python (FastAPI, tests with pytest),
+**Built with:** Python (FastAPI; checked with pytest, Ruff, and mypy),
 TypeScript (no framework, no bundler), plain JSON files for storage, and
 a language model through Ollama locally or OpenRouter in the demo.
 

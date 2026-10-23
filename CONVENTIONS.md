@@ -10,6 +10,7 @@ Technical standards for this codebase. Applies going forward.
 - New code placement
 - Project structure
 - Environment
+- Code checks
 - Security & privacy
 - LLM backend
 
@@ -47,12 +48,12 @@ See `docs/04-current-state.md` for which directories actually exist today and wh
 
 - Each project here is self-contained: its own `.venv/`, its own `requirements.txt`, its own `data/` (see root `README.md`). For `app/`, that means `app/.venv/` and `app/requirements.txt` — there is no shared, repository-root virtual environment to activate instead.
 - `app/backend/` is a Python package (`app/ui/` is a separate TypeScript prototype, not part of this package). Because its modules import from each other, project scripts must be run from `app/`'s own root using `-m` rather than as file paths — a plain file path will not work, since the imports rely on Python treating them as package members. `cd app/` first, then activate its environment once per terminal session (`source .venv/bin/activate`) to run things as plain `python -m ...` instead of `.venv/bin/python -m ...` each time. See `docs/04-current-state.md` for which modules actually exist and how to run them today.
-- New dependencies: from within `app/`, install into its `.venv`, then refresh its own lockfile:
-  ```bash
-  .venv/bin/pip install <package>
-  .venv/bin/pip freeze > requirements.txt
-  ```
+- New dependencies: from within `app/`, install into its `.venv` (`.venv/bin/pip install <package>`), then add it to `requirements.txt` as `<package>==<version>`, sorted. The file lists only what the project uses directly; what those packages need themselves is installed with them.
 - Every project's own `.venv/` is git-ignored — never commit it.
+
+## Code checks
+
+- Python under `app/` is formatted with `ruff format` and passes `ruff check` and `mypy`; their settings are in `app/pyproject.toml`. `tools/project_check.py` runs all three, so it reports a file that does not pass. Tests are not type-checked.
 
 ## Security & privacy
 

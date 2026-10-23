@@ -876,6 +876,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes, from git: the old handler and the new app answered the same tests. The UI change works with either server.
 
+## 74. 2026-10-24 — Ruff formats and lints, mypy checks types
+
+**Decision:** Ruff replaces pyflakes: `ruff check` with the rule groups E, F, I, UP, and B, and `ruff format` with lines of 88 characters (long strings and comments may run over). mypy checks the app's own code under `app/`, not the tests (they pass stand-ins such as `FakeRequest` on purpose) and not the parked Time code (`TODO.md` 66). The settings for all three tools and pytest live in `app/pyproject.toml`; `tools/project_check.py` runs Ruff and mypy and fails when either finds something. The one-time reformat is its own commit, listed in `.git-blame-ignore-revs` so `git blame` skips it.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** keeping pyflakes (catches unused names only, no formatting); Ruff's full default rule set (61 findings, mostly style preferences); line length 100 (fewer changed lines, but 88 is Ruff's and Black's default); type checking only in the editor through Pylance (checks only for whoever runs that editor, not in `project_check`).
+
+**Why this choice:** One formatter and one linter make every file read the same and catch slips before they run; mypy catches a wrong type passed between functions. Two findings changed code: request bodies no longer share one default object between requests (`Body(default_factory=...)` in `api/app.py`), and `guard()` declares the shape it needs as a `Handler` protocol instead of `BaseHTTPRequestHandler`.
+
+**Reversible?** Yes; the tools only read the code. The formatting stays as it is if they are dropped.
+
 ## See also
 
 - [[03-architecture]]

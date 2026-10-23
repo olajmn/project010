@@ -7,11 +7,11 @@ report, then offer fixes.
    already known, so known items are not reported as new.
 2. **`project_check`**: `app/.venv/bin/python3 -m tools.project_check`
    from the project root — git status, whether `docs/04-current-state.md`
-   is stale, the `app/backend/` tree, an import smoke test, pyflakes,
+   is stale, the `app/backend/` tree, an import smoke test, Ruff, mypy,
    stale code-path mentions, modules with no inbound import, and
    `docs_check.py` / `docs_lint.py`.
 3. **Tests**: `.venv/bin/python -m pytest -q` from `app/` — runs every
-   `test_*` function under `app/backend/` (`app/pytest.ini`).
+   `test_*` function under `app/backend/` (`app/pyproject.toml`).
 4. **UI type check**: `npx tsc --noEmit` from `app/ui/` (no output means
    no type errors; nothing is written to `ui/dist/`).
 5. **Review** — look for what the scripts cannot see. Spot-check with

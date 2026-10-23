@@ -36,7 +36,7 @@ Three scripts keep the mapping above honest — against itself and against the a
 
 - **`tools/docs_check.py`** — structural integrity of `docs/`: expected files present, `[[wikilinks]]` and `docs/<name>.md` references resolve, each doc's own heading number matches its filename.
 - **`tools/docs_lint.py`** — this project's documentation-neutrality style rule (`CONVENTIONS.md`), on `docs/` and code comments/docstrings.
-- **`tools/project_check.py`** — broader repository orientation: wraps both of the above as sub-checks, plus git status, whether `docs/04-current-state.md` is older than the areas it describes, `app/`'s actual `backend/` tree, an import smoke test, pyflakes, and a few repo-hygiene checks nothing else covers.
+- **`tools/project_check.py`** — broader repository orientation: wraps both of the above as sub-checks, plus git status, whether `docs/04-current-state.md` is older than the areas it describes, `app/`'s actual `backend/` tree, an import smoke test, Ruff (lint and format) and mypy, and a few repo-hygiene checks nothing else covers.
 
 At the start of a session, run (from the project root, against `app/`'s own venv - the only project this script's code checks target):
 

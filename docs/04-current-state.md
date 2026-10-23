@@ -11,7 +11,8 @@ From `app/`, with its own `.venv/` (`ollama` is only installed there):
 | Start the app | `.venv/bin/python -m server` → http://localhost:8000/ (every API route: `/docs`) |
 | Tests | `.venv/bin/python -m pytest` (one file: add its path, e.g. `backend/project/test_timeline.py`) |
 | Build the UI | `cd ui && npm run build` (TypeScript → `ui/dist/`) |
-| Project checks | from the root: `app/.venv/bin/python3 -m tools.project_check` |
+| Lint, format, types | `.venv/bin/ruff check`, `.venv/bin/ruff format`, `.venv/bin/mypy` (settings in `pyproject.toml`) |
+| Project checks | from the root: `app/.venv/bin/python3 -m tools.project_check` (runs the three above too) |
 
 `/full-check` runs the checks and the tests in one go.
 

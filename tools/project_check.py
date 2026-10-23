@@ -4,7 +4,7 @@ of a session, so it doesn't have to trust its own memory or
 docs/04-current-state.md's prose at face value. Reports observable
 facts: git status, files newer than docs/04-current-state.md, app/'s
 actual backend/ tree, whether the core modules still import,
-code-level hygiene (pyflakes, stale backend/ path mentions, modules
+code-level hygiene (Ruff, mypy, stale backend/ path mentions, modules
 with no inbound import), and this same tools/'s docs_check.py/
 docs_lint.py findings.
 
@@ -12,14 +12,14 @@ Interprets nothing about content or correctness - every finding is
 left for a human/Claude to judge. See ../COLLABORATION.md for how a
 session is expected to use this output. Wraps docs_check.py and
 docs_lint.py (this same directory - one shared tools/ for the whole
-project, not a per-project copy) and pyflakes as sub-checks rather
+project, not a per-project copy), Ruff, and mypy as sub-checks rather
 than duplicating their logic.
 
 Run from the project root, but against app/'s own venv (this is the
 only project this script's backend/import checks target):
     app/.venv/bin/python3 -m tools.project_check
 
-Exit code 0 if docs_check.py, docs_lint.py, pyflakes, and the import
+Exit code 0 if docs_check.py, docs_lint.py, Ruff, mypy, and the import
 smoke test all pass; 1 if any of them found something. Every other
 section is pure information and never affects the exit code.
 """
@@ -38,7 +38,7 @@ section is pure information and never affects the exit code.
 #      - directory_tree()
 #      - import_smoke_test()
 #      - run_tool()
-#      - run_pyflakes()
+#      - run_ruff() / run_mypy()
 #      - CODE_PATH_RE / STALE_PATH_SCAN_TARGETS
 #      - _is_history() / stale_code_path_mentions()
 #      - modules_with_no_inbound_import()
@@ -166,10 +166,18 @@ def run_tool(module: str) -> tuple[int, str]:
     return _run([str(PYTHON), "-m", f"tools.{module}"], cwd=PROJECT_ROOT)
 
 
-def run_pyflakes() -> tuple[int, str]:
-    """Run pyflakes (see app/requirements.txt) against app/'s
-    backend/ and its top-level entry points."""
-    return _run([str(PYTHON), "-m", "pyflakes", "backend", "server.py"])
+def run_ruff() -> tuple[int, str]:
+    """Ruff's lint rules, then whether the code is formatted, with the
+    settings in app/pyproject.toml."""
+    code, output = _run([str(PYTHON), "-m", "ruff", "check", "--quiet"])
+    fmt_code, fmt_output = _run([str(PYTHON), "-m", "ruff", "format", "--check", "--quiet"])
+    return max(code, fmt_code), "\n".join(o for o in (output, fmt_output) if o)
+
+
+def run_mypy() -> tuple[int, str]:
+    """mypy on the files app/pyproject.toml names. Reports only problems."""
+    code, output = _run([str(PYTHON), "-m", "mypy", "--no-error-summary"])
+    return code, output
 
 
 # A backend/...-looking .py path mentioned in a comment, docstring, or
@@ -312,8 +320,15 @@ def main() -> int:
         print("  all modules import cleanly")
 
     print()
-    print("=== pyflakes (app/backend/, app/server.py) ===")
-    code, output = run_pyflakes()
+    print("=== ruff (lint + format, app/pyproject.toml) ===")
+    code, output = run_ruff()
+    print(output if output else "  no issues found")
+    if code != 0:
+        exit_code = 1
+
+    print()
+    print("=== mypy (app/pyproject.toml) ===")
+    code, output = run_mypy()
     print(output if output else "  no issues found")
     if code != 0:
         exit_code = 1
