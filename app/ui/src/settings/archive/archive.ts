@@ -27,6 +27,7 @@ import {
   settingsListRow,
   settingsSection,
   madeAndChanged,
+  projectState,
   shortDate,
 } from "../rows.js";
 
@@ -87,14 +88,8 @@ function accountRow(account: AccountView, repaint: () => Promise<void>): HTMLEle
   ]);
 }
 
-function projectStatus(project: ProjectView): string {
-  if (project.cancelled) return "Archived";
-  if (project.completed) return "Completed";
-  return "Closed";
-}
-
 function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): HTMLElement {
-  const details = [projectStatus(project), madeAndChanged(project.started_at, project.created_at)]
+  const details = [projectState(project), madeAndChanged(project.started_at, project.created_at)]
     .filter(Boolean)
     .join(" · ");
   const canRestore = project.cancelled && !project.completed;

@@ -16,6 +16,7 @@
 
 import { fetchAccounts, fetchArchivedProjects, fetchProjects } from "../../api.js";
 import type { AccountView, ProjectView } from "../../dataShapes.js";
+import { projectsChronologicalForUser } from "../../panes/create/projectOrder.js";
 import { userLabel } from "../../user/activeAccount.js";
 import { logSection } from "./log.js";
 import {
@@ -25,6 +26,7 @@ import {
   settingsHint,
   settingsRow,
   settingsSection,
+  projectState,
   shortDate,
 } from "../rows.js";
 
@@ -61,7 +63,7 @@ export async function mountDetails(host: HTMLElement, query: URLSearchParams): P
 }
 
 /** The address of a project's or an account's details page. */
-export function detailsHref(kind: "project" | "account", id: string, from: string | null): string {
+function detailsHref(kind: "project" | "account", id: string, from: string | null): string {
   const query = new URLSearchParams({ [kind]: id });
   if (from) query.set("from", from);
   return `/settings/details.html?${query}`;
@@ -91,13 +93,12 @@ export function detailsAction(
 
 function projectDetails(project: ProjectView, accounts: AccountView[], from: string | null): HTMLElement[] {
   const account = accounts.find((a) => a.id === project.account_id);
-  const state = project.cancelled ? "Archived" : project.completed ? "Completed" : "Open";
   const rows = [
     settingsRow("Kind", "project"),
     settingsRow("Id", project.project_id),
     settingsRow("Made", shortDate(project.started_at ?? project.created_at)),
     settingsRow("Last changed", shortDate(project.created_at)),
-    settingsRow("State", state),
+    settingsRow("State", projectState(project)),
   ];
   if (account) {
     rows.push(settingsRow("Account", userLabel(account), [detailsAction("account", account.id, from)]));
@@ -117,9 +118,7 @@ function accountDetails(account: AccountView, projects: ProjectView[], from: str
     settingsRow("Made", shortDate(account.created_at)),
   ];
   if (account.archived) rows.push(settingsRow("State", "Archived"));
-  const own = projects
-    .filter((p) => p.account_id === account.id)
-    .sort((a, b) => (a.started_at ?? "").localeCompare(b.started_at ?? ""));
+  const own = projectsChronologicalForUser(projects, account.id);
   const list = own.length
     ? settingsGroup(
         own.map((p) => settingsRow(p.name, shortDate(p.started_at ?? p.created_at), [detailsAction("project", p.project_id, from)])),

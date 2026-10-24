@@ -211,9 +211,3 @@
   color: var(--color-error);
 }
 
-/* "Show more" under a long list (Logs): centred, quiet. */
-.settings-action.settings-more {
-  align-self: center;
-  padding: 0.3rem 0.9rem;
-  background: var(--fill-control);
-}

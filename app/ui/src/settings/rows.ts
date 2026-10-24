@@ -14,6 +14,7 @@
 //  2. Formatting
 //      - shortDate()
 //      - madeAndChanged()
+//      - projectState()
 
 // 1. Builders
 
@@ -133,4 +134,11 @@ export function madeAndChanged(
   const last = shortDate(changed);
   if (!last || last === made) return made ? `made ${made}` : "";
   return `made ${made} · changed ${last}`;
+}
+
+/** "Archived", "Completed", or "Open": a project's state in Settings. */
+export function projectState(project: { cancelled: boolean; completed: boolean }): string {
+  if (project.cancelled) return "Archived";
+  if (project.completed) return "Completed";
+  return "Open";
 }
