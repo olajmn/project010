@@ -196,6 +196,25 @@ export async function renameNode(
   return (await res.json()) as ProjectView;
 }
 
+/** Undo (or redo) the latest map change made after log line `since`
+ *  (panes/canvas/undo.ts). */
+export async function undoMapChange(
+  projectId: string,
+  since: number,
+  redo = false,
+): Promise<ProjectView> {
+  const res = await fetch(`/api/projects/${projectId}/${redo ? "redo" : "undo"}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ since }),
+  });
+  if (!res.ok) {
+    const detail = (await res.text()).trim();
+    throw new Error(detail.slice(0, 200) || `request failed: ${res.status}`);
+  }
+  return (await res.json()) as ProjectView;
+}
+
 export async function removeNode(projectId: string, stepId: string): Promise<ProjectView> {
   const res = await fetch(`/api/projects/${projectId}/map/${stepId}/remove`, {
     method: "POST",

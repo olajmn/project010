@@ -64,7 +64,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Accounts and which one owns a project | `storage/accounts_persistence.py`, `panes/create/project_account.py` | `panes/create/accounts/`, `settings/directory/` |
 | What a node is; ids; sibling names | `project/node/` (see its `README.md`) | — |
 | Add, remove, move, rename, paste, folder | `panes/canvas/edit_map.py`, `text_to_tree.py`, `add_folder/` | `panes/canvas/` |
-| Undo and redo of map edits (backend only; no button or shortcut yet) | `panes/canvas/undo.py`, `project/changes/undo.py` | — |
+| Undo and redo of map edits (arrows in the map's top bar, Ctrl+Z / Ctrl+Shift+Z) | `panes/canvas/undo.py`, `project/changes/undo.py` | `panes/canvas/undo.ts` |
 | Saved trees | `project/saved_trees/`, `storage/saved_trees_persistence.py` | `panes/canvas/savedTrees/` |
 | The map as drawn | `api/answers_to_browser.py` (`map_tree()`) | `panes/canvas/drawNodes.ts`, `lines/`, `zoomAndPan/` |
 | A chat message | `panes/chat/reply.py`, `model/brief/conversation.py`, `talk_prompt.py` | `panes/chat/` |

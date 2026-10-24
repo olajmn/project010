@@ -57,7 +57,7 @@ drags it back out.
   zoomed-out empty frame.
 - **Controls around the map** are stamped into the strips above and
   below it — signs and words, no boxes; hover only brightens them, and
-  symbol-only ones show a short label. On top: × ↑ − + and Text | Line
+  symbol-only ones show a short label. On top: × ↶ ↷ ↑ − + and Text | Line (the undo and redo arrows are white when they can act, grey when not)
   (not highlighted: the view switches by itself with zoom). Below:
   **+ Add** opens one menu for the ways to add many nodes (Paste
   structure, Add folder, Insert saved tree…); Copy as ASCII and Archive

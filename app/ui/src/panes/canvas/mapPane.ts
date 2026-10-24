@@ -12,6 +12,7 @@
 //      - installMapPane()
 
 import { isNodeId } from "./nodeId.js";
+import { undoButtons } from "./undo.js";
 import { addNode, removeNode, renameProject } from "../../api.js";
 import { getActiveUserId, setLastProjectId } from "../../user/activeAccount.js";
 import { markHiddenSelection } from "./hiddenSelection.js";
@@ -299,6 +300,7 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
     body.appendChild(line);
     installMapScale(body, line, project.project_id, {
       onClose: () => opts.onCloseProject(),
+      editButtons: undoButtons(project, opts.onUpdated),
     });
 
     body.appendChild(bar.copyRow);

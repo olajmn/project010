@@ -1014,6 +1014,8 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; undo lines are ordinary changes in the log.
 
+**Follow-up (same day, the page):** Undo and redo are two drawn arrows right after × in the map's top bar, white when they can act and grey when not, and Ctrl+Z / Ctrl+Shift+Z (Cmd on a Mac) outside text fields (`ui/src/panes/canvas/undo.ts`). There is no notice after a remove, so the confirmation before a remove stays.
+
 ## See also
 
 - [[03-architecture]]

@@ -5,7 +5,7 @@
  *  1. Column
  *  2. Main
  *  3. Map area + grain/view buttons
- *      - .project-body / .map-scale-toolbar / .map-scale-btn
+ *      - .project-body / .map-scale-toolbar / .map-scale-btn / .map-undo-btn
  */
 
 /* 1. Column */
@@ -62,7 +62,7 @@
   min-width: 1.6rem;
   padding: 0.25rem 0.45rem;
   color: var(--color-text-muted);
-  /* Actions (× ↑ − +) and Text / Line are stamped into the bar: no
+  /* Actions (× ↑ − +, undo, redo) and Text / Line are stamped into the bar: no
      fill, hover only brightens them. */
   background: transparent;
   border: 1px solid transparent;
@@ -78,6 +78,17 @@
 .map-scale-btn:disabled {
   opacity: 0.35;
   cursor: default;
+}
+
+/* Undo / redo: white when there is something to act on, grey when not. */
+.map-undo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-undo-btn:not(:disabled) {
+  color: var(--color-text);
 }
 
 /* Text / Line: two grey words with a thin divider, no box. The chosen

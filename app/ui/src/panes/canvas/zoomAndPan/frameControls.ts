@@ -104,6 +104,8 @@ export type MapScaleHandle = {
 type ScaleOpts = {
   /** Shows a close control in the top bar. Omitted = no close. */
   onClose?: () => void;
+  /** Undo and redo (undo.ts), right after close. */
+  editButtons?: HTMLElement[];
 };
 
 /**
@@ -195,7 +197,7 @@ export function installMapScale(
   const stage = document.createElement("div");
   stage.className = "map-scale-stage";
 
-  toolbar.prepend(closeBtn, topBtn);
+  toolbar.prepend(closeBtn, ...(opts.editButtons ?? []), topBtn);
   topBar.append(toolbar, viewGroup);
 
   body.insertBefore(viewport, mapEl);

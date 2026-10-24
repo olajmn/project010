@@ -70,6 +70,8 @@ export interface ProjectView {
   created_at?: string | null;
   /** When the project was made (its first history record). */
   started_at?: string | null;
+  /** Log line numbers where undo and redo would act (panes/canvas/undo.ts). */
+  undo: { log_lines: number; undo_line: number | null; redo_line: number | null };
   node: MapNode | null;
   thread: ChatMessage[];
   status: ProjectStatus;
