@@ -1042,6 +1042,8 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Follow-up (same day, the page):** The UI says node too: `stepId` is `nodeId`, `onAddStep` / `onRemoveStep` / `onStepClick` are `onAddNode` / `onRemoveNode` / `onNodeClick`, `labelForStepId` / `resolveStepId` and their `Live` forms follow, `isProgressionTree` is `isNodeTree`, and map rows carry `data-node-id` (read as `dataset.nodeId`). The empty map's hint reads "Add nodes with + — the map starts empty.", since the chat no longer adds nodes (#79). No stored browser setting changed name.
 
+**Follow-up (same day, the chat's names):** "Talk" as a name for the chat is gone from the code: `model/brief/talk_prompt.py` is `chat_prompt.py`, the provider setting is `CHAT_PROVIDER` (in `app/fly.toml`), and the demo's chat limits are `CHAT_PER_SESSION`, `CHAT_PER_IP`, and `CHAT_PER_DAY` (`DEMO_CHAT_PER_DAY` to change the last). "Talk about this" and the model's instructions keep the ordinary verb.
+
 ## See also
 
 - [[03-architecture]]

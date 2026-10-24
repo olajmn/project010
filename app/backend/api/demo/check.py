@@ -82,9 +82,9 @@ sessions = Sessions(
     on_end=_remove_sandbox,
 )
 login_failures = RateLimit(*settings.LOGIN_FAILURES_PER_IP)
-talk_per_session = RateLimit(*settings.TALK_PER_SESSION)
-talk_per_ip = RateLimit(*settings.TALK_PER_IP)
-talk_per_day = RateLimit(*settings.TALK_PER_DAY)
+chat_per_session = RateLimit(*settings.CHAT_PER_SESSION)
+chat_per_ip = RateLimit(*settings.CHAT_PER_IP)
+chat_per_day = RateLimit(*settings.CHAT_PER_DAY)
 
 if settings.ENABLED:
     # Sessions do not survive a restart, so neither do their sandboxes.
@@ -143,9 +143,9 @@ def guard(handler: Handler, method: str) -> bool:
         handler.send_error(413, "Too long for the demo.")
         return True
     if is_chat and not (
-        talk_per_session.allow(session.token)
-        and talk_per_ip.allow(client_ip(handler))
-        and talk_per_day.allow("all")
+        chat_per_session.allow(session.token)
+        and chat_per_ip.allow(client_ip(handler))
+        and chat_per_day.allow("all")
     ):
         handler.send_error(
             429, "Too many messages for the demo. Try again in a minute."

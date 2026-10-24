@@ -1,7 +1,7 @@
 """
 Puts together what the model is sent when you press Send, in order:
 
-1. The system text: the fixed slots from talk_prompt.py, then the
+1. The system text: the fixed slots from chat_prompt.py, then the
    project background — its summary rows and every change
    (project/status/; the panel above the chat shows the summary and a
    per-day count instead), every name in its structure, and the part
@@ -13,7 +13,7 @@ No model call, nothing saved. The rules it keeps: docs/chat.md.
 """
 
 from backend.model.brief.budget import CHARS_PER_TOKEN
-from backend.model.brief.talk_prompt import BEHAVIOR, EXAMPLES, LIMITS, ROLE, TASK
+from backend.model.brief.chat_prompt import BEHAVIOR, EXAMPLES, LIMITS, ROLE, TASK
 from backend.model.client import PROMPT_TOKENS
 from backend.project.node import find_path, nodes_of, path_lines, tree_lines
 from backend.project.status.build_status import changes_on_day_text, day_name

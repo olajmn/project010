@@ -41,9 +41,12 @@ next.
        `isProgressionTree`, `AddStepHandler` / `RemoveStepHandler`, and
        `focus_step_id` in `dataShapes.ts`, `api.ts`, and
        `api/request_bodies.py` (the same field on both sides).
-    4. **Talk and Status**: `talk_prompt.py` → `chat_prompt.py`,
-       `TALK_PROVIDER` → `CHAT_PROVIDER` (also `app/fly.toml`; needs a
-       deploy), the demo's `TALK_PER_*` limits; "Status" is "Current
+    4. **Talk and Status**, in two parts. a. **Talk** — done 2026-10-24
+       (#86 follow-up): `talk_prompt.py` → `chat_prompt.py`,
+       `TALK_PROVIDER` → `CHAT_PROVIDER` (also `app/fly.toml`; live after
+       the next deploy), the demo's `TALK_PER_*` → `CHAT_PER_*`. The
+       English verb stays where it is the words ("Talk about this", the
+       model's instructions). b. **Status**: "Status" is "Current
        state": `project/status/` and `build_status`.
     5. **Ids without a kind in front**, with step 2's conversion: an id
        is a bare UUIDv4, and what it belongs to is known from where it
@@ -56,8 +59,9 @@ next.
     Not renamed: `backend/foundation/` (parked Time code, where a step
     is a step in time; P2) and `docs/05-decisions.md` (history). Done
     when a whole-word search for `step`, `steps`, `Step`, `stepId`,
-    `progression`, `talk`, and `Talk` in `app/backend/` (outside
-    `foundation/`) and `app/ui/src/` finds nothing. Docs: a decision in
+    `progression`, `TALK_`, and `talk_` in `app/backend/` (outside
+    `foundation/`) and `app/ui/src/` finds nothing, and "status" is left
+    only where it means a node's state or an HTTP status. Docs: a decision in
     `05-decisions.md`, the data rows in `04-current-state.md` § 3,
     `docs/chat.md`, `docs/ui.md`, the two code-folder READMEs
     (`project/node/`, `identity/`).

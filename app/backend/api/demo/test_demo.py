@@ -75,9 +75,9 @@ def clock(tmp_path, monkeypatch) -> Clock:
         ),
     )
     monkeypatch.setattr(g, "login_failures", RateLimit(3, 60, clock))
-    monkeypatch.setattr(g, "talk_per_session", RateLimit(2, 60, clock))
-    monkeypatch.setattr(g, "talk_per_ip", RateLimit(10, 60, clock))
-    monkeypatch.setattr(g, "talk_per_day", RateLimit(100, 24 * 60 * 60, clock))
+    monkeypatch.setattr(g, "chat_per_session", RateLimit(2, 60, clock))
+    monkeypatch.setattr(g, "chat_per_ip", RateLimit(10, 60, clock))
+    monkeypatch.setattr(g, "chat_per_day", RateLimit(100, 24 * 60 * 60, clock))
     monkeypatch.setattr(settings, "PASSWORD", "secret")
     monkeypatch.setattr(settings, "SECURE_COOKIE", True)
     seed = tmp_path / "seed"

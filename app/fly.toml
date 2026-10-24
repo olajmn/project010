@@ -9,7 +9,7 @@ primary_region = "arn"      # Stockholm; check with `fly platform regions`
   HOST = "0.0.0.0"
   PORT = "8080"
   DEMO_MODE = "1"
-  TALK_PROVIDER = "openrouter"
+  CHAT_PROVIDER = "openrouter"
   # Fly's proxy writes this header itself, so it can be trusted for
   # per-IP limits.
   DEMO_CLIENT_IP_HEADER = "Fly-Client-IP"

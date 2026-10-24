@@ -126,9 +126,9 @@ def demo_api(data_dir, tmp_path, monkeypatch, server) -> Api:
         ),
     )
     monkeypatch.setattr(check, "login_failures", RateLimit(3, 60))
-    monkeypatch.setattr(check, "talk_per_session", RateLimit(2, 60))
-    monkeypatch.setattr(check, "talk_per_ip", RateLimit(10, 60))
-    monkeypatch.setattr(check, "talk_per_day", RateLimit(100, 24 * 60 * 60))
+    monkeypatch.setattr(check, "chat_per_session", RateLimit(2, 60))
+    monkeypatch.setattr(check, "chat_per_ip", RateLimit(10, 60))
+    monkeypatch.setattr(check, "chat_per_day", RateLimit(100, 24 * 60 * 60))
     seed = tmp_path / "seed"
     seed.mkdir()
     (seed / "accounts.json").write_text(

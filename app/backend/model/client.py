@@ -12,7 +12,7 @@ minutes and returned empty `content` because the trace consumed the
 response (docs/05-decisions.md #21). Models without that channel
 ignore the flag.
 
-PROVIDER is Ollama unless TALK_PROVIDER=openrouter is set: the hosted
+PROVIDER is Ollama unless CHAT_PROVIDER=openrouter is set: the hosted
 model is for the public demo only (docs/05-decisions.md #70), so it is
 never chosen by default.
 """
@@ -41,10 +41,10 @@ CONTEXT_TOKENS = 32_768
 PROMPT_TOKENS = CONTEXT_TOKENS - 2_048
 
 PROVIDERS = ("ollama", "openrouter")
-PROVIDER = os.environ.get("TALK_PROVIDER", "").strip().lower() or "ollama"
+PROVIDER = os.environ.get("CHAT_PROVIDER", "").strip().lower() or "ollama"
 if PROVIDER not in PROVIDERS:
     # Fails at startup: a typo must not silently fall back to another model.
-    raise ValueError(f"TALK_PROVIDER must be one of {PROVIDERS}, not {PROVIDER!r}")
+    raise ValueError(f"CHAT_PROVIDER must be one of {PROVIDERS}, not {PROVIDER!r}")
 
 MODEL_IN_USE = OPENROUTER_MODEL if PROVIDER == "openrouter" else MODEL
 

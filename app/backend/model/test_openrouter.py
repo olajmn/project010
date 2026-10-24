@@ -107,7 +107,7 @@ def test_errors_say_what_failed(key, urlopen, message) -> None:
 
 @pytest.fixture
 def reload_client(monkeypatch):
-    """Reload client.py under a test's TALK_PROVIDER, then back under the
+    """Reload client.py under a test's CHAT_PROVIDER, then back under the
     real environment (restored first, so the last reload sees it)."""
     yield lambda: importlib.reload(client)
     monkeypatch.undo()
@@ -115,7 +115,7 @@ def reload_client(monkeypatch):
 
 
 def test_default_provider_is_ollama(monkeypatch, reload_client) -> None:
-    monkeypatch.setenv("TALK_PROVIDER", "")
+    monkeypatch.setenv("CHAT_PROVIDER", "")
     reload_client()
     assert client.PROVIDER == "ollama"
     assert client.MODEL_IN_USE == client.MODEL == "qwen3.5:9b"
@@ -132,7 +132,7 @@ def test_default_provider_is_ollama(monkeypatch, reload_client) -> None:
 
 
 def test_openrouter_provider(monkeypatch, reload_client) -> None:
-    monkeypatch.setenv("TALK_PROVIDER", "OpenRouter")
+    monkeypatch.setenv("CHAT_PROVIDER", "OpenRouter")
     reload_client()
     assert client.PROVIDER == "openrouter"
     assert client.MODEL_IN_USE == client.OPENROUTER_MODEL == "qwen/qwen3.5-9b"
@@ -146,6 +146,6 @@ def test_openrouter_provider(monkeypatch, reload_client) -> None:
 
 
 def test_unknown_provider_stops_start(monkeypatch, reload_client) -> None:
-    monkeypatch.setenv("TALK_PROVIDER", "openai")
+    monkeypatch.setenv("CHAT_PROVIDER", "openai")
     with pytest.raises(ValueError):
         reload_client()

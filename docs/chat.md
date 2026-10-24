@@ -22,7 +22,7 @@ In this order, every time:
 
 | Part | From | Limit |
 |---|---|---|
-| Instructions: role, task, behavior, limits, examples | `model/brief/talk_prompt.py` | Fixed text |
+| Instructions: role, task, behavior, limits, examples | `model/brief/chat_prompt.py` | Fixed text |
 | Project status: name, created, last change, map size | `status_text()` in `project/status/build_status.py` | None |
 | Every change saved in the project, newest first, each by node names and their path at the time (`project/changes/describe.py`) | `changes_text()`, same file | None per project; one change lists up to 40 names, then says how many more |
 | The structure: every node name, indented | `tree_lines()` in `project/node/tree_as_text.py` | A third of the prompt; past that, cut with a note |

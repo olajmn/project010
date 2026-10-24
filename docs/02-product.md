@@ -100,7 +100,7 @@ helps but does not take over.
 
 The minimum the conversation must get right. The chat answers from the
 project only: it does not invent details, change the project, or offer
-to (`backend/model/brief/talk_prompt.py`).
+to (`backend/model/brief/chat_prompt.py`).
 
 1. **A greeting or small talk** ("hi", "cool!", "thanks") gets a short
    reply: no question back, no summary of the project.

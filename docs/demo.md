@@ -23,7 +23,7 @@ The app at https://demo-one.fly.dev behind one shared password. Each login gets 
 |---|---|---|
 | `DEMO_MODE` | `fly.toml` | `1` turns the demo on |
 | `DEMO_PASSWORD` | Fly secret | the shared password |
-| `TALK_PROVIDER` | `fly.toml` | `openrouter`; unset means Ollama |
+| `CHAT_PROVIDER` | `fly.toml` | `openrouter`; unset means Ollama |
 | `OPENROUTER_API_KEY` | Fly secret | key with its own credit limit |
 | `DEMO_IDLE_SECONDS`, `DEMO_MAX_SECONDS` | optional | default 30 min and 8 h |
 | `DEMO_START_PROJECT` | `fly.toml` | the name of the active project every login opens (`Building Project`) |

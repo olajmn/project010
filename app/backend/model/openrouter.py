@@ -16,7 +16,7 @@ import urllib.request
 
 URL = "https://openrouter.ai/api/v1/chat/completions"
 
-# Replies are one to four sentences (talk_prompt.py); this leaves room
+# Replies are one to four sentences (chat_prompt.py); this leaves room
 # for a long one and bounds what a single call can cost.
 MAX_TOKENS = 400
 

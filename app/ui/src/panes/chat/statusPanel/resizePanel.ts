@@ -7,7 +7,7 @@
 //  2. Drag
 //      - installPanelResize()
 
-// Key kept from the talk chart this panel replaced, so a pinned height survives.
+// Key kept from the chart this panel replaced, so a pinned height survives.
 const HEIGHT_KEY = "projects.chartHeightPx";
 const MIN_PANEL_HEIGHT = 0;
 const MIN_THREAD_HEIGHT = 80;

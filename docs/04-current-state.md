@@ -67,7 +67,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Undo and redo of map edits (arrows in the map's top bar, Ctrl+Z / Ctrl+Shift+Z) | `panes/canvas/undo.py`, `project/changes/undo.py` | `panes/canvas/undo.ts` |
 | Saved trees | `project/saved_trees/`, `storage/saved_trees_persistence.py` | `panes/canvas/savedTrees/` |
 | The map as drawn | `api/answers_to_browser.py` (`map_tree()`) | `panes/canvas/drawNodes.ts`, `lines/`, `zoomAndPan/` |
-| A chat message | `panes/chat/reply.py`, `model/brief/conversation.py`, `talk_prompt.py` | `panes/chat/` |
+| A chat message | `panes/chat/reply.py`, `model/brief/conversation.py`, `chat_prompt.py` | `panes/chat/` |
 | Slash commands | `panes/chat/commands/` | `panes/chat/commands/` |
 | The chat thread and its About frames (node by id, or day); rename notes | `panes/chat/screen/chat_thread.py` | `panes/chat/showOnlyThis.ts`, `statusPanel/` |
 | Current state panel | `project/status/` | `panes/chat/statusPanel/` |
@@ -123,13 +123,13 @@ How a message is built and sent, and its rules: [[chat]].
 - Local **Ollama**, model `qwen3.5:9b`, temperature 0.2
   (`backend/model/client.py`), used for chat replies only. A failed
   reply is not retried; the chat shows the error.
-- `TALK_PROVIDER=openrouter` sends the chat to the same model hosted on
+- `CHAT_PROVIDER=openrouter` sends the chat to the same model hosted on
   OpenRouter (`qwen/qwen3.5-9b`, reasoning off, at most 400 output
   tokens; `backend/model/openrouter.py`), with the key from
   `OPENROUTER_API_KEY`. Meant for the public demo only ([[05-decisions]]
   #70); unset, the chat uses Ollama. An unknown value stops the server at
   start. `GET /api/model` shows the provider in use.
-- A chat message sends: fixed instructions (`model/brief/talk_prompt.py`:
+- A chat message sends: fixed instructions (`model/brief/chat_prompt.py`:
   role, task, behavior, limits), the project's status, every change
   saved in it (`changes_text()`), every label on the map, the
   selected node's path or every change on the selected day

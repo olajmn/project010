@@ -123,7 +123,7 @@ def test_renamed_node_in_past_turns() -> None:
             {"id": "p1", "label": "Flower beds", "children": []},
         ],
     }
-    talk = [
+    turns = [
         {
             "reply": "Beds hold soil.",
             "message": "what is this",
@@ -132,13 +132,13 @@ def test_renamed_node_in_past_turns() -> None:
             "focus_node_id": "p1",
         }
     ]
-    later = build_messages(renamed_tree, "and now?", talk)
+    later = build_messages(renamed_tree, "and now?", turns)
     assert later[1] == {
         "role": "user",
         "content": "[about: Flower beds (then called Beds)] what is this",
     }
     assert (
-        past_turns(talk, [{"id": "p1", "label": "Beds", "children": []}])[0]["content"]
+        past_turns(turns, [{"id": "p1", "label": "Beds", "children": []}])[0]["content"]
         == "[about: Beds] what is this"
     )
 
