@@ -15,7 +15,7 @@ no product rules.
 #      - map_tree()
 
 from backend.project.changes.undo import undo_state
-from backend.project.node import steps_of
+from backend.project.node import count_nodes, steps_of
 from backend.project.panes.chat.screen.chat_thread import thread_for
 from backend.project.panes.create.resolver import (
     created_at_key,
@@ -113,15 +113,12 @@ def account_view(account: dict) -> dict:
 def saved_tree_view(saved: dict) -> dict:
     """{id, name, saved_at, node_count} — what the picker lists; the
     structure itself stays on the server until it is inserted."""
-
-    def count(node: dict) -> int:
-        return 1 + sum(count(c) for c in node.get("children") or [])
-
+    tree = saved.get("tree")
     return {
         "id": saved["id"],
         "name": saved["name"],
         "saved_at": saved["saved_at"],
-        "node_count": count(saved.get("tree") or {}),
+        "node_count": count_nodes([tree] if tree else []),
     }
 
 

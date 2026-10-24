@@ -25,7 +25,9 @@ from backend.identity import new_node_id
 from backend.project.changes import records
 from backend.project.node import (
     Step,
+    count_nodes,
     find_path,
+    find_step,
     from_nested_labels,
     sibling_label_clash,
     unique_sibling_label,
@@ -62,10 +64,9 @@ def add_map_node(
         progression["steps"] = steps
 
     if parent_id:
-        found = _find_step(steps, parent_id)
-        if found is None:
+        parent = find_step(steps, parent_id)
+        if parent is None:
             raise ValueError(f"parent step not found: {parent_id}")
-        parent, _ancestors = found
         children = parent.get("children")
         if not isinstance(children, list):
             children = []
@@ -138,15 +139,14 @@ def import_map_outline(
     new_steps = [step.to_dict() for step in from_nested_labels(forest, new_node_id)]
     # Every imported node, not just the top level: one paste of a
     # 95-node tree is one change, but it brought in 95 nodes.
-    imported = len(new_steps) + sum(_count_below(s) for s in new_steps)
+    imported = count_nodes(new_steps)
     what = "1 node" if imported == 1 else f"{imported} nodes"
 
     parent = None
     if parent_id:
-        found = _find_step(steps, parent_id)
-        if found is None:
+        parent = find_step(steps, parent_id)
+        if parent is None:
             raise ValueError(f"parent step not found: {parent_id}")
-        parent, _ancestors = found
         children = parent.get("children")
         if not isinstance(children, list):
             children = []
@@ -202,7 +202,7 @@ def remove_map_node(latest: dict, step_id: str) -> dict:
     change = records.removed(parent["id"] if parent else None, index, [step])
     del siblings[index]
     label = str(step.get("label") or step_id)
-    below = _count_below(step)
+    below = count_nodes(step.get("children") or [])
     feedback = (
         f"Removed step under {parent.get('label') or ''}: {label}"
         if parent
@@ -320,14 +320,6 @@ def save_map_edit(
     )
 
 
-def _count_below(step: dict) -> int:
-    """Every node under `step`, at any depth."""
-    children = step.get("children")
-    if not isinstance(children, list):
-        return 0
-    return sum(1 + _count_below(c) for c in children if isinstance(c, dict))
-
-
 def _number_sibling_clashes(siblings: list, new_steps: list[dict]) -> None:
     """Rename in place any new label that collides with existing
     siblings or with an earlier new peer (` (2)`, ` (3)`, …).
@@ -342,15 +334,6 @@ def _number_sibling_clashes(siblings: list, new_steps: list[dict]) -> None:
         children = step.get("children")
         if isinstance(children, list) and children:
             _number_sibling_clashes([], children)
-
-
-def _find_step(steps: list, step_id: str) -> tuple[dict, list[str]] | None:
-    """The step with this id and its ancestors' labels (top first), or
-    None. The tree walk itself is node.find_path()."""
-    path = find_path(steps, step_id)
-    if path is None:
-        return None
-    return path[-1], [step.get("label") or "" for step in path[:-1]]
 
 
 def _validate_forest(raw: list[dict]) -> list[dict]:

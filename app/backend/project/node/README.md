@@ -37,7 +37,7 @@ render time and is never stored.
 Three different things (`docs/05-decisions.md` #52):
 
 - **`id`** is the identity. Every backend write finds a node by id
-  (`_find_step`, `remove_map_node`, `parent_id`), the UI selects by id,
+  (`find_step()`, `remove_map_node()`, `parent_id`), the UI selects by id,
   and chat turns about a node store `focus_step_id`.
 - **`label`** is an attribute people use to describe the node. Two nodes
   may share a label.

@@ -86,6 +86,13 @@ def steps_of(record: dict) -> list:
     return steps if isinstance(steps, list) else []
 
 
+def count_nodes(steps: list) -> int:
+    """Every node in `steps` and under them, at any depth."""
+    return sum(
+        1 + count_nodes(s.get("children") or []) for s in steps if isinstance(s, dict)
+    )
+
+
 def sibling_label_clash(siblings: list, label: str) -> str | None:
     """If a sibling already uses this label (same level), return an
     error string; else None. Accepts Step objects or dict steps."""

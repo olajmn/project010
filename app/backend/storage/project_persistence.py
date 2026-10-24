@@ -138,16 +138,6 @@ def _read_json(path: Path) -> dict:
     return data
 
 
-def _write_events(project_id: str, events: list[dict]) -> None:
-    path = events_path(project_id)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(".jsonl.tmp")
-    with open(tmp, "w", encoding="utf-8") as f:
-        for event in events:
-            f.write(json.dumps(event, ensure_ascii=False) + "\n")
-    tmp.replace(path)
-
-
 def _append_event(project_id: str, event: dict) -> None:
     path = events_path(project_id)
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -67,7 +67,7 @@ def apply_change(steps: list[dict], change: dict) -> None:
     edit did. Raises ValueError if the record does not fit the tree."""
     op = change.get("op")
     if op in ("add", "remove"):
-        siblings = _children(steps, change["parent"])
+        siblings = children_of(steps, change["parent"])
         index, nodes = change["index"], change["nodes"]
         if op == "add":
             if not 0 <= index <= len(siblings):
@@ -82,7 +82,7 @@ def apply_change(steps: list[dict], change: dict) -> None:
             )
         del siblings[index : index + len(nodes)]
     elif op == "move":
-        siblings = _children(steps, change["parent"])
+        siblings = children_of(steps, change["parent"])
         i, j = change["from"], change["to"]
         if not _at(siblings, i, change["node_id"]) or not 0 <= j < len(siblings):
             raise ValueError(
@@ -100,8 +100,9 @@ def apply_change(steps: list[dict], change: dict) -> None:
         raise ValueError(f"{change.get('id')}: unknown op {op}")
 
 
-def _children(steps: list[dict], parent_id: str | None) -> list[dict]:
-    """The sibling list under `parent_id` (the top level for None)."""
+def children_of(steps: list[dict], parent_id: str | None) -> list[dict]:
+    """The sibling list under `parent_id` (the top level for None); a
+    node without children gets an empty list to add to."""
     if parent_id is None:
         return steps
     path = find_path(steps, parent_id)

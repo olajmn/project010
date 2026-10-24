@@ -72,12 +72,7 @@ _REVERSE_OP = {"add": "remove", "remove": "add", "move": "move", "rename": "rena
 def reversed_change(change: dict) -> dict:
     """A new record that undoes `change`: add and remove swap, a move
     and a rename swap `from` and `to`."""
-    out = {
-        key: copy.deepcopy(value)
-        for key, value in change.items()
-        if key not in ("undoes", "redoes")
-    }
-    out["id"] = new_change_id()
+    out = _fresh_copy(change)
     out["op"] = _REVERSE_OP[change["op"]]
     if change["op"] in ("move", "rename"):
         out["from"], out["to"] = change["to"], change["from"]
@@ -87,11 +82,17 @@ def reversed_change(change: dict) -> dict:
 
 def repeated_change(change: dict) -> dict:
     """A new record that does `change` again (a redo)."""
+    out = _fresh_copy(change)
+    out["redoes"] = change["id"]
+    return out
+
+
+def _fresh_copy(change: dict) -> dict:
+    """`change` copied with a new id and without its undo/redo link."""
     out = {
         key: copy.deepcopy(value)
         for key, value in change.items()
         if key not in ("undoes", "redoes")
     }
     out["id"] = new_change_id()
-    out["redoes"] = change["id"]
     return out

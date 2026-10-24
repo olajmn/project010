@@ -6,8 +6,8 @@ node was when the change was made. A long list of names is cut with a
 note. Logs keeps its own short sentences (timeline.py).
 """
 
-from backend.project.changes.replay import apply_change
-from backend.project.node import find_path
+from backend.project.changes.replay import apply_change, children_of
+from backend.project.node import count_nodes, find_path
 
 # Names listed for one change before the rest is counted instead.
 MAX_NAMES = 40
@@ -45,7 +45,7 @@ def _describe(steps: list[dict], change: dict, event: str | None) -> str:
     where = _place(steps, change.get("parent"))
     if op == "add":
         nodes = change["nodes"]
-        count = sum(_count(n) for n in nodes)
+        count = count_nodes(nodes)
         verb = _VERB.get(event or "", "Added")
         if count == 1:
             text = f"{verb} {_names(nodes)} {where}"
@@ -54,7 +54,7 @@ def _describe(steps: list[dict], change: dict, event: str | None) -> str:
     elif op == "remove":
         text = f"Removed {_names(change['nodes'])} {where}"
     elif op == "move":
-        siblings = _siblings(steps, change.get("parent"))
+        siblings = children_of(steps, change.get("parent"))
         node = siblings[change["from"]]["label"]
         other = siblings[change["to"]]["label"]
         side = "above" if change["to"] < change["from"] else "below"
@@ -78,22 +78,11 @@ def _place(steps: list[dict], parent_id: str | None) -> str:
     return "under " + " > ".join(str(s.get("label") or "") for s in path)
 
 
-def _siblings(steps: list[dict], parent_id: str | None) -> list[dict]:
-    if parent_id is None:
-        return steps
-    path = find_path(steps, parent_id) or [{}]
-    return path[-1].get("children") or []
-
-
-def _count(node: dict) -> int:
-    return 1 + sum(_count(c) for c in node.get("children") or [])
-
-
 def _names(nodes: list[dict]) -> str:
     """'A (B, C (D)), E' — every node with what is under it, cut after
     MAX_NAMES names with a note of how many more."""
     shown = 0
-    total = sum(_count(n) for n in nodes)
+    total = count_nodes(nodes)
 
     def walk(items: list[dict]) -> str:
         nonlocal shown
