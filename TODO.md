@@ -11,31 +11,48 @@ next.
 
 ## Active
 
-54. **Undo for map edits** (Step) — nothing can be undone today, and the
-    history keeps only a short text per change, not the tree, so an
-    earlier tree cannot be worked out from it. Shape: snapshots
-    (memento) — keep a copy of the tree before each map edit, the last
-    20 or so; Undo saves the previous copy back as a new change ("Undid:
-    Removed step: Kitchen"), so history is never erased. A node brought
-    back keeps its id, so its chat reconnects (`docs/chat.md`). Decide
-    one at a time: which edits count (add, remove, move, rename, paste,
-    folder, insert tree); redo; whether undo survives a reload; Ctrl+Z
-    only while the map has focus (text fields keep their own undo); an
-    Undo button right after a remove, after which the remove
-    confirmation may go. Also open: removing a node but keeping its
-    children (moved up a level).
-    Where it goes: a new folder `app/backend/project/undo/`
-    (`undo.py`: take a snapshot before an edit, put the previous one
-    back; `test_undo.py`), like `project/saved_trees/`. Every map edit
-    in `panes/canvas/edit_map.py` calls it once, through one helper,
-    not at each call site. If snapshots survive a reload, their file
-    belongs to Storage (`storage/undo_persistence.py`, e.g.
-    `data/projects/{id}/snapshots.jsonl`). Route
-    `POST /api/projects/{id}/undo` in `api/app.py`, HTTP test in
-    `api/test_http_api.py`; UI in a new `ui/src/panes/canvas/undo.ts`
-    (Ctrl+Z on the map, the Undo button) and one call in `api.ts`.
-    Docs: decision in `05-decisions.md`, rows in `04-current-state.md`
-    § 2-3.
+54. **Change records, then undo** (Step) — every map edit saves what it
+    actually did, not only a sentence about it; undo, replay, and the
+    chat's history all read those records (event sourcing). Today each
+    line in `events.jsonl` describes a change ("Removed step under
+    Actors: Client") but cannot repeat or reverse it, and the tree in
+    `current.json` cannot be rebuilt from the history. Planned
+    2026-10-24, replaces the earlier plan of keeping tree copies.
+    1. **Change records.** Each map edit line in `events.jsonl` gets a
+       `change` field beside its `feedback`: add (node, parent, place),
+       remove (the whole removed branch with its ids, parent, place),
+       move (id, from, to), rename (id, old, new), import / folder /
+       insert tree (every node brought in, parent). Written once, in
+       `panes/canvas/edit_map.py` through one helper; kept by
+       `save_plan()` (`storage/project_persistence.py`).
+    2. **A starting point and replay.** History before step 1 is too
+       thin to replay, so each project gets one checkpoint line holding
+       its tree when records begin; from then on the tree is the
+       checkpoint plus every change after it. `current.json` stays as
+       the quick answer; `tools/project_check.py` checks that replaying
+       the log gives exactly `current.json`.
+    3. **Undo and redo.** Undo reads the last change and saves its
+       opposite as a new change ("Undid: Removed step: Client"); nodes
+       come back with their own ids, so their chat reconnects; redo is
+       an undo of an undo. Nothing in the history is erased. Works
+       after a reload and has no step limit, since the records are the
+       log. Route `POST /api/projects/{id}/undo` in `api/app.py`.
+    4. **The UI.** A back-arrow icon (drawn, not a character) on the
+       map's toolbar, grey when there is nothing to undo; Ctrl+Z while
+       the map has focus (text fields keep their own undo); a short
+       "Undo" notice after a remove, after which the remove
+       confirmation may go. New `ui/src/panes/canvas/undo.ts`, one call
+       in `api.ts`.
+    5. **The chat reads them.** A readable line per change for the
+       model ("Removed Client under Actors, with Client A, …"), names
+       and paths, not ids, cut with a note when long (`docs/chat.md`
+       rules). Closes the import part of 38; part of 63.
+    Where it goes: a new folder `app/backend/project/changes/`
+    (`records.py`: build a record; `undo.py`: its opposite;
+    `replay.py`: the tree from the log; their tests), like
+    `project/saved_trees/`. Docs: a decision in `05-decisions.md`, the
+    data rows in `04-current-state.md` § 3, `docs/chat.md`. Order: 1, 2,
+    3, 4, 5; each step is usable on its own.
 
 ## Queue
 
