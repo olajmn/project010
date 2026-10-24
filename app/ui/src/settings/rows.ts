@@ -13,6 +13,7 @@
 //      - settingsHint() / settingsError()
 //  2. Formatting
 //      - shortDate()
+//      - madeAndChanged()
 
 // 1. Builders
 
@@ -120,4 +121,16 @@ export function shortDate(iso: string | null | undefined): string {
   const when = new Date(iso);
   if (Number.isNaN(when.getTime())) return "";
   return `${when.getDate()} ${MONTHS[when.getMonth()]} ${when.getFullYear()}`;
+}
+
+/** "made 3 Aug 2026 · changed 23 Oct 2026" for a project row; one date
+ *  when both fall on the same day. */
+export function madeAndChanged(
+  started: string | null | undefined,
+  changed: string | null | undefined,
+): string {
+  const made = shortDate(started ?? changed);
+  const last = shortDate(changed);
+  if (!last || last === made) return made ? `made ${made}` : "";
+  return `made ${made} · changed ${last}`;
 }

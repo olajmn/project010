@@ -26,6 +26,7 @@ import {
   settingsHint,
   settingsListRow,
   settingsSection,
+  madeAndChanged,
   shortDate,
 } from "../rows.js";
 
@@ -102,7 +103,7 @@ function projectStatus(project: ProjectView): string {
 
 function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): HTMLElement {
   const local = `#${shortId(project.project_id)}`;
-  const details = [local, projectStatus(project), shortDate(project.created_at)]
+  const details = [local, projectStatus(project), madeAndChanged(project.started_at, project.created_at)]
     .filter(Boolean)
     .join(" · ");
   const canRestore = project.cancelled && !project.completed;

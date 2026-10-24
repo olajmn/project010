@@ -35,6 +35,7 @@ import {
   settingsListRow,
   settingsRow,
   settingsSection,
+  madeAndChanged,
   shortDate,
 } from "../rows.js";
 
@@ -79,7 +80,7 @@ function newAccountSection(onCreate: (name: string) => Promise<void>): HTMLEleme
 
 function childProjectRow(project: ProjectView): HTMLElement {
   const local = `#${shortId(project.project_id)}`;
-  const details = [project.name, shortDate(project.created_at)].filter(Boolean).join(" · ");
+  const details = [project.name, madeAndChanged(project.started_at, project.created_at)].filter(Boolean).join(" · ");
   const row = settingsListRow(local, details);
   row.classList.add("is-child");
   return row;
