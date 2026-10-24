@@ -119,7 +119,9 @@ How a message is built and sent, and its rules: [[chat]].
   (`Rooms / Planning`), with its earlier name after a rename, or
   "(since removed)" when it is gone ([[05-decisions]] #76). A selected
   part that is no longer in the tree counts as nothing selected; the chat
-  on screen shows such a frame as "(removed)", not clickable. A message
+  on screen shows such a frame as "(removed)", not clickable; a frame
+  whose label another node also has names what it sits under
+  ("Concept" (in Design)). A message
   sent from that frame's own conversation ("Show only this") is about
   the removed part, and the model is told it is gone.
 - Locally the model is asked for a 32,768-token context

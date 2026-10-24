@@ -38,12 +38,15 @@ def thread_messages(history: list[dict], steps: list | None = None) -> list[dict
     line with that node's `focus_step_id` and its new label as `focus`.
 
     With `steps` (the tree now), both lines of a turn about a node that
-    is no longer in it carry `removed: True`."""
+    is no longer in it carry `removed: True`, and a turn about a node
+    whose label another node also has carries `focus_context`: the
+    labels above it that tell the two apart ("Design")."""
     talked_about = {
         (r.get("focus_step_id") or "").strip()
         for r in history
         if r.get("event") == "chat"
     } - {""}
+    contexts = _contexts(steps) if steps is not None else {}
     messages: list[dict] = []
     for record in history:
         note_line = _rename_note(record, talked_about)
@@ -64,6 +67,8 @@ def thread_messages(history: list[dict], steps: list | None = None) -> list[dict
                 extra["focus_step_id"] = step
                 if steps is not None and find_step(steps, step) is None:
                     extra["removed"] = True
+                elif step in contexts:
+                    extra["focus_context"] = contexts[step]
         elif day:
             extra["focus_day"] = day
         created_at = record.get("created_at")
@@ -90,6 +95,36 @@ def thread_for(
     if history is None:
         history = get_history_for_project(project_id)
     return thread_messages(history, steps)
+
+
+def _contexts(steps: list) -> dict[str, str]:
+    """{node id: the nearest labels above it that tell it apart} for each
+    node whose label another node also has; the fewest levels that do."""
+    found: list[tuple[str, str, list[str]]] = []
+
+    def walk(nodes: list, above: list[str]) -> None:
+        for node in nodes:
+            if not isinstance(node, dict):
+                continue
+            label = (node.get("label") or "").strip()
+            found.append((str(node.get("id") or ""), label, above))
+            walk(node.get("children") or [], [*above, label])
+
+    walk(steps, [])
+    by_label: dict[str, list[tuple[str, list[str]]]] = {}
+    for step_id, label, above in found:
+        by_label.setdefault(label, []).append((step_id, above))
+    contexts: dict[str, str] = {}
+    for same in by_label.values():
+        if len(same) < 2:
+            continue
+        for step_id, above in same:
+            for levels in range(1, len(above) + 1):
+                tail = above[-levels:]
+                if sum(other[-levels:] == tail for _, other in same) == 1:
+                    break
+            contexts[step_id] = " / ".join(above[-levels:]) if above else ""
+    return {k: v for k, v in contexts.items() if k and v}
 
 
 def _rename_note(record: dict, talked_about: set[str]) -> dict | None:

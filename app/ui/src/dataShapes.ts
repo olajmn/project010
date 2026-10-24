@@ -37,6 +37,8 @@ export interface ChatMessage {
   focus_day?: string;
   /** The node this turn was about is no longer in the project. */
   removed?: boolean;
+  /** The labels above that node, when another node has the same label. */
+  focus_context?: string;
 }
 
 /** A project's status (backend/project/status/build_status.py): the

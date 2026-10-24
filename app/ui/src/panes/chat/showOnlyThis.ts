@@ -51,7 +51,14 @@ type Frame = {
   name: string;
   day: string | null;
   removed?: { stepId: string; label: string };
+  /** The labels above the node when another node has the same label. */
+  context?: string;
 };
+
+/** "“Concept”", or "“Concept” (in Design)" when the label is used twice. */
+function frameTitle(frame: Frame): string {
+  return frame.context ? `“${frame.name}” (in ${frame.context})` : `“${frame.name}”`;
+}
 
 /** What a message's About-frame is: its node (by id when saved, else by
  * label), or its day of changes. `key` groups messages; `name` is shown:
@@ -68,7 +75,7 @@ function frameOf(
       return { key: `id:${stepId}`, name: `${label} (removed)`, day: null, removed: { stepId, label } };
     }
     const name = labelForStepId?.(stepId) || focus || stepId;
-    return { key: `id:${stepId}`, name, day: null };
+    return { key: `id:${stepId}`, name, day: null, context: message.focus_context };
   }
   if (focus) return { key: focus, name: focus, day: null };
   const day = message.focus_day?.trim();
@@ -89,7 +96,7 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
     const banner = document.createElement("div");
     banner.className = "thread-isolation-banner";
     const label = document.createElement("span");
-    label.textContent = `Showing only: About “${isolatedFocus?.name}”`;
+    label.textContent = `Showing only: About ${isolatedFocus ? frameTitle(isolatedFocus) : ""}`;
     const back = document.createElement("button");
     back.type = "button";
     back.className = "thread-isolation-back";
@@ -154,7 +161,7 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
           header.className = "chat-focus-header";
           const marker = document.createElement("span");
           marker.className = "chat-focus-marker";
-          marker.textContent = `About “${current.name}”`;
+          marker.textContent = `About ${frameTitle(current)}`;
           const isolateBtn = document.createElement("button");
           isolateBtn.type = "button";
           isolateBtn.className = "thread-isolate-button";

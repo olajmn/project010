@@ -185,3 +185,68 @@ def test_turns_about_a_removed_part_are_marked() -> None:
     ]
     shown = thread_messages(history, steps)
     assert [m.get("removed") for m in shown] == [True, True, None, None]
+
+
+def _turn_about(step_id: str, label: str) -> dict:
+    return {
+        "event": "chat",
+        "message": "what belongs here?",
+        "reply": "ok",
+        "map_focus": label,
+        "focus_step_id": step_id,
+    }
+
+
+def _contexts(steps: list, history: list) -> list:
+    return [m.get("focus_context") for m in thread_messages(history, steps)[::2]]
+
+
+def test_a_label_used_twice_shows_its_parent() -> None:
+    steps = [
+        {
+            "id": "p1",
+            "label": "Design",
+            "children": [{"id": "p2", "label": "Concept", "children": []}],
+        },
+        {
+            "id": "p3",
+            "label": "Development",
+            "children": [{"id": "p4", "label": "Concept", "children": []}],
+        },
+        {"id": "p5", "label": "Actors", "children": []},
+    ]
+    history = [
+        _turn_about("p2", "Concept"),
+        _turn_about("p4", "Concept"),
+        _turn_about("p5", "Actors"),
+    ]
+    assert _contexts(steps, history) == ["Design", "Development", None]
+
+
+def test_parents_with_the_same_label_show_one_level_more() -> None:
+    steps = [
+        {
+            "id": "p1",
+            "label": "Client A",
+            "children": [
+                {
+                    "id": "p2",
+                    "label": "Scope",
+                    "children": [{"id": "p3", "label": "Fees", "children": []}],
+                },
+            ],
+        },
+        {
+            "id": "p4",
+            "label": "Architect A",
+            "children": [
+                {
+                    "id": "p5",
+                    "label": "Scope",
+                    "children": [{"id": "p6", "label": "Fees", "children": []}],
+                },
+            ],
+        },
+    ]
+    history = [_turn_about("p3", "Fees"), _turn_about("p6", "Fees")]
+    assert _contexts(steps, history) == ["Client A / Scope", "Architect A / Scope"]

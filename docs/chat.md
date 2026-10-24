@@ -14,7 +14,7 @@ The chat beside the map answers questions about the open project. It does not se
 4. **The prompt** is built by `build_messages()` (`model/brief/conversation.py`) and fitted to the model's context by `fit_to_budget()` (`model/brief/budget.py`).
 5. **The model** is called by `send_chat()` (`model/client.py`), the one place that knows which provider answers; which ones are in use: [[04-current-state]] § 4.
 6. **The turn is saved** as one line in `events.jsonl` with `event: "chat"`, the user's `message`, the model's `reply`, and the node or day it was about.
-7. **The screen** rebuilds the thread from saved lines (`screen/chat_thread.py`) and frames turns by the node they were about (`ui/src/panes/chat/showOnlyThis.ts`).
+7. **The screen** rebuilds the thread from saved lines (`screen/chat_thread.py`) and frames turns by the node they were about (`ui/src/panes/chat/showOnlyThis.ts`). When another node has the same label, the frame also names what it sits under: About “Concept” (in Design).
 
 ## 3. What the model is sent
 
