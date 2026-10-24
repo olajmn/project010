@@ -45,18 +45,34 @@ Three different things (`docs/05-decisions.md` #52):
   and `/select` resolve it to an id (`id_at_path` in
   `panes/chat/commands/node_path.py`, first match per level).
 
-To see ids: the chat's `/id` with a node selected replies with its id and
-path; with none selected it switches the map between showing ids and
-labels (display only — `ui/src/panes/canvas/idView.ts`).
+To see ids: the chat's `/id` with a node selected replies with its short
+id and path; with none selected it switches the map between showing
+short ids and labels (display only — `ui/src/panes/canvas/idView.ts`).
+
+## How an id is made
+
+Every node id is minted by `new_node_id()` in `identity.py`, and nowhere
+else; `panes/canvas/edit_map.py` and everything that adds nodes ask it.
+An id is a random UUIDv4 in its standard form
+(`3f9c2a71-8b4e-4d10-a6f2-91c0e7b45d38`), shown to people as its first
+8 characters (`short_id()`, and `ui/src/panes/canvas/nodeId.ts` on the
+map), the way git shows a commit. `docs/05-decisions.md` #78.
+
+What an id promises:
+
+- **It identifies one node and nothing else.** It says nothing about
+  when the node was made, in what order, or how many came before it.
+- **It is unique beyond its project and this app.** Projects, devices,
+  or other systems can hold the same nodes side by side without ids
+  colliding; no counter has to be kept in step.
+- **It is never reused.** A removed node's id is retired, not freed: it
+  keeps meaning that one node wherever it is still named — its changes,
+  its chat turns, the source of a saved tree.
+- **It is separate from what the node holds.** The label, place, and
+  children can all change; the id does not. A copy (an inserted saved
+  tree) is a new node with a new id.
 
 ## Rules
-
-- **Ids are never reused within a project.** Ids are `p1`, `p2`, …,
-  minted by `_id_minter()` in `panes/canvas/edit_map.py`, which keeps a
-  high-water mark in `plan["node_id_hi"]`. A removed node's id stays
-  retired, because events and chat focus can still refer to it.
-- **Ids are unique per project only.** `p12` exists in many projects. An
-  identity across projects would need a separate global id.
 - **Sibling labels stay unique**, as an addressing and readability rule,
   not an identity rule. A user-written clash (+, paste, folder, `/add`,
   `Step.add_child`) is numbered: `Taco`, `Taco (2)`, `Taco (3)`
@@ -65,7 +81,7 @@ labels (display only — `ui/src/panes/canvas/idView.ts`).
 ## Where nodes live
 
 Stored as plain dicts under `plan.progression.steps` in
-`data/projects/{id}/current.json`, with `plan.node_id_hi` beside them.
+`data/projects/{id}/current.json`.
 Read them with `steps_of(record)` in `node.py`, the one place that
 knows where they sit on a record; all writes go through
 `panes/canvas/edit_map.py`. `tree_as_text.py` turns a tree into

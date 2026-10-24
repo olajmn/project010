@@ -5,8 +5,8 @@ A per-account library of structures (see project/saved_trees/). Plain
 records, no history: {id, name, account_id, saved_at, source, tree}.
 
 Tree ids (`t1`, `t2`, …) are never reused: the file keeps an `id_hi`
-high-water mark, as project plans keep `node_id_hi` for node ids, so a
-deleted tree's id stays retired.
+high-water mark, so a deleted tree's id stays retired. (Node ids are a
+different kind: random, from project/node/identity.py.)
 """
 
 # Contents

@@ -11,15 +11,7 @@ next.
 
 ## Active
 
-50. **Node ids → globally unique random ids** (Step, before data is
-    shared outside this app) — `p<N>` ids are unique per project only,
-    need a counter (`node_id_hi`), and show count and order. Target:
-    UUIDv7 or ULID, shown as a short prefix like git. The id is minted
-    in `_id_minter()` (`edit_map.py`); old `p` ids in `events.jsonl`
-    need a transition. Open: which side mints ids if another app shares
-    the data. Also open (was 49): a Settings overview of every node's
-    id, and a check for duplicate or dangling ids. Rules:
-    `app/backend/project/node/README.md`.
+Nothing chosen yet; pick the next item from the Queue.
 
 ## Queue
 
@@ -39,14 +31,19 @@ next.
 67. **A real database** (Step, shape open) — storage is JSON files
     under `data/`. Candidate: SQLite, still a local file
     ([[03-architecture]] § 5); only Storage changes. To decide: tables,
-    migrating existing data, and what a demo sandbox copies. Related to
-    50.
+    migrating existing data, and what a demo sandbox copies. Node ids
+    are UUIDs since #78, so they can be keys as they are.
 68. **Frontend framework** (Question, not before 65) — React or Svelte
     (stays web and TypeScript), or Flutter as a new project on the same
     API. Either way the frontend is rewritten.
 
 ### Map and nodes
 
+72. **Node id follow-ups** (Step, when needed) — ids are random UUIDv4
+    since 2026-10-24 (#78, `app/backend/project/node/README.md`). Open:
+    a Settings overview of every node's id (was 49); a check that walks
+    `data/projects/*/` for duplicate ids and references to ids that
+    never existed; which side mints ids if another app shares the data.
 54. **Undo for map edits (Ctrl+Z)** (Step) — nothing can be undone
     today. Likely shape: keep the last 10–20 versions of the tree;
     Undo saves the previous one back as a new change. To decide: which

@@ -928,6 +928,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Follow-up (same day):** With the budget in place, two fixed caps went. The model gets every change saved in the project, not the last 10 (`changes_text()` in `project/status/build_status.py`), and the structure has no 400-line cap: it may use a third of the prompt (`STRUCTURE_TOKENS` in `model/brief/conversation.py`) and is cut past that with a note saying how many parts are shown. A prompt still over the budget without past turns is reported in the terminal, not sent silently.
 
+## 78. 2026-10-24 — Node ids are random UUIDv4, minted in one place
+
+**Decision:** A node's id is a random UUIDv4 in its standard written form, minted by `new_node_id()` in `backend/project/node/identity.py` and nowhere else, and shown to people as its first 8 characters (`short_id()`; `ui/src/panes/canvas/nodeId.ts` on the map; `/id`). The `p<N>` ids and their per-project counter (`plan.node_id_hi`) are gone. The 645 existing ids, in `app/data/` and `app/demo_seed/`, were replaced once by a one-off script: per project, each `p` id got one new id wherever it appeared (node ids, `focus_step_id` in `current.json` and `events.jsonl`, and `source.step_id` of saved trees), retired ids of removed nodes and of a deleted project included. It checked that every tree kept its shape and labels and every reference its node, and that the map, chat frames, and saved trees read the same before and after; `app/data/` was backed up first. What an id promises: `project/node/README.md`.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** `p<N>` (unique per project only, a counter to keep, and it shows order and count); UUIDv7 or ULID (unique, but their first characters are the creation time, so ids still show order); a short random id of our own (enough for this app, but a format no other system knows); converting only new nodes (two id shapes side by side for good).
+
+**Why this choice:** An id should identify a node and say nothing else, and hold beyond this project and this app when data is shared. UUIDv4 is the common standard for that, built into Python (`uuid.uuid4()`) and browsers, so nothing new is invented or installed. Keeping it to one module makes the rule visible and the source of every id one function. #52 (id is identity), #76 (the chat follows ids).
+
+**Reversible?** Only by converting back; the backup of `app/data/` from before the conversion is outside the repository.
+
 ## See also
 
 - [[03-architecture]]
