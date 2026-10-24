@@ -55,18 +55,12 @@ next.
 
 ### Backend and code
 
-66. **What the app understands about time** (Question) — one place for
-    time, nothing started.
-    1. **The parked code:** `backend/foundation/` (about 1,800 lines:
-       `week_windows()` / `day_windows()`, `step_plan`; P1, P2) is used
-       by nothing in the product ([[04-current-state]]). It is kept on
-       purpose, as the parked home for the time sense the chat and the
-       agent may need later (when things happened, how often to step
-       in); keep, move to a branch, or remove is still open.
-    2. **What a session or visit is** (was 27): if the app needs one,
-       build on `created_at` in project history, not server starts.
-    3. **Practices have no shape** (was 17): recurring open-ended
-       commitments ("10 push-ups a day") fit no current axis.
+66. **Parked Time code** (Question) — `backend/foundation/` (about
+    1,800 lines: `week_windows()` / `day_windows()`, `step_plan`; P1,
+    P2) is used by nothing in the product ([[04-current-state]]). It is
+    kept on purpose, as the parked home for a sense of time the chat
+    may need later (when things happened); keep, move to a branch, or
+    remove is still open.
 62. **Old names left in code** (Step, not crucial) — "Talk" is "the
     chat" in docs since 2026-10-14 but remains in `TALK_PROVIDER` (also
     in `app/fly.toml`, so a rename needs a deploy), `talk_prompt.py`,
@@ -154,6 +148,12 @@ next.
 Not planned and not built. Moving one into the Queue is a deliberate
 choice.
 
+- **Time, from the agent idea** — questions from when the app was meant
+  to be an agent that follows the user over time, not part of the map
+  and chat today: what a session or visit is, to say "since last time"
+  (build on `created_at` in project history, not server starts; was
+  27), and how recurring open-ended commitments ("10 push-ups a day")
+  would fit (was 17). Related: Queue 66.
 - **Larger domains** — a second capability beside Project, memory,
   acting, and background behavior (was 9–11, 13, 14). Reading documents
   and knowledge (RAG) is part of Queue 63.
