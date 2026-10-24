@@ -104,6 +104,10 @@ card-style nodes.
   parent), `panes/create/` (sidebar and accounts), `panes/canvas/`,
   `panes/chat/`, `settings/`, `demo/` (login page and Log out, public
   demo only).
+- **Settings** is three tabs (General, Directory, Archive) in
+  `settings/<tab>/`. A project's or account's details page
+  (`settings/details/`) sits a level below a tab: no tabs, only the way
+  back to the tab it was opened from ([[05-decisions]] #88).
 - **Tokens:** shared look lives once in `css/tokens.css`. If it should
   look the same everywhere, change a token; don't add a colour in an
   area file.
