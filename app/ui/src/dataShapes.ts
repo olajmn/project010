@@ -39,6 +39,8 @@ export interface ChatMessage {
   removed?: boolean;
   /** The labels above that node, when another node has the same label. */
   focus_context?: string;
+  /** That node's labels from the top ("Civic Centre / Design / Concept"). */
+  focus_path?: string;
 }
 
 /** A project's status (backend/project/status/build_status.py): the

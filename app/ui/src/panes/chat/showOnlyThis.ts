@@ -53,6 +53,8 @@ type Frame = {
   removed?: { stepId: string; label: string };
   /** The labels above the node when another node has the same label. */
   context?: string;
+  /** The node's labels from the top, shown on hover. */
+  path?: string;
 };
 
 /** "“Concept”", or "“Concept” (in Design)" when the label is used twice. */
@@ -75,7 +77,13 @@ function frameOf(
       return { key: `id:${stepId}`, name: `${label} (removed)`, day: null, removed: { stepId, label } };
     }
     const name = labelForStepId?.(stepId) || focus || stepId;
-    return { key: `id:${stepId}`, name, day: null, context: message.focus_context };
+    return {
+      key: `id:${stepId}`,
+      name,
+      day: null,
+      context: message.focus_context,
+      path: message.focus_path,
+    };
   }
   if (focus) return { key: focus, name: focus, day: null };
   const day = message.focus_day?.trim();
@@ -162,6 +170,7 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
           const marker = document.createElement("span");
           marker.className = "chat-focus-marker";
           marker.textContent = `About ${frameTitle(current)}`;
+          if (current.path) marker.title = current.path;
           const isolateBtn = document.createElement("button");
           isolateBtn.type = "button";
           isolateBtn.className = "thread-isolate-button";

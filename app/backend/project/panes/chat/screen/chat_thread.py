@@ -11,7 +11,7 @@ edits, archive lines, and the project's first record belong in Status,
 not here — same rule as model/brief/conversation.past_turns().
 """
 
-from backend.project.node import find_step
+from backend.project.node import find_path
 from backend.project.panes.create.resolver import get_history_for_project
 
 # A node rename is saved as "Renamed step: <old> → <new>"
@@ -40,7 +40,8 @@ def thread_messages(history: list[dict], steps: list | None = None) -> list[dict
     With `steps` (the tree now), both lines of a turn about a node that
     is no longer in it carry `removed: True`, and a turn about a node
     whose label another node also has carries `focus_context`: the
-    labels above it that tell the two apart ("Design")."""
+    labels above it that tell the two apart ("Design"). A turn about a
+    node in the tree carries `focus_path`, its labels from the top."""
     talked_about = {
         (r.get("focus_step_id") or "").strip()
         for r in history
@@ -65,10 +66,15 @@ def thread_messages(history: list[dict], steps: list | None = None) -> list[dict
             extra["focus"] = focus
             if step:
                 extra["focus_step_id"] = step
-                if steps is not None and find_step(steps, step) is None:
+                path = find_path(steps, step) if steps is not None else None
+                if steps is not None and path is None:
                     extra["removed"] = True
-                elif step in contexts:
-                    extra["focus_context"] = contexts[step]
+                elif path is not None:
+                    extra["focus_path"] = " / ".join(
+                        (node.get("label") or "").strip() for node in path
+                    )
+                    if step in contexts:
+                        extra["focus_context"] = contexts[step]
         elif day:
             extra["focus_day"] = day
         created_at = record.get("created_at")

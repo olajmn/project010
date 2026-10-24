@@ -250,3 +250,29 @@ def test_parents_with_the_same_label_show_one_level_more() -> None:
     ]
     history = [_turn_about("p3", "Fees"), _turn_about("p6", "Fees")]
     assert _contexts(steps, history) == ["Client A / Scope", "Architect A / Scope"]
+
+
+def test_turns_carry_their_full_path() -> None:
+    # Shown when the pointer rests on a frame's title.
+    steps = [
+        {
+            "id": "p1",
+            "label": "Civic Centre",
+            "children": [
+                {
+                    "id": "p2",
+                    "label": "Design",
+                    "children": [{"id": "p3", "label": "Concept", "children": []}],
+                },
+            ],
+        },
+    ]
+    shown = thread_messages(
+        [_turn_about("p3", "Concept"), _turn_about("p9", "Gone")], steps
+    )
+    assert [m.get("focus_path") for m in shown] == [
+        "Civic Centre / Design / Concept",
+        "Civic Centre / Design / Concept",
+        None,
+        None,
+    ]
