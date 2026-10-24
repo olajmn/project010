@@ -11,8 +11,45 @@ next.
 
 ## Active
 
-None chosen; the next one comes from the Queue. Change records, undo,
-and redo (54) were finished 2026-10-24 (#80, #83, #84, #85).
+62. **Old names left in code** (Step) — names from the planner era and
+    from before "the chat" and "Current state" still name today's
+    things, and confuse reading the code ("step" is a node). Rename only:
+    no behavior changes, no new files beyond one renamed module, and no
+    code that reads both old and new names (data is converted once).
+    Planned 2026-10-24. One commit per step; after each, pytest, the UI
+    type check, and `tools/project_check.py` (its replay check catches
+    data that no longer matches).
+    1. **Backend names** (`app/backend/`, not `foundation/`): `Step` →
+       `Node`, `steps_of()` → `nodes_of()` (still the one place that
+       knows where nodes sit on a record), `find_step()` → `find_node()`,
+       `step` / `step_id` / `new_steps` → `node` / `node_id` /
+       `new_nodes`, `save_plan()` → `save_project()` with `nodes`
+       instead of a `plan` dict. Tests follow.
+    2. **Saved data**, with step 1: `current.json`
+       `plan.progression.steps` → `nodes` (an empty map is `[]`, not
+       `progression: null`); `focus_step_id` → `focus_node_id` on log
+       lines; saved trees' `source.step_id` → `source.node_id`. One
+       conversion script outside the repository for `app/data/` and
+       `app/demo_seed/`, backed up first; `backend/seed/` writes the new
+       names. Change records already say `nodes` / `node_id`.
+    3. **UI names** (`app/ui/src/`): `stepId` → `nodeId`, `onAddStep` /
+       `onRemoveStep` / `onStepClick` → `…Node…`, `labelForStepId`,
+       `resolveStepId(Live)`, `stepIdForLabel`, `stepLayout`,
+       `isProgressionTree`, `AddStepHandler` / `RemoveStepHandler`, and
+       `focus_step_id` in `dataShapes.ts`, `api.ts`, and
+       `api/request_bodies.py` (the same field on both sides).
+    4. **Talk and Status**: `talk_prompt.py` → `chat_prompt.py`,
+       `TALK_PROVIDER` → `CHAT_PROVIDER` (also `app/fly.toml`; needs a
+       deploy), the demo's `TALK_PER_*` limits; "Status" is "Current
+       state": `project/status/` and `build_status`.
+    Not renamed: `backend/foundation/` (parked Time code, where a step
+    is a step in time; P2) and `docs/05-decisions.md` (history). Done
+    when a whole-word search for `step`, `steps`, `Step`, `stepId`,
+    `progression`, `talk`, and `Talk` in `app/backend/` (outside
+    `foundation/`) and `app/ui/src/` finds nothing. Docs: a decision in
+    `05-decisions.md`, the data rows in `04-current-state.md` § 3,
+    `docs/chat.md`, `docs/ui.md`, the two code-folder READMEs
+    (`project/node/`, `identity/`).
 
 ## Queue
 
@@ -24,13 +61,6 @@ and redo (54) were finished 2026-10-24 (#80, #83, #84, #85).
     kept on purpose, as the parked home for a sense of time the chat
     may need later (when things happened); keep, move to a branch, or
     remove is still open.
-62. **Old names left in code** (Step, not crucial) — "Talk" is "the
-    chat" in docs since 2026-10-14 but remains in `TALK_PROVIDER` (also
-    in `app/fly.toml`, so a rename needs a deploy), `talk_prompt.py`,
-    `_save_talk()`, and the demo's `TALK_PER_*` limits. "Status" is
-    "Current state" in the UI but not in `project/status/` or
-    `build_status`. Rename with the tests when there is a reason to
-    touch them.
 67. **A real database** (Step, not needed yet) — when JSON files stop
     being enough, and what replaces them.
     1. **Today:** JSON files under `app/data/`: per project a
