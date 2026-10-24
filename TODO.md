@@ -24,10 +24,8 @@ next.
        that contains ` Note: ` is split in the wrong place. Store reply
        and message in their own fields; decide whether saved turns in
        `data/` are converted once or both shapes are read.
-    2. **A map edit can pass for a chat turn.** Turns are recognised by
-       ` Note: ` in the text, not by `event`, so adding a node named
-       "Site Note: walls" shows up as a conversation, on screen and to
-       the model. Read only `event: "chat"` lines as turns.
+    2. ~~A map edit can pass for a chat turn~~ — fixed 2026-10-24:
+       only `event: "chat"` lines are read as turns.
     3. **Removed nodes stay in the conversation.** Past turns about a
        node that was later removed still say `[about: Kitchen]` with no
        sign it is gone; renames are handled, removals and moves are not.
@@ -40,6 +38,13 @@ next.
     6. **The structure is cut at 400 lines without saying so**
        (`MAX_LINES` in `project/node/tree_as_text.py`); the model is
        told it sees every name.
+    7. **Ollama cuts the prompt at 4,096 tokens without saying so.**
+       `client.py` sets no `num_ctx`, so Ollama uses its default (4,096,
+       measured with `ollama ps`); the model is trained for 262,144. A
+       prompt is 1,100-1,800 tokens before past turns, so 20 turns can
+       pass the limit, and Ollama then drops the start: the
+       instructions and the project background. Local only; OpenRouter
+       has the full context.
     Related, not part of this item: how much context the chat gets
     (63), whether the structure helps at all (69), and `/select` hints
     (53).

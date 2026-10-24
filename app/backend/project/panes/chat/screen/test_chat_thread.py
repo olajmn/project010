@@ -54,10 +54,11 @@ def test_map_focus_tags_each_turn() -> None:
         [
             {
                 "feedback": "A room. Note: what is this?",
+                "event": "chat",
                 "map_focus": "Rooms",
                 "focus_step_id": "p1",
             },
-            {"feedback": "Paint. Note: and now?"},
+            {"event": "chat", "feedback": "Paint. Note: and now?"},
         ]
     )
     assert focused[0] == {
@@ -74,7 +75,13 @@ def test_map_focus_tags_each_turn() -> None:
 def test_turn_about_a_day() -> None:
     # A turn about a day of changes carries focus_day, not a node focus.
     by_day = thread_messages(
-        [{"feedback": "Two edits. Note: what changed?", "focus_day": "2026-09-27"}]
+        [
+            {
+                "event": "chat",
+                "feedback": "Two edits. Note: what changed?",
+                "focus_day": "2026-09-27",
+            }
+        ]
     )
     assert by_day[0] == {
         "role": "user",
@@ -88,7 +95,12 @@ def test_at_times() -> None:
     # `at`: the user line prefers sent_at, the agent line uses created_at.
     timed = thread_messages(
         [
-            {"feedback": "Ok. Note: hi", "sent_at": "t1", "created_at": "t2"},
+            {
+                "event": "chat",
+                "feedback": "Ok. Note: hi",
+                "sent_at": "t1",
+                "created_at": "t2",
+            },
         ]
     )
     assert timed[0]["at"] == "t1" and timed[1]["at"] == "t2"
@@ -101,6 +113,7 @@ def test_rename_notes() -> None:
         [
             {
                 "feedback": "Outside. Note: what is this?",
+                "event": "chat",
                 "map_focus": "Surroundings",
                 "focus_step_id": "p6",
             },
@@ -125,3 +138,9 @@ def test_rename_notes() -> None:
         "at": "t3",
     }
     assert len(renamed) == 3
+
+
+def test_map_edit_with_note_in_its_text_is_not_a_turn() -> None:
+    # Only lines saved as chat are turns, whatever a node is called.
+    edit = {"feedback": "Added step: Site Note: walls", "event": "node_added"}
+    assert thread_messages([edit]) == []

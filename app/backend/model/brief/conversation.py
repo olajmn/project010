@@ -61,7 +61,7 @@ def past_turns(
     turns: list[dict] = []
     for record in history:
         feedback = record.get("feedback") or ""
-        if _NOTE_MARKER not in feedback:
+        if record.get("event") != "chat" or _NOTE_MARKER not in feedback:
             continue
         reply, note = feedback.split(_NOTE_MARKER, 1)
         focus = _focus_tag(

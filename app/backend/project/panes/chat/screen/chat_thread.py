@@ -40,7 +40,7 @@ def thread_messages(history: list[dict]) -> list[dict]:
     talked_about = {
         (r.get("focus_step_id") or "").strip()
         for r in history
-        if _NOTE_MARKER in (r.get("feedback") or "")
+        if r.get("event") == "chat"
     } - {""}
     messages: list[dict] = []
     for record in history:
@@ -49,7 +49,7 @@ def thread_messages(history: list[dict]) -> list[dict]:
         if note_line:
             messages.append(note_line)
             continue
-        if _NOTE_MARKER not in feedback:
+        if record.get("event") != "chat" or _NOTE_MARKER not in feedback:
             continue
         reply, note = feedback.split(_NOTE_MARKER, 1)
         focus = (record.get("map_focus") or "").strip() or None
