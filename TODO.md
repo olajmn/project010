@@ -16,8 +16,14 @@ next.
     project is the same kind of thing as a node. The pitch stays (a
     workspace for the structure of projects); this adds a layer: an
     account becomes a workspace where things can be copied, moved, and
-    put together freely, each keeping its own identity. Planned
-    2026-10-24, in stages, each usable on its own.
+    put together freely, each keeping its own identity. Three kinds of
+    thing stay apart throughout: holders (accounts), things (nodes and
+    projects), and events (changes, the log's lines). A change is never
+    a node: a node can change, an event is history that does not; each
+    event records who made it. Bare ids (#87) and the node names (#86)
+    already fit; stages 1 and 2 barely touch today's change records,
+    replay, and undo. Planned 2026-10-24, in stages, each usable on its
+    own.
     1. **Everything is always held.** Today a project may have no
        account (`account_id` null). Where that is allowed: creating a
        project without one (`panes/create/lifecycle.py`), unlinking one
@@ -51,8 +57,15 @@ next.
        node in another project, keeping its id and its history; copying
        still makes new ids (as saved trees do). The history follows the
        node rather than the project folder (the largest change), and a
-       move that would put a node inside itself is refused. Open: who
-       holds a project once it is inside another one.
+       move that would put a node inside itself is refused. A thing may
+       be held by a node; following the holders upward always ends at
+       an account. What it means for today's code: a new change record
+       for moving under another parent (today's move only reorders
+       siblings), and the log kept per account or workspace instead of
+       per project folder, so replay, undo, the chat's change lines, and
+       the details pages' logs read that log; the code that reads a log
+       mostly stays, where the log lives moves. Open: who holds a
+       project once it is inside another one.
     4. **The workspace.** An account's things can be pasted, moved, and
        put together freely across what are projects today.
 
