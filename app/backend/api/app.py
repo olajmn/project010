@@ -62,6 +62,7 @@ from backend.api.request_bodies import (
     ProjectOwner,
     RenameAccount,
     TextBody,
+    UndoRedo,
 )
 from backend.model.client import MODEL_IN_USE, PROVIDER, TEMPERATURE
 from backend.project.panes.canvas.add_folder import choose_folder
@@ -74,6 +75,7 @@ from backend.project.panes.canvas.edit_map import (
     rename_map_node,
 )
 from backend.project.panes.canvas.text_to_tree import parse_outline
+from backend.project.panes.canvas.undo import redo_map_change, undo_map_change
 from backend.project.panes.chat.reply import reply
 from backend.project.panes.create.lifecycle import (
     cancel_project,
@@ -362,6 +364,24 @@ def post_rename_node(
     text = _text(body)
     latest = _load_project(project_id)
     return _map_change(lambda: rename_map_node(latest, node_id, text))
+
+
+@app.post("/api/projects/{project_id}/undo")
+def post_undo(
+    project_id: str, body: Annotated[UndoRedo, Body(default_factory=UndoRedo)]
+) -> dict:
+    """Reverse the latest map change made since the page opened the project."""
+    latest = _load_project(project_id)
+    return _map_change(lambda: undo_map_change(latest, body.since))
+
+
+@app.post("/api/projects/{project_id}/redo")
+def post_redo(
+    project_id: str, body: Annotated[UndoRedo, Body(default_factory=UndoRedo)]
+) -> dict:
+    """Do again the latest change undone since the page opened the project."""
+    latest = _load_project(project_id)
+    return _map_change(lambda: redo_map_change(latest, body.since))
 
 
 @app.post("/api/parse-outline-preview")

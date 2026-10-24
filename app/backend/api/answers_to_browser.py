@@ -14,6 +14,7 @@ no product rules.
 #  2. Map tree
 #      - map_tree()
 
+from backend.project.changes.undo import undo_state
 from backend.project.node import steps_of
 from backend.project.panes.chat.screen.chat_thread import thread_for
 from backend.project.panes.create.resolver import (
@@ -63,6 +64,8 @@ def project_view(
         "started_at": history[0].get("created_at")
         if history
         else record.get("created_at"),
+        # Where undo and redo would act; the page compares with where it opened.
+        "undo": undo_state(history),
         "node": node,
         "thread": thread,
         "status": build_status(history, current=record),

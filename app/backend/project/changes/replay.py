@@ -24,6 +24,8 @@ MAP_EDITS = {
     "pasted",
     "folder_added",
     "tree_inserted",
+    "undone",
+    "redone",
 }
 
 
@@ -38,7 +40,7 @@ def replay(events: list[dict]) -> list[dict]:
             if line.get("event") in MAP_EDITS:
                 raise ValueError(f"line {line.get('id')}: map edit without a record")
             continue
-        _apply(steps, change)
+        apply_change(steps, change)
     return steps
 
 
@@ -60,23 +62,25 @@ def mismatch(project_dir: Path) -> str | None:
     return None if rebuilt == saved else "replayed tree differs from current.json"
 
 
-def _apply(steps: list[dict], change: dict) -> None:
+def apply_change(steps: list[dict], change: dict) -> None:
+    """Apply one record to `steps` (the top-level nodes) in place, as the
+    edit did. Raises ValueError if the record does not fit the tree."""
     op = change.get("op")
-    if op == "add":
+    if op in ("add", "remove"):
         siblings = _children(steps, change["parent"])
-        if change["index"] != len(siblings):
+        index, nodes = change["index"], change["nodes"]
+        if op == "add":
+            if not 0 <= index <= len(siblings):
+                raise ValueError(f"{change['id']}: no place {index} to add at")
+            siblings[index:index] = copy.deepcopy(nodes)
+            return
+        if [s.get("id") for s in siblings[index : index + len(nodes)]] != [
+            n["id"] for n in nodes
+        ]:
             raise ValueError(
-                f"{change['id']}: added at {change['index']}, not at the end"
+                f"{change['id']}: the nodes are not where they were removed"
             )
-        siblings.extend(copy.deepcopy(change["nodes"]))
-    elif op == "remove":
-        siblings = _children(steps, change["parent"])
-        node = change["node"]
-        if not _at(siblings, change["index"], node["id"]):
-            raise ValueError(
-                f"{change['id']}: {node['id']} is not where it was removed"
-            )
-        del siblings[change["index"]]
+        del siblings[index : index + len(nodes)]
     elif op == "move":
         siblings = _children(steps, change["parent"])
         i, j = change["from"], change["to"]

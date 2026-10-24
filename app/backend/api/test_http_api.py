@@ -164,6 +164,42 @@ def test_rename_move_remove_node(api, project) -> None:
     assert labels(view["node"]) == [("Garden", [])]
 
 
+def test_undo_and_redo(api, project) -> None:
+    pid, node = project["project_id"], ids(project["node"])
+    # The page keeps where the log stood when it opened the project.
+    since = {"since": project["undo"]["log_lines"]}
+    api.post(f"/api/projects/{pid}/map/{node['Rooms']}/remove")
+    api.post(f"/api/projects/{pid}/map/{node['Garden']}/rename", {"text": "Yard"})
+
+    # Each undo goes one change further back; nodes return with their ids.
+    _, view = api.post(f"/api/projects/{pid}/undo", since)
+    assert labels(view["node"]) == [("Garden", [])]
+    _, view = api.post(f"/api/projects/{pid}/undo", since)
+    assert ids(view["node"]) == node
+    assert labels(view["node"]) == [("Rooms", [("Kitchen", [])]), ("Garden", [])]
+    # The project's own nodes were added before the page opened it.
+    assert api.post(f"/api/projects/{pid}/undo", since) == (422, "nothing to undo")
+
+    # Redo puts them back in order, then there is nothing left to redo.
+    _, view = api.post(f"/api/projects/{pid}/redo", since)
+    assert labels(view["node"]) == [("Garden", [])]
+    _, view = api.post(f"/api/projects/{pid}/redo", since)
+    assert labels(view["node"]) == [("Yard", [])]
+    assert api.post(f"/api/projects/{pid}/redo", since) == (422, "nothing to redo")
+
+    # A new edit after an undo ends what can be redone.
+    api.post(f"/api/projects/{pid}/undo", since)
+    _, view = api.post(f"/api/projects/{pid}/map", {"label": "Shed"})
+    assert view["undo"]["redo_line"] is None
+    assert api.post(f"/api/projects/{pid}/redo", since) == (422, "nothing to redo")
+
+    # Every undo and redo is a new line in the log; nothing is erased.
+    _, timeline = api.get(f"/api/projects/{pid}/timeline")
+    texts = [entry["text"] for entry in timeline]
+    assert "Undid: Removed step: Rooms (and 1 under it)" in texts
+    assert "Redid: Renamed step: Garden → Yard" in texts
+
+
 def test_map_edit_errors(api, project) -> None:
     pid, node = project["project_id"], ids(project["node"])
     # A refused edit is 422 with the reason as plain text.

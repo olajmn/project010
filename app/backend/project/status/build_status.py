@@ -155,6 +155,8 @@ _TALLY_WORDS = {
     "pasted": "imported",
     "tree_inserted": "imported",
     "folder_added": "imported",
+    "undone": "undone",
+    "redone": "redone",
     "suggested": "suggested",
     "renamed": "renamed",
 }

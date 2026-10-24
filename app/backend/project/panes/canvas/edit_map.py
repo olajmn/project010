@@ -13,7 +13,8 @@ keeping its id and everything under it (no LLM).
 rename_map_node() — give a Step a new label, keeping its id, so chat
 turns about it stay attached (docs/05-decisions.md #52, #71).
 
-New nodes get their ids from backend/identity/.
+New nodes get their ids from backend/identity/. Undo and redo are
+undo.py, saved through the same save_map_edit().
 
 Does not touch the Steps-page scratch tree.
 """
@@ -84,7 +85,7 @@ def add_map_node(
     else:
         feedback = f"Added step: {text}"
 
-    return _save_map(latest, plan, feedback, "node_added", change)
+    return save_map_edit(latest, plan, feedback, "node_added", change)
 
 
 def import_map_outline(
@@ -159,7 +160,7 @@ def import_map_outline(
     change = records.added(parent["id"] if parent else None, len(siblings), new_steps)
     siblings.extend(new_steps)
 
-    return _save_map(latest, plan, feedback, event, change)
+    return save_map_edit(latest, plan, feedback, event, change)
 
 
 def import_map_folder(
@@ -198,7 +199,7 @@ def remove_map_node(latest: dict, step_id: str) -> dict:
     parent = path[-2] if len(path) > 1 else None
     siblings = parent["children"] if parent else steps
     index = next(n for n, s in enumerate(siblings) if s is step)
-    change = records.removed(parent["id"] if parent else None, index, step)
+    change = records.removed(parent["id"] if parent else None, index, [step])
     del siblings[index]
     label = str(step.get("label") or step_id)
     below = _count_below(step)
@@ -213,7 +214,7 @@ def remove_map_node(latest: dict, step_id: str) -> dict:
     if not steps:
         plan["progression"] = None
 
-    return _save_map(latest, plan, feedback, "node_removed", change)
+    return save_map_edit(latest, plan, feedback, "node_removed", change)
 
 
 def move_map_node(latest: dict, step_id: str, direction: str) -> dict:
@@ -251,7 +252,7 @@ def move_map_node(latest: dict, step_id: str, direction: str) -> dict:
         else f"Moved step: {label} {where} {other}"
     )
 
-    return _save_map(latest, plan, feedback, "node_moved", change)
+    return save_map_edit(latest, plan, feedback, "node_moved", change)
 
 
 def rename_map_node(latest: dict, step_id: str, label: str) -> dict:
@@ -286,7 +287,7 @@ def rename_map_node(latest: dict, step_id: str, label: str) -> dict:
         raise ValueError(clash)
     step["label"] = text
 
-    return _save_map(
+    return save_map_edit(
         latest,
         plan,
         f"Renamed step: {old} → {text}",
@@ -296,7 +297,7 @@ def rename_map_node(latest: dict, step_id: str, label: str) -> dict:
     )
 
 
-def _save_map(
+def save_map_edit(
     latest: dict,
     plan: dict,
     feedback: str,
@@ -305,7 +306,8 @@ def _save_map(
     focus_step_id: str | None = None,
 ) -> dict:
     """Save one map edit: the new tree, its line for Logs and the chat
-    (`feedback`), and its full record (`change`, project/changes/)."""
+    (`feedback`), and its full record (`change`, project/changes/). Every
+    edit here and every undo and redo (undo.py) saves through this."""
     return save_plan(
         latest["name"],
         plan,

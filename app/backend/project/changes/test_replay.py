@@ -22,7 +22,7 @@ def test_every_kind_of_change_replays() -> None:
         _line(records.added(None, 0, [a, b])),
         _line(records.moved("node_b", None, 1, 0)),
         _line(records.renamed("node_c", "C", "See")),
-        _line(records.removed(None, 1, a)),
+        _line(records.removed(None, 1, [a])),
         {"event": "chat", "message": "Hi"},
     ]
     assert replay(events) == [_node("node_b", "B", [_node("node_c", "See")])]

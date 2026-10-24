@@ -63,5 +63,12 @@ class ChatMessage(BaseModel):
     about_removed: bool = False
 
 
+class UndoRedo(BaseModel):
+    """`since`: the log's last line number when the page opened the
+    project; undo and redo reach only changes after it."""
+
+    since: int = 0
+
+
 class RenameAccount(BaseModel):
     text: str | None = None

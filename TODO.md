@@ -32,18 +32,12 @@ next.
        through the app's own edits, and is also the local data; the old
        `app/data/` is archived. `tools/project_check.py` checks that
        each log replays to `current.json` (`project/changes/replay.py`).
-    3. **Undo and redo.** Undo reads the last change and saves its
-       opposite as a new change ("Undid: Removed step: Client"); nodes
-       come back with their own ids, so their chat reconnects. Each
-       undo goes one change further back,
-       and redo puts undone changes back in order until a new edit is
-       made. Nothing in the history is erased. Undo reaches only the
-       changes made since the project was opened in this page (a
-       reload or switching projects starts again); older changes stay
-       in the log, and reversing them is a separate, deliberate action
-       (see Ideas: a details window). Routes
-       `POST /api/projects/{id}/undo` and `/redo` in `api/app.py`.
-    4. **The UI.** A back-arrow icon (drawn, not a character) on the
+    3. **Undo and redo** — backend done 2026-10-24 (#84):
+       `POST /api/projects/{id}/undo` and `/redo` with `since`, the log
+       line the page opened at. The page has to send it (step 4).
+    4. **The UI.** On opening a project, keep `undo.log_lines` from its
+       view and send it as `since`; grey undo when `undo.undo_line` is
+       not after it, and redo likewise with `undo.redo_line`. A back-arrow icon (drawn, not a character) on the
        map's toolbar, grey when there is nothing to undo; Ctrl+Z while
        the map has focus (text fields keep their own undo); a short
        "Undo" notice after a remove, after which the remove

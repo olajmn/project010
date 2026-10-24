@@ -64,6 +64,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Accounts and which one owns a project | `storage/accounts_persistence.py`, `panes/create/project_account.py` | `panes/create/accounts/`, `settings/directory/` |
 | What a node is; ids; sibling names | `project/node/` (see its `README.md`) | — |
 | Add, remove, move, rename, paste, folder | `panes/canvas/edit_map.py`, `text_to_tree.py`, `add_folder/` | `panes/canvas/` |
+| Undo and redo of map edits (backend only; no button or shortcut yet) | `panes/canvas/undo.py`, `project/changes/undo.py` | — |
 | Saved trees | `project/saved_trees/`, `storage/saved_trees_persistence.py` | `panes/canvas/savedTrees/` |
 | The map as drawn | `api/answers_to_browser.py` (`map_tree()`) | `panes/canvas/drawNodes.ts`, `lines/`, `zoomAndPan/` |
 | A chat message | `panes/chat/reply.py`, `model/brief/conversation.py`, `talk_prompt.py` | `panes/chat/` |
@@ -107,6 +108,10 @@ Everything lives in `app/data/` as plain JSON:
   has its `change` record, and replaying a project's log from empty
   gives exactly its `current.json` (`project/changes/replay.py`;
   checked by `tools/project_check.py` for `data/` and `demo_seed/`).
+- Undo and redo are new lines (`undone`, `redone`) whose record
+  reverses or repeats an earlier one (`undoes`, `redoes`); they reach
+  only changes after the log line the page opened at (`since`,
+  [[05-decisions]] #84).
 
 ## 4. The model
 

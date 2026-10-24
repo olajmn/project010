@@ -32,7 +32,7 @@ Arrows show who calls whom; every answer returns the same way.
 | Folder | What it holds |
 |---|---|
 | `node/` | What a node is: identity, children, rules ([[05-decisions]] #52) |
-| `changes/` | Each map edit as a full record, and replaying a log into its tree ([[05-decisions]] #80, #83) |
+| `changes/` | Each map edit as a full record, replaying a log into its tree, and which change undo and redo act on ([[05-decisions]] #80, #83, #84) |
 | `saved_trees/` | Saving a branch as structure and inserting it again ([[05-decisions]] #54) |
 | `panes/create/` | Creating, naming, archiving projects; which account owns one |
 | `panes/canvas/` | Changing the map: add, remove, paste, folder |

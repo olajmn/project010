@@ -1002,6 +1002,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** The archive of the old `app/data/` can be put back, but it holds the older ids (#82).
 
+## 84. 2026-10-24 — Undo and redo are new changes in the log, reaching back one visit
+
+**Decision:** Undo reverses the latest map change not yet undone and saves the reverse as a new log line (`undone`, feedback "Undid: …") whose record names the change it reverses (`undoes`); redo saves the undone change again (`redone`, `redoes`). Repeated undos go one change further back; redo brings undone changes back in order until a new edit is made. Which change is next is read from the log as a stack (`project/changes/undo.py`), the tree changes the way replay applies a record (`apply_change()` in `changes/replay.py`), and the line is saved through the same `save_map_edit()` as every map edit (`panes/canvas/undo.py`). Undo and redo reach only changes after `since`, the log's last line number when the page opened the project; a reload or switching projects starts again. A remove record now holds `nodes` (a list), the same shape as add, so each is the other's reverse; the 6 stored remove records were converted. Removed nodes come back with their own ids and in their old place, so their chat reconnects. Routes `POST /api/projects/{id}/undo` and `/redo`; the project view carries `undo` (`log_lines`, `undo_line`, `redo_line`) for the page.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** undo that toggles (a second undo redoes, so only one step back); undo with no reach limit (the log goes back to the start, so old work, or in the demo the built history, could be taken down by repeated undo); erasing undone lines (the log would no longer be the account of what happened).
+
+**Why this choice:** Repeated undo going further back is what Ctrl+Z does elsewhere, and the undo list of other programs lasts as long as the open document; here that is one visit of the page. Saving undo as a change keeps the log complete and replayable, and older changes stay there to be reversed on purpose later.
+
+**Reversible?** Yes; undo lines are ordinary changes in the log.
+
 ## See also
 
 - [[03-architecture]]

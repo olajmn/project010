@@ -194,11 +194,13 @@ def test_remove_records_the_whole_branch(saved) -> None:
         "op": "remove",
         "parent": "p1",
         "index": 0,
-        "node": {
-            "id": "p2",
-            "label": "Mid",
-            "children": [{"id": "p3", "label": "Leaf", "children": []}],
-        },
+        "nodes": [
+            {
+                "id": "p2",
+                "label": "Mid",
+                "children": [{"id": "p3", "label": "Leaf", "children": []}],
+            }
+        ],
     }
 
 

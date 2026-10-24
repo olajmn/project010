@@ -47,6 +47,8 @@ GROUPS = {
     "pasted": "Map",
     "folder_added": "Map",
     "tree_inserted": "Map",
+    "undone": "Map",
+    "redone": "Map",
     "suggested": "Map",
     "renamed": "Renamed",
     "owner_changed": "Owner",
