@@ -41,7 +41,9 @@ Nothing chosen yet; pick the next item from the Queue.
 
 72. **Node id follow-ups** (Step, when needed) — ids are random UUIDv4
     since 2026-10-24 (#78, `app/backend/project/node/README.md`). Open:
-    a Settings overview of every node's id (was 49); a check that walks
+    a Settings overview of every node's id (was 49) — purpose not
+    decided; most likely an inspection list for development (project,
+    short id, label, path), not a feature for users; a check that walks
     `data/projects/*/` for duplicate ids and references to ids that
     never existed; which side mints ids if another app shares the data.
 54. **Undo for map edits (Ctrl+Z)** (Step) — nothing can be undone
