@@ -13,6 +13,7 @@ reload.
 
 from backend.model.brief.conversation import build_messages
 from backend.model.client import send_chat
+from backend.project.node import find_step, steps_of
 from backend.project.panes.chat.commands import try_command
 from backend.project.panes.create.resolver import get_history_for_project
 from backend.project.status.build_status import (
@@ -38,6 +39,11 @@ def reply(
     # Taken before the model is called: the reply can take a while, and
     # the message was sent now, not when the reply is saved.
     sent_at = now_utc()
+
+    # The screen may still hold a node that was removed; a selection that
+    # is not in the tree is no selection.
+    if focus_step_id and find_step(steps_of(latest), focus_step_id) is None:
+        map_focus = focus_step_id = None
 
     commanded = try_command(latest, note, focus_step_id=focus_step_id)
     if commanded is not None:

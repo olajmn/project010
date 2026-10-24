@@ -900,6 +900,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Only by converting back; the backup of `app/data/` from before the conversion is outside the repository.
 
+## 76. 2026-10-24 — The chat names a part by its id, looked up in the tree now
+
+**Decision:** A turn's part is found by its saved `focus_step_id` in the tree as it is now, not by its saved label. The model gets it as a path from the top (`Rooms / Planning`), with its earlier name after a rename, or as "<label> (since removed)" when it is gone (`_part_name()` in `model/brief/conversation.py`). A selected part that is not in the tree is no selection: the model is told nothing is selected, and `panes/chat/reply.py` saves the turn without it. On screen, `thread_messages()` marks turns about a removed part `removed`, and their frame reads "(removed)" and cannot be clicked (`ui/src/panes/chat/showOnlyThis.ts`).
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** tagging by label (two parts with the same label under different parents read the same, and a removed part read as present); sending node ids to the model (unambiguous, but the model repeats ids such as "p3" in replies, and `talk_prompt.py` keeps it to names); dropping turns about removed parts (they were said, and later replies may build on them).
+
+**Why this choice:** A node's identity is its id (#52); the label is what people read. Looking the id up in the tree now keeps renames, removals, and repeated labels from misleading the model or the screen. Items 3-5 of `TODO.md` 71.
+
+**Reversible?** Yes; nothing saved changes shape.
+
 ## See also
 
 - [[03-architecture]]

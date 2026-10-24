@@ -303,3 +303,19 @@ def test_accounts(api) -> None:
     for action in ("rename", "archive", "restore", "delete"):
         status, text = api.post(f"/api/accounts/{aid}/{action}", {"text": "X"})
         assert (status, text) == (404, "no such account"), action
+
+
+def test_chat_about_a_removed_part_is_saved_without_it(
+    api, project, monkeypatch
+) -> None:
+    # The screen may still hold a part that was removed (TODO 71.4).
+    monkeypatch.setattr(reply_module, "send_chat", lambda messages: "Fine.")
+    pid = project["project_id"]
+    status, view = api.post(
+        f"/api/projects/{pid}/chat",
+        {"text": "and this?", "focus_label": "Ghost", "focus_step_id": "p99"},
+    )
+    assert status == 200
+    asked = view["thread"][-2]
+    assert asked["text"] == "and this?"
+    assert "focus" not in asked and "focus_step_id" not in asked

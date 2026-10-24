@@ -43,7 +43,7 @@ export type IsolateChatOptions = {
 
 // 2. Helpers
 
-type Frame = { key: string; name: string; day: string | null };
+type Frame = { key: string; name: string; day: string | null; removed?: boolean };
 
 /** What a message's About-frame is: its node (by id when saved, else by
  * label), or its day of changes. `key` groups messages; `name` is shown:
@@ -55,6 +55,9 @@ function frameOf(
   const focus = message.focus?.trim();
   const stepId = message.focus_step_id?.trim();
   if (stepId) {
+    if (message.removed) {
+      return { key: `id:${stepId}`, name: `${focus || stepId} (removed)`, day: null, removed: true };
+    }
     const name = labelForStepId?.(stepId) || focus || stepId;
     return { key: `id:${stepId}`, name, day: null };
   }
@@ -126,7 +129,7 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
             frame.classList.add("is-clickable");
             frame.title = `Talk about ${current.name} again`;
             frame.addEventListener("click", () => onDayClick(day));
-          } else if (focus && onFocusClick) {
+          } else if (focus && onFocusClick && !current.removed) {
             frame.classList.add("is-clickable");
             frame.title = `Select “${focus}” on the map`;
             frame.addEventListener("click", () => {

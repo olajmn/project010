@@ -113,6 +113,11 @@ Everything lives in `app/data/` as plain JSON:
   selected node's path or every change on the selected day
   (`changes_on_day_text()`, up to 100), the last 20 turns, and the new
   message. The model is told to answer from the project only.
+- Each turn is tagged with the part it was about, by path from the top
+  (`Rooms / Planning`), with its earlier name after a rename, or
+  "(since removed)" when it is gone ([[05-decisions]] #76). A selected
+  part that is no longer in the tree counts as nothing selected; the chat
+  on screen shows such a frame as "(removed)", not clickable.
 - The model sees labels only — not node ids, file contents, or anything
   outside the project.
 

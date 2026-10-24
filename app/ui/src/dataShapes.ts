@@ -35,6 +35,8 @@ export interface ChatMessage {
   focus_step_id?: string;
   /** A turn about one day of changes (YYYY-MM-DD) instead of a node. */
   focus_day?: string;
+  /** The node this turn was about is no longer in the project. */
+  removed?: boolean;
 }
 
 /** A project's status (backend/project/status/build_status.py): the

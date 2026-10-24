@@ -21,15 +21,12 @@ next.
        saved as `message` and `reply`; old turns converted once (#75).
     2. ~~A map edit can pass for a chat turn~~ — fixed 2026-10-24:
        only `event: "chat"` lines are read as turns.
-    3. **Removed nodes stay in the conversation.** Past turns about a
-       node that was later removed still say `[about: Kitchen]` with no
-       sign it is gone; renames are handled, removals and moves are not.
-    4. **A selected node that no longer exists** falls back to its bare
-       label, so the model is told about a part it cannot find in the
-       structure (`_background()` in `conversation.py`).
-    5. **Same label in two places.** Two nodes under different parents
-       can share a label; `[about: Planning]` does not say which one.
-       Tag turns by path or id, not label alone.
+    3. ~~Removed nodes stay in the conversation~~ — fixed 2026-10-24:
+       "(since removed)" for the model, "(removed)" on screen (#76).
+    4. ~~A selected node that no longer exists~~ — fixed 2026-10-24:
+       it counts as nothing selected, and is not saved with the turn.
+    5. ~~Same label in two places~~ — fixed 2026-10-24: turns are tagged
+       by path, e.g. `Rooms / Planning`.
     6. **The structure is cut at 400 lines without saying so**
        (`MAX_LINES` in `project/node/tree_as_text.py`); the model is
        told it sees every name.

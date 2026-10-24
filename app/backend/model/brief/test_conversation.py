@@ -93,7 +93,7 @@ def test_map_text_and_selected_path() -> None:
     assert "readme.txt" in system
     assert "what it contains):\nSample\n  src\n    main.py" in system
     loose = build_messages(tree, "hi", [], "loose", None)[0]["content"]
-    assert "what it contains):\nloose" in loose
+    assert "Nothing is selected" in loose and "loose" not in loose
     empty = build_messages({"plan": {}}, "hi", [])[0]["content"]
     assert "The project has no parts yet." in empty
 
@@ -150,7 +150,8 @@ def test_renamed_node_in_past_turns() -> None:
         "content": "[about: Flower beds (then called Beds)] what is this",
     }
     assert (
-        past_turns(talk, {"p1": "Beds"})[0]["content"] == "[about: Beds] what is this"
+        past_turns(talk, [{"id": "p1", "label": "Beds", "children": []}])[0]["content"]
+        == "[about: Beds] what is this"
     )
 
 
@@ -171,3 +172,66 @@ def test_message_and_reply_are_kept_apart() -> None:
         {"role": "user", "content": "what now? Note: walls are wet"},
         {"role": "assistant", "content": "Paint first. Note: let them dry."},
     ]
+
+
+# A house where Kitchen (p9) was removed and two parts share the label
+# "Planning", one under Rooms and one under Garden (TODO 71.3, 71.5).
+HOUSE = {
+    "name": "House",
+    "plan": {
+        "progression": {
+            "steps": [
+                {
+                    "id": "p1",
+                    "label": "Rooms",
+                    "children": [{"id": "p3", "label": "Planning", "children": []}],
+                },
+                {
+                    "id": "p2",
+                    "label": "Garden",
+                    "children": [{"id": "p4", "label": "Planning", "children": []}],
+                },
+            ]
+        }
+    },
+}
+
+
+def _turn(message: str, label: str, step_id: str) -> dict:
+    return {
+        "event": "chat",
+        "message": message,
+        "reply": "ok",
+        "map_focus": label,
+        "focus_step_id": step_id,
+    }
+
+
+def test_past_turns_name_their_part_by_path_or_as_removed() -> None:
+    history = [
+        _turn("what goes here?", "Kitchen", "p9"),
+        _turn("when do we start?", "Planning", "p3"),
+        _turn("and this one?", "Planning", "p4"),
+    ]
+    user_lines = [
+        m["content"]
+        for m in build_messages(HOUSE, "next?", history)
+        if m["role"] == "user"
+    ]
+    assert user_lines[:3] == [
+        "[about: Kitchen (since removed)] what goes here?",
+        "[about: Rooms / Planning] when do we start?",
+        "[about: Garden / Planning] and this one?",
+    ]
+
+
+def test_selected_part_is_named_by_path() -> None:
+    messages = build_messages(HOUSE, "and now?", [], "Planning", "p4")
+    assert messages[-1]["content"] == "[about: Garden / Planning] and now?"
+
+
+def test_selected_part_that_no_longer_exists_is_no_selection() -> None:
+    messages = build_messages(HOUSE, "and now?", [], "Kitchen", "p9")
+    assert "Nothing is selected" in messages[0]["content"]
+    assert "Kitchen" not in messages[0]["content"]
+    assert messages[-1]["content"] == "and now?"

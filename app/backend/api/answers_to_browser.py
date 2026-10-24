@@ -51,7 +51,7 @@ def project_view(
         print(f"(debug: map_tree() failed for project {pid}: {e})")
         node = None
     history = get_history_for_project(pid) if pid is not None else []
-    thread = thread_for(pid, history) if pid is not None else []
+    thread = thread_for(pid, history, steps_of(record)) if pid is not None else []
     view = {
         "project_id": pid,
         "name": record["name"],

@@ -11,6 +11,7 @@ edits, archive lines, and the project's first record belong in Status,
 not here — same rule as model/brief/conversation.past_turns().
 """
 
+from backend.project.node import find_step
 from backend.project.panes.create.resolver import get_history_for_project
 
 # A node rename is saved as "Renamed step: <old> → <new>"
@@ -19,7 +20,7 @@ _RENAME_PREFIX = "Renamed step: "
 _RENAME_ARROW = " → "
 
 
-def thread_messages(history: list[dict]) -> list[dict]:
+def thread_messages(history: list[dict], steps: list | None = None) -> list[dict]:
     """[{role, text, focus?}] oldest first - each saved chat turn is one
     user line (the note) and one agent line (the reply).
 
@@ -34,7 +35,10 @@ def thread_messages(history: list[dict]) -> list[dict]:
     since 2026-09-25), else `created_at`.
 
     A rename of a node that has chat turns becomes one `role: "note"`
-    line with that node's `focus_step_id` and its new label as `focus`."""
+    line with that node's `focus_step_id` and its new label as `focus`.
+
+    With `steps` (the tree now), both lines of a turn about a node that
+    is no longer in it carry `removed: True`."""
     talked_about = {
         (r.get("focus_step_id") or "").strip()
         for r in history
@@ -58,6 +62,8 @@ def thread_messages(history: list[dict]) -> list[dict]:
             extra["focus"] = focus
             if step:
                 extra["focus_step_id"] = step
+                if steps is not None and find_step(steps, step) is None:
+                    extra["removed"] = True
         elif day:
             extra["focus_day"] = day
         created_at = record.get("created_at")
@@ -73,12 +79,17 @@ def thread_messages(history: list[dict]) -> list[dict]:
     return messages
 
 
-def thread_for(project_id: int, history: list[dict] | None = None) -> list[dict]:
+def thread_for(
+    project_id: int,
+    history: list[dict] | None = None,
+    steps: list | None = None,
+) -> list[dict]:
     """Live thread for one project. Pass `history` when the caller
-    already loaded it."""
+    already loaded it, and `steps` (the tree now) to mark turns about
+    removed nodes."""
     if history is None:
         history = get_history_for_project(project_id)
-    return thread_messages(history)
+    return thread_messages(history, steps)
 
 
 def _rename_note(record: dict, talked_about: set[str]) -> dict | None:

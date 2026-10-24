@@ -163,3 +163,25 @@ def test_message_and_reply_are_kept_apart() -> None:
         {"role": "user", "text": "what now? Note: walls are wet"},
         {"role": "agent", "text": "Paint first. Note: let them dry."},
     ]
+
+
+def test_turns_about_a_removed_part_are_marked() -> None:
+    steps = [{"id": "p1", "label": "Rooms", "children": []}]
+    history = [
+        {
+            "event": "chat",
+            "message": "a?",
+            "reply": "b",
+            "map_focus": "Kitchen",
+            "focus_step_id": "p9",
+        },
+        {
+            "event": "chat",
+            "message": "c?",
+            "reply": "d",
+            "map_focus": "Rooms",
+            "focus_step_id": "p1",
+        },
+    ]
+    shown = thread_messages(history, steps)
+    assert [m.get("removed") for m in shown] == [True, True, None, None]
