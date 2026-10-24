@@ -11,7 +11,28 @@ next.
 
 ## Active
 
-Nothing chosen yet; pick the next item from the Queue.
+73. **Enter sends, Shift+Enter adds a line** (Step, small) — today Enter
+    only adds a line; sending needs the Send button. Handle `keydown` on
+    `#chat-input` (`ui/src/panes/chat/sendMessage.ts`): Enter without
+    Shift submits the form; not while composing characters
+    (`isComposing`), not when empty or while a send is under way.
+    Decide first: a multi-line message sent while a node is selected is
+    imported as child nodes today (the paste shortcut in
+    `sendMessage.ts`); with Shift+Enter, a written multi-line message
+    would turn into nodes by accident.
+54. **Undo for map edits** (Step) — nothing can be undone today, and the
+    history keeps only a short text per change, not the tree, so an
+    earlier tree cannot be worked out from it. Shape: snapshots
+    (memento) — keep a copy of the tree before each map edit, the last
+    20 or so; Undo saves the previous copy back as a new change ("Undid:
+    Removed step: Kitchen"), so history is never erased. A node brought
+    back keeps its id, so its chat reconnects (`docs/chat.md`). Decide
+    one at a time: which edits count (add, remove, move, rename, paste,
+    folder, insert tree); redo; whether undo survives a reload; Ctrl+Z
+    only while the map has focus (text fields keep their own undo); an
+    Undo button right after a remove, after which the remove
+    confirmation may go. Also open: removing a node but keeping its
+    children (moved up a level).
 
 ## Queue
 
@@ -46,11 +67,6 @@ Nothing chosen yet; pick the next item from the Queue.
     short id, label, path), not a feature for users; a check that walks
     `data/projects/*/` for duplicate ids and references to ids that
     never existed; which side mints ids if another app shares the data.
-54. **Undo for map edits (Ctrl+Z)** (Step) — nothing can be undone
-    today. Likely shape: keep the last 10–20 versions of the tree;
-    Undo saves the previous one back as a new change. To decide: which
-    edits count, whether undo survives a reload, redo, and focus
-    handling. With undo the remove confirmation may go.
 53. **`/select` gives no hint when it fails** (Step) — matching stays
     exact on purpose; the reply should say where a name actually sits,
     or suggest the closest name for a typo
