@@ -32,6 +32,13 @@ OPENROUTER_MODEL = "qwen/qwen3.5-9b"
 # dial for the agent.
 TEMPERATURE = 0.2
 
+# Context the local model is asked for; Ollama's own default is 4,096
+# tokens and cuts the start of a longer prompt without saying so. 32,768
+# costs about 0.6 GB more memory than the default (measured 2026-10-24).
+CONTEXT_TOKENS = 32_768
+# What a prompt may use, leaving room for the reply (model/brief/budget.py).
+PROMPT_TOKENS = CONTEXT_TOKENS - 2_048
+
 PROVIDERS = ("ollama", "openrouter")
 PROVIDER = os.environ.get("TALK_PROVIDER", "").strip().lower() or "ollama"
 if PROVIDER not in PROVIDERS:
@@ -49,7 +56,7 @@ def send_chat(messages: list[dict]) -> str:
     response = ollama.chat(
         model=MODEL,
         think=False,
-        options={"temperature": TEMPERATURE},
+        options={"temperature": TEMPERATURE, "num_ctx": CONTEXT_TOKENS},
         messages=messages,
     )
     return response["message"]["content"]

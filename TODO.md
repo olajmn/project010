@@ -30,13 +30,11 @@ next.
     6. **The structure is cut at 400 lines without saying so**
        (`MAX_LINES` in `project/node/tree_as_text.py`); the model is
        told it sees every name.
-    7. **Ollama cuts the prompt at 4,096 tokens without saying so.**
-       `client.py` sets no `num_ctx`, so Ollama uses its default (4,096,
-       measured with `ollama ps`); the model is trained for 262,144. A
-       prompt is 1,100-1,800 tokens before past turns, so 20 turns can
-       pass the limit, and Ollama then drops the start: the
-       instructions and the project background. Local only; OpenRouter
-       has the full context.
+    7. ~~Ollama cuts the prompt at 4,096 tokens without saying so~~ —
+       fixed 2026-10-24: the app asks for 32,768 (`CONTEXT_TOKENS` in
+       `model/client.py`) and fits each prompt itself, dropping the
+       oldest turns with a note (`model/brief/budget.py`, #77). Measured
+       before: Ollama kept the system text but dropped the oldest turns.
     Related, not part of this item: how much context the chat gets
     (63), whether the structure helps at all (69), and `/select` hints
     (53).

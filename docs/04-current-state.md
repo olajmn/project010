@@ -120,6 +120,12 @@ Everything lives in `app/data/` as plain JSON:
   on screen shows such a frame as "(removed)", not clickable. A message
   sent from that frame's own conversation ("Show only this") is about
   the removed part, and the model is told it is gone.
+- Locally the model is asked for a 32,768-token context
+  (`CONTEXT_TOKENS`); Ollama's default of 4,096 dropped old turns
+  silently. Before sending, `model/brief/budget.py` leaves out the
+  oldest turns if a prompt would not fit, and says so in the system
+  text; the instructions and background are never cut ([[05-decisions]]
+  #77).
 - The model sees labels only — not node ids, file contents, or anything
   outside the project.
 

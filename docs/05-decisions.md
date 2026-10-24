@@ -914,6 +914,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Follow-up (same day):** A removed part can still be talked about on purpose. A message sent while its conversation is shown alone ("Show only this") carries `about_removed`; the turn is saved with the part's retired id, stays in its frame, and the model is told the user is asking about a part that was removed. Without that flag, a selection that is not in the tree still counts as none. Ids are never reused (#52), so a retired id keeps meaning that one part.
 
+## 77. 2026-10-24 — The app sets the model's context and fits each prompt itself
+
+**Decision:** Ollama is asked for a 32,768-token context (`CONTEXT_TOKENS`, sent as `num_ctx` by `send_chat()` in `model/client.py`). Before every send, `fit_to_budget()` (`model/brief/budget.py`) estimates the prompt's size from its characters, on the large side, and if it would pass `PROMPT_TOKENS` (the context less 2,048 for the reply) leaves out the oldest past turns in pairs and adds a line to the system text saying how many. The instructions, the project background, and the new message are never cut.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** Ollama's default context (4,096 tokens: measured, a 6,400-token prompt was read as 4,059 tokens, its oldest turns dropped without notice); a larger context such as 262,144 (the model's maximum, more memory for no current need); counting tokens with the model's tokenizer (exact, but another dependency; the estimate only needs to err on the large side).
+
+**Why this choice:** What the model is sent must be what the app built, or say what is missing. 32,768 tokens costs about 0.6 GB more memory than 4,096 (5.4 to 6.0 GB, measured with `ollama ps`) and holds every current project several times over. `TODO.md` 71.7.
+
+**Reversible?** Yes; both are constants in `model/client.py`.
+
 ## See also
 
 - [[03-architecture]]

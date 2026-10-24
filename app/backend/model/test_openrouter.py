@@ -121,10 +121,14 @@ def test_default_provider_is_ollama(monkeypatch, reload_client) -> None:
     assert client.MODEL_IN_USE == client.MODEL == "qwen3.5:9b"
     with (
         mock.patch("backend.model.openrouter.chat") as hosted,
-        mock.patch("ollama.chat", return_value={"message": {"content": "local"}}),
+        mock.patch(
+            "ollama.chat", return_value={"message": {"content": "local"}}
+        ) as local,
     ):
         assert client.send_chat(MESSAGES) == "local"
     hosted.assert_not_called()
+    # Ollama's own default context is 4,096 tokens; the app asks for more.
+    assert local.call_args.kwargs["options"]["num_ctx"] == client.CONTEXT_TOKENS
 
 
 def test_openrouter_provider(monkeypatch, reload_client) -> None:

@@ -11,8 +11,9 @@ The message and reply are saved, so the chat is still there after a
 reload.
 """
 
+from backend.model.brief.budget import fit_to_budget
 from backend.model.brief.conversation import build_messages
-from backend.model.client import send_chat
+from backend.model.client import PROMPT_TOKENS, send_chat
 from backend.project.node import find_step, steps_of
 from backend.project.panes.chat.commands import try_command
 from backend.project.panes.create.resolver import get_history_for_project
@@ -93,7 +94,7 @@ def reply(
         focus_day=focus_day,
         about_removed=gone and about_removed,
     )
-    text = send_chat(messages).strip()
+    text = send_chat(fit_to_budget(messages, PROMPT_TOKENS)).strip()
     record = _save_talk(
         latest,
         note,
