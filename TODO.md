@@ -72,23 +72,33 @@ Nothing chosen yet; pick the next item from the Queue.
 
 ### Chat
 
-63. **How much context the chat gets** (Question) — the goal is that
-    the chat can use the whole map and history. Since 2026-10-24 it gets
-    every label and every change (no longer the last 10), a selected
-    day, and the last 20 turns ([[04-current-state]] § 4); not what is
-    behind a node (was 33). A prompt that would not fit is cut by
-    leaving out the oldest turns, with a note (#77). Open: the 20-turn
-    cap, and what to do when a project's history alone outgrows the
-    context. Candidates: a summary of older history, lookup on demand,
-    or richer events (38).
+63. **What the chat can read** (Question) — one plan for how the
+    chat reads more over time; nothing here is started. How it reads
+    today, and the rules every step keeps: `docs/chat.md`.
+    1. **Today:** every label, every change, a selected node or day, and
+       the last 20 turns, built by fixed rules (#75-#77).
+    2. **A history too large for the context:** for example a summary
+       of older changes, sent instead of them.
+    3. **Content behind a node** (documents, PDFs, long notes): it will
+       not all fit, so the chat has to pick the parts a question needs
+       (retrieval / RAG). Needs nodes that carry more than a label
+       (Ideas: Node types and fields).
+    4. **Showing what it read:** a light "Looking at…" indicator while
+       it works, and later a short line from the backend on what was
+       actually sent. Matters most at step 3, where the pick can be
+       wrong.
+    5. **The 20-turn cap:** still open.
 69. **Does the structure help the chat?** (Question) — the README's
     central claim is untested. Ask about 10 realistic questions on a
     demo project with and without the structure and history, and score
     the answers side by side. Findings go in `docs/01-research.md`.
+    Now that what the model is sent is exact (`docs/chat.md`), a test
+    measures the model, not gaps in the prompt.
 38. **Changes on the map** (Step, parked) — a day in Current state
     already selects its changes for the chat ([[05-decisions]] #62).
     Open: highlight the nodes touched that day, and say which nodes an
-    import added ("Imported 95 nodes" does not).
+    import added ("Imported 95 nodes" does not). The import text matters
+    more since 2026-10-24: the model now reads every change.
 
 ### Demo and login
 
@@ -113,7 +123,8 @@ Not planned and not built. Moving one into the Queue is a deliberate
 choice.
 
 - **Larger domains** — a second capability beside Project, memory,
-  knowledge / RAG, acting, and background behavior (was 9–11, 13, 14).
+  acting, and background behavior (was 9–11, 13, 14). Reading documents
+  and knowledge (RAG) is part of Queue 63.
 - **Node types and fields** — a node could carry a type and structured
   fields, not only a label and children (cf. Tana; `docs/01-research.md`).
 - **More than one parent** — the tree would become a graph; the node
