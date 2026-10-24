@@ -4,6 +4,7 @@
  * Who-under-who from nodeFamily; lines from mapLines; indent from spacing.ts.
  */
 
+import { isNodeId, shortId } from "./nodeId.js";
 import type { MapNode } from "../../dataShapes.js";
 import { indentRem, NEST_INSET_REM } from "./spacing.js";
 import { installMapLines } from "./lines/addLines.js";
@@ -84,8 +85,6 @@ const NODE_MENU_ACTIONS: {
     detail: "Add one of your saved trees under this node as new nodes.",
   },
 ];
-
-const PROGRESSION_LIKE = /^p\d+$/;
 
 function childGuide(_parentContinues: boolean): string {
   // Indent width only; SVG draws connectors. Kept for stem length → depth.
@@ -180,10 +179,10 @@ function fillBeadUnit(
   const unit = document.createElement("div");
   unit.className = "progress-bead-unit";
 
-  const canEdit = PROGRESSION_LIKE.test(node.id);
+  const canEdit = isNodeId(node.id);
   // `/id` shows the id in the box; the label stays in data-label, which
   // is what everything reading a node's name uses (mapPane beadLabel()).
-  const shown = mapShowsIds() ? node.id : node.label;
+  const shown = mapShowsIds() ? shortId(node.id) : node.label;
 
   if (onStepClick) {
     const button = document.createElement("button");

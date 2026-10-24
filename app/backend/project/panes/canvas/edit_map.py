@@ -13,24 +13,24 @@ keeping its id and everything under it (no LLM).
 rename_map_node() — give a Step a new label, keeping its id, so chat
 turns about it stay attached (docs/05-decisions.md #52, #71).
 
+New nodes get their ids from project/node/identity.py.
+
 Does not touch the Steps-page scratch tree.
 """
 
 import copy
-import re
 
 from backend.project.node import (
     Step,
     find_path,
     from_nested_labels,
+    new_node_id,
     sibling_label_clash,
     unique_sibling_label,
 )
 from backend.project.panes.canvas.add_folder import folder_tree
 from backend.project.panes.canvas.text_to_tree import parse_outline
 from backend.storage.project_persistence import save_plan
-
-_ID_NUM = re.compile(r"^p(\d+)$")
 
 
 def add_map_node(
@@ -75,8 +75,7 @@ def add_map_node(
 
     text = unique_sibling_label(siblings, text)
 
-    mint = _id_minter(plan)
-    new_step = Step(id=mint(), label=text).to_dict()
+    new_step = Step(id=new_node_id(), label=text).to_dict()
     siblings.append(new_step)
     if parent is not None:
         feedback = f"Added step under {parent.get('label') or parent_id}: {text}"
@@ -140,8 +139,7 @@ def import_map_outline(
         steps = []
         progression["steps"] = steps
 
-    mint = _id_minter(plan)
-    new_steps = [step.to_dict() for step in from_nested_labels(forest, mint)]
+    new_steps = [step.to_dict() for step in from_nested_labels(forest, new_node_id)]
     # Every imported node, not just the top level: one paste of a
     # 95-node tree is one change, but it brought in 95 nodes.
     imported = len(new_steps) + sum(_count_below(s) for s in new_steps)
@@ -202,9 +200,6 @@ def remove_map_node(latest: dict, step_id: str) -> dict:
     if not isinstance(steps, list):
         raise ValueError("project has no nodes")
 
-    # Stamp the high-water mark before the node disappears, so its id
-    # stays retired even on a project saved before the mark existed.
-    _id_minter(plan)
     # Where it sat and how much went with it, read before it is gone:
     # the saved text is all Logs and the chat's model ever see of it.
     found = _find_step(steps, step_id)
@@ -370,41 +365,6 @@ def _find_step(steps: list, step_id: str) -> tuple[dict, list[str]] | None:
     if path is None:
         return None
     return path[-1], [step.get("label") or "" for step in path[:-1]]
-
-
-def _id_minter(plan: dict):
-    """Mint `p<N>` ids that are never reused within this project.
-
-    `plan["node_id_hi"]` is a high-water mark (like `account_n_hi`)
-    kept on the plan, not on progression, because removing the last
-    node sets progression to None. Events and chat focus refer to node
-    ids, so a removed node's id must stay retired. Projects saved before
-    the mark existed fall back to the highest id still in the tree.
-    """
-    progression = plan.get("progression") or {}
-    hi = plan.get("node_id_hi")
-    used = {0, hi if isinstance(hi, int) else 0}
-
-    def walk(nodes: list) -> None:
-        for node in nodes:
-            if not isinstance(node, dict):
-                continue
-            match = _ID_NUM.match(str(node.get("id") or ""))
-            if match:
-                used.add(int(match.group(1)))
-            walk(node.get("children") or [])
-
-    walk(progression.get("steps") or [])
-    counter = {"n": max(used)}
-    if counter["n"]:
-        plan["node_id_hi"] = counter["n"]
-
-    def mint() -> str:
-        counter["n"] += 1
-        plan["node_id_hi"] = counter["n"]
-        return f"p{counter['n']}"
-
-    return mint
 
 
 def _validate_forest(raw: list[dict]) -> list[dict]:

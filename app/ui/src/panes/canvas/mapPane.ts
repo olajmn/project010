@@ -11,6 +11,7 @@
 //  3. Public API
 //      - installMapPane()
 
+import { isNodeId } from "./nodeId.js";
 import { addNode, removeNode, renameProject } from "../../api.js";
 import { getActiveUserId, setLastProjectId } from "../../user/activeAccount.js";
 import { markHiddenSelection } from "./hiddenSelection.js";
@@ -32,7 +33,6 @@ import type { MapNode, ProjectView } from "../../dataShapes.js";
 
 // 1. Types
 
-const PROGRESSION_STEP_ID = /^p\d+$/;
 const DEFAULT_CHAT_PLACEHOLDER = "Talk about this project…";
 
 export type MapPane = {
@@ -68,7 +68,7 @@ type MapPaneOpts = {
 export function isProgressionTree(
   node: { children: { id: string }[] },
 ): boolean {
-  return node.children.some((child) => PROGRESSION_STEP_ID.test(child.id));
+  return node.children.some((child) => isNodeId(child.id));
 }
 
 /** A map row's node label — from data-label, not the box text, which

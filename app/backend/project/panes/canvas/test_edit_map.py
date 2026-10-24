@@ -144,3 +144,17 @@ def test_rename_refused(saved, step_id, label) -> None:
     # Empty, a sibling's name, or an unknown id.
     with pytest.raises(ValueError):
         edit_map.rename_map_node(row(), step_id, label)
+
+
+def test_new_nodes_get_random_ids_and_no_counter(saved) -> None:
+    import uuid
+
+    edit_map.add_map_node(tree(), "Roof")
+    added = saved["plan"]["progression"]["steps"][-1]
+    assert uuid.UUID(added["id"]).version == 4
+    assert "node_id_hi" not in saved["plan"]
+    forest = [{"label": "A", "children": [{"label": "B", "children": []}]}]
+    edit_map.import_map_outline(tree(), forest=forest)
+    top = saved["plan"]["progression"]["steps"][-1]
+    assert uuid.UUID(top["id"]).version == 4
+    assert uuid.UUID(top["children"][0]["id"]).version == 4
