@@ -42,6 +42,14 @@ next.
        `TALK_PROVIDER` → `CHAT_PROVIDER` (also `app/fly.toml`; needs a
        deploy), the demo's `TALK_PER_*` limits; "Status" is "Current
        state": `project/status/` and `build_status`.
+    5. **Ids without a kind in front**, with step 2's conversion: an id
+       is a bare UUIDv4, and what it belongs to is known from where it
+       is kept (a node in `nodes`, an account in `accounts.json`, a
+       project as its folder), not read from the id. `backend/identity/`
+       still makes every id (`new_node_id()`, … say what they make);
+       `kind_of()` goes, and the map tells its project row from nodes
+       some other way than `isNodeId()`'s prefix check. A new decision
+       replaces #81's prefixes.
     Not renamed: `backend/foundation/` (parked Time code, where a step
     is a step in time; P2) and `docs/05-decisions.md` (history). Done
     when a whole-word search for `step`, `steps`, `Step`, `stepId`,
@@ -179,9 +187,15 @@ choice.
 - **Export / share a structure** — a branch or project as a file others
   can open.
 - **A details window per project and account** — a Details button opens
-  what is about the system rather than for people: ids, made and changed
-  dates, and the project's log (now under Settings → Logs). The rows in
-  Directory and Archive would then show names only.
+  what is about the system rather than for people: its kind and id,
+  made and changed dates, and the project's log (now under Settings →
+  Logs). The rows in Directory and Archive would then show names only.
+  The kind is shown from where the details were opened (a project row
+  says "project"), not read from the id (62 step 5). Open: how it
+  scales: projects and accounts are few and can each have a Details
+  window in Settings; nodes can be many, so a node's details likely
+  belong on the node itself (its ⋯ menu on the map) rather than in a
+  list of every node (cf. 72).
 - **Sync across devices** with end-to-end encryption, the local copy
   staying the real one (`docs/03-architecture.md` § 5).
 - **Other front ends on the same data** — the node data is portable.
