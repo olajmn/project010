@@ -265,6 +265,7 @@ def save_plan(
     focus_day: str | None = None,
     message: str | None = None,
     reply: str | None = None,
+    change: dict | None = None,
 ) -> dict:
     """
     Update the project's current SoT and append one slim event.
@@ -281,6 +282,8 @@ def save_plan(
     `focus_day` (YYYY-MM-DD) marks a chat turn about one day's changes
     instead, the same way.
     `message` / `reply` are a chat turn's two sides, each in its own field.
+    `change` is a map edit's full record (project/changes/records.py); it
+    goes to the events line only, not to current.json.
 
     Returns the current record that was saved.
     """
@@ -321,7 +324,10 @@ def save_plan(
         record["reply"] = reply
 
     _write_json(current_path(pid), record)
-    _append_event(pid, _slim_event(record))
+    line = _slim_event(record)
+    if change is not None:
+        line["change"] = change
+    _append_event(pid, line)
     return record
 
 

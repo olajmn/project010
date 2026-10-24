@@ -952,6 +952,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; both are small UI changes.
 
+## 80. 2026-10-24 — Every map edit saves a full change record
+
+**Decision:** Each map edit's line in `events.jsonl` carries a `change` record beside its `feedback` sentence: what the edit actually did, by node id and with whole nodes (`backend/project/changes/records.py`). Four shapes: `add` (parent, place, every node added, which covers paste, folders, and saved trees), `remove` (parent, place, the whole removed branch), `move` (id, parent, from, to), `rename` (id, old, new label). All map edits save through one helper, `_save_map()` in `panes/canvas/edit_map.py`; `save_plan()` puts the record on the log line only, not in `current.json`. Lines saved before have no record.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** keeping copies of the whole tree for undo (a second store beside the log, a fixed number of steps, and nothing for the chat); recording only labels (cannot be reversed or replayed when labels repeat or change).
+
+**Why this choice:** The log described each change ("Removed step under Actors: Client") but could not repeat or reverse it. With full records the log becomes the account of what happened: undo is a new record that reverses one, the tree can be rebuilt from the log, and the chat can be told exactly what changed. First step of `TODO.md` 54.
+
+**Reversible?** Yes; records are an added field, and nothing reads them yet.
+
 ## See also
 
 - [[03-architecture]]

@@ -20,6 +20,7 @@ Does not touch the Steps-page scratch tree.
 
 import copy
 
+from backend.project.changes import records
 from backend.project.node import (
     Step,
     find_path,
@@ -76,20 +77,14 @@ def add_map_node(
     text = unique_sibling_label(siblings, text)
 
     new_step = Step(id=new_node_id(), label=text).to_dict()
+    change = records.added(parent["id"] if parent else None, len(siblings), [new_step])
     siblings.append(new_step)
     if parent is not None:
         feedback = f"Added step under {parent.get('label') or parent_id}: {text}"
     else:
         feedback = f"Added step: {text}"
 
-    return save_plan(
-        latest["name"],
-        plan,
-        feedback=feedback,
-        project_id=latest["project_id"],
-        account_id=latest.get("account_id"),
-        event="node_added",
-    )
+    return _save_map(latest, plan, feedback, "node_added", change)
 
 
 def import_map_outline(
@@ -145,6 +140,7 @@ def import_map_outline(
     imported = len(new_steps) + sum(_count_below(s) for s in new_steps)
     what = "1 node" if imported == 1 else f"{imported} nodes"
 
+    parent = None
     if parent_id:
         found = _find_step(steps, parent_id)
         if found is None:
@@ -160,16 +156,10 @@ def import_map_outline(
         siblings = steps
         feedback = f"Imported {what}"
     _number_sibling_clashes(siblings, new_steps)
+    change = records.added(parent["id"] if parent else None, len(siblings), new_steps)
     siblings.extend(new_steps)
 
-    return save_plan(
-        latest["name"],
-        plan,
-        feedback=feedback,
-        project_id=latest["project_id"],
-        account_id=latest.get("account_id"),
-        event=event,
-    )
+    return _save_map(latest, plan, feedback, event, change)
 
 
 def import_map_folder(
@@ -200,18 +190,22 @@ def remove_map_node(latest: dict, step_id: str) -> dict:
     if not isinstance(steps, list):
         raise ValueError("project has no nodes")
 
-    # Where it sat and how much went with it, read before it is gone:
-    # the saved text is all Logs and the chat's model ever see of it.
-    found = _find_step(steps, step_id)
-    removed_label = _remove_step(steps, step_id)
-    if removed_label is None or found is None:
+    # Where it sat and how much went with it, read before it is gone.
+    path = find_path(steps, step_id)
+    if path is None:
         raise ValueError(f"step not found: {step_id}")
-    step, ancestors = found
+    step = path[-1]
+    parent = path[-2] if len(path) > 1 else None
+    siblings = parent["children"] if parent else steps
+    index = next(n for n, s in enumerate(siblings) if s is step)
+    change = records.removed(parent["id"] if parent else None, index, step)
+    del siblings[index]
+    label = str(step.get("label") or step_id)
     below = _count_below(step)
     feedback = (
-        f"Removed step under {ancestors[-1]}: {removed_label}"
-        if ancestors
-        else f"Removed step: {removed_label}"
+        f"Removed step under {parent.get('label') or ''}: {label}"
+        if parent
+        else f"Removed step: {label}"
     )
     if below:
         feedback += f" (and {below} under it)"
@@ -219,14 +213,7 @@ def remove_map_node(latest: dict, step_id: str) -> dict:
     if not steps:
         plan["progression"] = None
 
-    return save_plan(
-        latest["name"],
-        plan,
-        feedback=feedback,
-        project_id=latest["project_id"],
-        account_id=latest.get("account_id"),
-        event="node_removed",
-    )
+    return _save_map(latest, plan, feedback, "node_removed", change)
 
 
 def move_map_node(latest: dict, step_id: str, direction: str) -> dict:
@@ -252,6 +239,7 @@ def move_map_node(latest: dict, step_id: str, direction: str) -> dict:
     if not 0 <= j < len(siblings):
         raise ValueError(f"already {'first' if direction == 'up' else 'last'}")
     siblings[i], siblings[j] = siblings[j], siblings[i]
+    change = records.moved(step_id, path[-2]["id"] if len(path) > 1 else None, i, j)
 
     # Which neighbour it passed, so Logs and the chat's model can place it.
     label = path[-1].get("label") or step_id
@@ -263,14 +251,7 @@ def move_map_node(latest: dict, step_id: str, direction: str) -> dict:
         else f"Moved step: {label} {where} {other}"
     )
 
-    return save_plan(
-        latest["name"],
-        plan,
-        feedback=feedback,
-        project_id=latest["project_id"],
-        account_id=latest.get("account_id"),
-        event="node_moved",
-    )
+    return _save_map(latest, plan, feedback, "node_moved", change)
 
 
 def rename_map_node(latest: dict, step_id: str, label: str) -> dict:
@@ -305,14 +286,35 @@ def rename_map_node(latest: dict, step_id: str, label: str) -> dict:
         raise ValueError(clash)
     step["label"] = text
 
+    return _save_map(
+        latest,
+        plan,
+        f"Renamed step: {old} → {text}",
+        "node_renamed",
+        records.renamed(step_id, old, text),
+        focus_step_id=step_id,
+    )
+
+
+def _save_map(
+    latest: dict,
+    plan: dict,
+    feedback: str,
+    event: str,
+    change: dict,
+    focus_step_id: str | None = None,
+) -> dict:
+    """Save one map edit: the new tree, its line for Logs and the chat
+    (`feedback`), and its full record (`change`, project/changes/)."""
     return save_plan(
         latest["name"],
         plan,
-        feedback=f"Renamed step: {old} → {text}",
+        feedback=feedback,
         project_id=latest["project_id"],
         account_id=latest.get("account_id"),
-        event="node_renamed",
-        focus_step_id=step_id,
+        event=event,
+        focus_step_id=focus_step_id,
+        change=change,
     )
 
 
@@ -322,24 +324,6 @@ def _count_below(step: dict) -> int:
     if not isinstance(children, list):
         return 0
     return sum(1 + _count_below(c) for c in children if isinstance(c, dict))
-
-
-def _remove_step(steps: list, step_id: str) -> str | None:
-    """Delete the dict with id==step_id from this list or a nested
-    children list. Returns its label, or None if not found."""
-    for i, step in enumerate(steps):
-        if not isinstance(step, dict):
-            continue
-        if step.get("id") == step_id:
-            label = str(step.get("label") or step_id)
-            del steps[i]
-            return label
-        nested = step.get("children")
-        if isinstance(nested, list):
-            found = _remove_step(nested, step_id)
-            if found is not None:
-                return found
-    return None
 
 
 def _number_sibling_clashes(siblings: list, new_steps: list[dict]) -> None:

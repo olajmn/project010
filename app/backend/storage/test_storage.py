@@ -155,3 +155,10 @@ def test_empty_create_name_becomes_next_new_project() -> None:
     assert create_project("Typed", "1")["name"] == "Typed"
     cancel_project(create_project("", "3")["project_id"])
     assert create_project("", "3")["name"] == "New project 1"  # archived don't count
+
+
+def test_a_change_record_goes_to_the_log_not_the_current_state() -> None:
+    change = {"op": "rename", "id": "p1", "from": "A", "to": "B"}
+    pp.save_plan("P", {"now": "x"}, event="node_renamed", change=change)
+    assert pp.load_project_events(1)[-1]["change"] == change
+    assert "change" not in pp.load_current(1)

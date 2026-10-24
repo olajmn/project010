@@ -18,7 +18,7 @@ next.
     Actors: Client") but cannot repeat or reverse it, and the tree in
     `current.json` cannot be rebuilt from the history. Planned
     2026-10-24, replaces the earlier plan of keeping tree copies.
-    1. **Change records.** Each map edit line in `events.jsonl` gets a
+    1. **Change records** — done 2026-10-24 (#80). Each map edit line in `events.jsonl` gets a
        `change` field beside its `feedback`: add (node, parent, place),
        remove (the whole removed branch with its ids, parent, place),
        move (id, from, to), rename (id, old, new), import / folder /
