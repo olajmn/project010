@@ -7,7 +7,6 @@ app.py                   - the FastAPI app: gets each request from the
 request_bodies.py        - the shape of the JSON each POST sends
 answers_to_browser.py    - shapes the data sent back for the screen:
                            project, map tree, chat
-activity_log.py          - the list of every saved change (Settings → Logs)
 files_to_browser.py      - finds the app's own files (HTML, JavaScript,
                            CSS) for app.py to send — not data
 

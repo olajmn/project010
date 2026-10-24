@@ -1058,6 +1058,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Only by converting back; the data with prefixes is outside the repository.
 
+## 88. 2026-10-24 — Details pages replace the Logs tab
+
+**Decision:** Each project and account has a details page in Settings (`settings/details.html`, `ui/src/settings/details/`), opened by a quiet "Details" action on its row in Directory or Archive. It shows what is about the system rather than for people: its kind (named from what the page was opened for, not read from the id, #87), its full id, its dates, and its log. A project's log is its own changes; an account's log is all its projects' changes together, each line naming its project. The log reads newest first and opens on the last 7 days, with Today, Last 30 days, and All to pick from. The Directory and Archive rows now show names and dates only. The Logs tab is gone, with its All activity feed, its one-project picker, and the `/api/log` route (`api/activity_log.py`); a project's log still comes from `/api/projects/{id}/timeline`. A log line with no text of its own reads as its kind ("Created"), not "Created · created". Node details are `TODO.md` 72. `TODO.md` 75.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** a popup over the row (too narrow for a log); keeping the Logs tab beside the pages (two ways to read one project's log); keeping All activity (it mixes every project in one list; the same view is now an account's log).
+
+**Why this choice:** Ids, kinds, and logs are for inspecting the system, so they move out of the lists people read and into one place per thing. Everything is still visible, entered through the account or the project that holds it, and the time range keeps a long history short.
+
+**Reversible?** Yes; nothing saved changes.
+
 ## See also
 
 - [[03-architecture]]

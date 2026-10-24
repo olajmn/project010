@@ -17,7 +17,7 @@
 import { fetchAccounts, fetchArchivedProjects, fetchProjects } from "../../api.js";
 import type { AccountView, ProjectView } from "../../dataShapes.js";
 import { userLabel } from "../../user/activeAccount.js";
-import { mountProjectTimeline } from "../logs/projectTimeline.js";
+import { logSection } from "./log.js";
 import {
   settingsAction,
   settingsError,
@@ -101,9 +101,10 @@ function projectDetails(project: ProjectView, accounts: AccountView[], from: str
   if (account) {
     rows.push(settingsRow("Account", userLabel(account), [detailsAction("account", account.id, from)]));
   }
-  const log = document.createElement("div");
-  void mountProjectTimeline(log, project.project_id);
-  return [settingsSection(project.name, settingsGroup(rows)), settingsSection("Log", log)];
+  return [
+    settingsSection(project.name, settingsGroup(rows)),
+    settingsSection("Log", logSection([project.project_id])),
+  ];
 }
 
 // 3. An account
@@ -123,5 +124,7 @@ function accountDetails(account: AccountView, projects: ProjectView[], from: str
         own.map((p) => settingsRow(p.name, shortDate(p.started_at ?? p.created_at), [detailsAction("project", p.project_id, from)])),
       )
     : settingsHint("No projects.");
-  return [settingsSection(userLabel(account), settingsGroup(rows)), settingsSection("Projects", list)];
+  const out = [settingsSection(userLabel(account), settingsGroup(rows)), settingsSection("Projects", list)];
+  if (own.length) out.push(settingsSection("Log", logSection(own.map((p) => p.project_id))));
+  return out;
 }

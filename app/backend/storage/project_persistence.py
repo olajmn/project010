@@ -15,7 +15,7 @@ optional account_id.
 #      - project_dir() / current_path() / events_path()
 #      - _slim_event()
 #      - load_current() / load_project_events() / save_project()
-#      - load_history() / load_all_currents() / delete_project()
+#      - load_all_currents() / delete_project()
 
 import json
 import shutil
@@ -260,15 +260,6 @@ def save_project(
         line["change"] = change
     _append_event(pid, line)
     return record
-
-
-def load_history() -> list[dict]:
-    """Every project's events, oldest first within each project
-    (projects in a fixed but meaningless order)."""
-    all_records: list[dict] = []
-    for pid in sorted(_existing_project_ids()):
-        all_records.extend(load_project_events(pid))
-    return all_records
 
 
 def load_all_currents() -> list[dict]:

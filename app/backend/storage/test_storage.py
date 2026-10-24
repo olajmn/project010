@@ -81,7 +81,6 @@ def test_projects_of_one_account() -> None:
     assert "vision_id" not in abs_project
     assert pp.current_path(abs_project["project_id"]).exists()
     assert pp.current_path(cardio_project["project_id"]).exists()
-    assert len(pp.load_history()) == 3
     assert len(pp.load_project_history(abs_project["project_id"])) == 1
 
 

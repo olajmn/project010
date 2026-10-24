@@ -41,7 +41,7 @@ helps but does not take over.
 
 | Column | What it holds |
 |---|---|
-| **Sidebar** | Accounts, each with its projects; `+` for a new project; Settings (General, Directory, Archive, Logs) |
+| **Sidebar** | Accounts, each with its projects; `+` for a new project; Settings (General, Directory, Archive) |
 | **Canvas** | The open project's map: nodes under the project title, each with a ⋯ menu; depth (− / +) and Text / Line view on top; below it **+ Add** (Paste structure, Add folder, Insert saved tree…) and icon buttons for Copy as ASCII and Archive |
 | **Chat** | Current state of the project, the conversation thread (turns about a node are framed and can be shown on their own), and the message box with a `/` command menu |
 
@@ -89,9 +89,10 @@ helps but does not take over.
   `/add Name` or `/add Parent / Child` adds a node;
   `/select Parent / Child` selects one; `/id` shows the selected node's id, or switches the whole map
   between ids and names. An unknown command gets a fixed reply.
-- **Look back:** Settings → Logs lists every saved change by day,
-  across all projects (the newest 200, then Show more) or as one
-  project's full timeline. Settings → Archive holds
+- **Look back:** each project and account in Settings has a Details
+  page: its kind, id, and dates, and its log, every saved change by
+  day, newest first, for today, the last 7 or 30 days, or all (an
+  account's log covers all its projects). Settings → Archive holds
   archived accounts and projects, to restore or delete for good.
 - **Settings:** General sets light or dark appearance and shows which
   model is used; Directory creates, renames, and archives accounts.

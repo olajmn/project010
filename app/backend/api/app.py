@@ -41,7 +41,6 @@ from fastapi.responses import FileResponse, PlainTextResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from backend.api import demo
-from backend.api.activity_log import activity_log
 from backend.api.answers_to_browser import (
     account_view,
     active_projects,
@@ -196,11 +195,6 @@ def _start_project_id() -> str | None:
 @app.get("/api/model")
 def get_model() -> dict:
     return {"provider": PROVIDER, "model": MODEL_IN_USE, "temperature": TEMPERATURE}
-
-
-@app.get("/api/log")
-def get_log(offset: int = 0) -> dict | list:
-    return activity_log(offset)
 
 
 @app.get("/api/projects/{project_id}/timeline")

@@ -4,9 +4,9 @@ created, chat, node added, renamed, archived, ...
 
 Every change is already saved as one timestamped line in
 data/projects/{id}/events.jsonl (storage/project_persistence.py). This file only reads
-those lines back as events; it writes nothing. Used by Settings → Logs
-(api/activity_log.py) and the project timeline address
-(/api/projects/<id>/timeline). See docs/04-current-state.md § 2.
+those lines back as events; it writes nothing. Used by the project
+timeline address (/api/projects/<id>/timeline), which a project's
+Details page in Settings shows. See docs/04-current-state.md § 2.
 """
 
 # Contents
@@ -16,17 +16,13 @@ those lines back as events; it writes nothing. Used by Settings → Logs
 #
 #  2. Reading timelines
 #      - project_timeline()
-#      - all_events()
 #      - to_event()
 
 from backend.project.panes.create.resolver import (
-    created_at_key,
     get_history_for_project,
-    get_latest_for_all_projects,
 )
 from backend.storage.project_persistence import (
     load_current,
-    load_history,
     record_project_id,
 )
 
@@ -35,7 +31,7 @@ from backend.storage.project_persistence import (
 # ============================================================
 
 # Each saved line's `event` (written since 2026-09-25) → the group shown
-# as the entry's title in Settings → Logs.
+# as the entry's title in a project's log (Settings → Details).
 GROUPS = {
     "created": "Created",
     "chat": "Chat",
@@ -77,22 +73,6 @@ def project_timeline(project_id: str) -> list[dict]:
         history[-1].get("name", "") if history else ""
     )
     return [to_event(r, name) for r in history]
-
-
-def all_events(limit: int | None = None, offset: int = 0) -> list[dict]:
-    """Every project's events together, newest first; `offset` skips the
-    newest ones already shown and `limit` keeps the next ones only."""
-    names = {
-        record_project_id(r): r.get("name") or "" for r in get_latest_for_all_projects()
-    }
-    records = sorted(load_history(), key=created_at_key, reverse=True)
-    records = records[max(offset, 0) :]
-    if limit is not None:
-        records = records[:limit]
-    return [
-        to_event(r, names.get(record_project_id(r)) or r.get("name") or "")
-        for r in records
-    ]
 
 
 def to_event(record: dict, project_name: str) -> dict:

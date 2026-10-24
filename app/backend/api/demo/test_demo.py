@@ -147,7 +147,7 @@ def test_rate_limit_per_key_and_window() -> None:
 def test_no_session(clock) -> None:
     # API is 401, pages go to the login page, assets load.
     assert guarded("/api/projects", method="GET").status == 401
-    for page in ("/", "/settings/logs.html"):
+    for page in ("/", "/settings/details.html"):
         request = guarded(page, method="GET")
         assert request.status == 303
         assert request.sent_headers["Location"] == "/login.html"
@@ -182,7 +182,6 @@ def test_session_passes_requests_on(clock) -> None:
     _, token = login()
     assert g.guard(FakeRequest("/api/projects", cookie=token), "GET") is False
     assert g.guard(FakeRequest("/", cookie=token), "GET") is False
-    assert g.guard(FakeRequest("/api/log?offset=50", cookie=token), "GET") is False
     assert (
         g.guard(FakeRequest("/api/projects/1/map", b"{}", cookie=token), "POST")
         is False

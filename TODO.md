@@ -11,38 +11,7 @@ next.
 
 ## Active
 
-75. **A details page per project and account** (Step) — what is about
-    the system rather than for people moves out of the Directory and
-    Archive rows into its own Settings page: kind, full id, dates, and a
-    project's log. The rows then show names and dates only. Kind is shown
-    from where the page was opened, not read from the id (#87). Planned
-    2026-10-24; node details are 72, not this.
-    1. **The page.** `app/ui/settings/details.html` with
-       `src/settings/details/` (`page.ts`, `details.ts`), like the other
-       Settings pages. `?project=<id>`: Kind "project", the full id,
-       made (`started_at`), last changed (`created_at`), its account (a
-       link to that account's page), archived or not, and its whole log
-       below, reusing `settings/logs/projectTimeline.ts`. `?account=<id>`:
-       Kind "account", the full id, made, and its projects (each a link
-       to its page). A link back to the tab it came from (`&from=`).
-       Read from what the API already gives (`fetchProjects()`,
-       `fetchArchivedProjects()`, `fetchAccounts()`,
-       `fetchProjectTimeline()`); no backend change.
-    2. **The rows.** Directory and Archive rows drop the short id and
-       the word "account" before a named account: a project row reads
-       `Building Project · made 3 Aug 2026 · changed 24 Oct 2026`, an
-       account row `John Doe · 3 Aug 2026`, each with a quiet "Details"
-       action that opens its page. An account with no name still shows
-       its short id, as its only label (`userLabel()`).
-    3. **Logs.** Open: whether Settings → Logs keeps its one-project
-       picker (`settings/logs/scope.ts`) beside the project's page, or
-       keeps "All activity" only and sends one project to its page. Two
-       ways to read one project's log would be a parallel path.
-    Docs: `docs/ui.md` (Settings pages), `docs/04-current-state.md` § 2,
-    a decision in `05-decisions.md`. One commit per step, with the UI
-    type check and a look in the browser.
-
-77. **A project always has an account** (Step, next after 75) — like
+77. **A project always has an account** (Step) — like
     an address on a chain, something always holds a project: nothing
     exists without an owner, and giving one up is a recorded change to
     another holder, not an empty field. Today a project may have no

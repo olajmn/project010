@@ -18,8 +18,8 @@
 //      - archiveAccount(), restoreAccount(), deleteAccount()
 //  5. Model (Settings → General)
 //      - fetchModel()
-//  6. Activity log (Settings → Logs)
-//      - fetchLog(), fetchProjectTimeline()
+//  6. A project's log (Settings → Details)
+//      - fetchProjectTimeline()
 //  7. Saved trees
 //      - saveTree(), fetchSavedTrees(), insertSavedTree(), deleteSavedTree()
 //  8. Demo session
@@ -439,17 +439,7 @@ export async function fetchModel(): Promise<ModelView> {
   return (await res.json()) as ModelView;
 }
 
-// 6. Activity log (Settings → Logs)
-
-/** One page of the activity log, newest first; `offset` = entries
- *  already shown (backend/api/activity_log.py LOG_LIMIT per page). */
-export async function fetchLog(offset = 0): Promise<LogEntry[]> {
-  const res = await fetch(offset > 0 ? `/api/log?offset=${offset}` : "/api/log");
-  if (!res.ok) {
-    throw new Error(`request failed: ${res.status}`);
-  }
-  return (await res.json()) as LogEntry[];
-}
+// 6. A project's log (Settings → Details)
 
 /** One project's full history, oldest first (ungrouped). */
 export async function fetchProjectTimeline(

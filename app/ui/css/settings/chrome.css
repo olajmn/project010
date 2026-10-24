@@ -3,7 +3,7 @@
  * Contents
  *  1. Page shell
  *  2. Content stack
- *  3. Logs scope (All activity / one project)
+ *  3. Log range on a details page
  */
 
 /* 1. Page shell — the same floating block as the app (css/shell/layout.css),
@@ -109,46 +109,26 @@ body.settings-body main > nav a[aria-current="page"] {
   max-width: 40rem;
 }
 
-/* 3. Logs scope (All activity / one project) */
+/* 3. Log range on a details page (Today … All) */
 
-.settings-logs-scope-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-2) var(--space-3);
-}
-
-.settings-logs-scope-label {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.settings-logs-scope {
+.settings-log-range {
   font-size: var(--font-size-sm);
   color: var(--color-text);
   background: var(--fill-control);
   border: 1px solid transparent;
   border-radius: var(--radius-control);
   padding: var(--space-2) var(--space-3);
+  margin: 0 0 var(--space-3);
   max-width: 100%;
 }
 
 /* A select keeps focus after its list closes, so the browser's own ring
    (the system accent, e.g. orange) would linger. Our own quiet edge
    instead, still there for keyboard use. */
-.settings-logs-scope:focus {
+.settings-log-range:focus {
   outline: none;
 }
 
-.settings-logs-scope:focus-visible {
+.settings-log-range:focus-visible {
   border-color: var(--hairline);
-}
-
-.settings-logs-scope-hint {
-  flex-basis: 100%;
-  margin: 0;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  line-height: var(--line-height);
 }

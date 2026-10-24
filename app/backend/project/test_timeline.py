@@ -1,8 +1,7 @@
-"""Checks for event_name() / to_event() / all_events() paging - no files,
+"""Checks for event_name() / to_event() - no files,
 no model.
 """
 
-import backend.project.timeline as timeline
 from backend.project.timeline import event_name, to_event
 
 
@@ -49,33 +48,3 @@ def test_to_event() -> None:
         {"project_id": "project_4", "feedback": "Added node: " + "x" * 300}, "House"
     )
     assert long["text"].endswith("…") and len(long["text"]) == 161
-
-
-def test_all_events_pages_newest_first(monkeypatch) -> None:
-    # Offset skips what is already shown.
-    lines = [
-        {
-            "project_id": "project_1",
-            "event": "node_added",
-            "feedback": f"Added node: {n}",
-            "created_at": f"2026-09-2{n}T10:00:00",
-        }
-        for n in range(1, 6)
-    ]
-    monkeypatch.setattr(timeline, "load_history", lambda: lines)
-    monkeypatch.setattr(
-        timeline,
-        "get_latest_for_all_projects",
-        lambda: [{"project_id": "project_1", "name": "P"}],
-    )
-
-    def texts(events):
-        return [e["text"] for e in events]
-
-    assert texts(timeline.all_events(limit=2)) == ["Added node: 5", "Added node: 4"]
-    assert texts(timeline.all_events(limit=2, offset=2)) == [
-        "Added node: 3",
-        "Added node: 2",
-    ]
-    assert texts(timeline.all_events(limit=2, offset=4)) == ["Added node: 1"]
-    assert timeline.all_events(limit=2, offset=9) == []

@@ -115,10 +115,10 @@ export interface ModelView {
 
 // 6. Activity log (Settings → Logs)
 
-/** One saved change, from backend/project/timeline.py (via /api/log or
+/** One saved change, from backend/project/timeline.py (via
  * /api/projects/<id>/timeline). `event` is what happened ("node_added",
- * "renamed", …); `kind` is its group, shown as the entry's title on the
- * mixed activity feed; `focus` is the map node a chat was about. */
+ * "renamed", …); `kind` is its group, shown before the change in a
+ * details page's log; `focus` is the map node a chat was about. */
 export interface LogEntry {
   at: string | null;
   project_id: string | null;

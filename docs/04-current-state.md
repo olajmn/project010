@@ -71,7 +71,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Slash commands | `panes/chat/commands/` | `panes/chat/commands/` |
 | The chat thread and its About frames (node by id, or day); rename notes | `panes/chat/screen/chat_thread.py` | `panes/chat/showOnlyThis.ts`, `currentState/` |
 | Current state panel | `project/current_state/` | `panes/chat/currentState/` |
-| Logs and a project's timeline | `project/timeline.py`, `api/activity_log.py` | `settings/logs/` |
+| A project's or account's details page and its log | `project/timeline.py` | `settings/details/` |
 | Archive (restore / delete) | `panes/create/lifecycle.py`, `storage/accounts_persistence.py` | `settings/archive/` |
 | Every HTTP route | `api/app.py` (FastAPI) | `api.ts` |
 | Demo mode: login, sessions, limits | `api/demo/` | `demo/`, `ui/login.html` |
@@ -113,8 +113,8 @@ Everything lives in `app/data/` as plain JSON:
   only changes after the log line the page opened at (`since`,
   [[05-decisions]] #84).
 - The chat's model reads each change from its record, by node names
-  and paths at that moment (`project/changes/describe.py`, #85); Logs
-  keeps the short sentence saved with the line.
+  and paths at that moment (`project/changes/describe.py`, #85); a
+  details page's log keeps the short sentence saved with the line.
 
 ## 4. The model
 

@@ -33,8 +33,8 @@ CONTENT_TYPES = {
 
 
 def find_file(requested: str) -> Path | None:
-    """Map an address to a real file under app/ui/ (e.g. /settings/logs.html
-    → ui/settings/logs.html). Refuses anything outside app/ui/."""
+    """Map an address to a real file under app/ui/ (e.g. /settings/details.html
+    → ui/settings/details.html). Refuses anything outside app/ui/."""
     name = requested.lstrip("/")
     if not name or ".." in name.split("/"):
         return None

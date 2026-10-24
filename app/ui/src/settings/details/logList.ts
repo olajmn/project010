@@ -1,6 +1,6 @@
 // Logs as day sections of one-line rows: "Today", "Yesterday", or a date,
-// then time · (project) · what happened. Shared by All activity
-// (activity.ts) and one project's timeline (projectTimeline.ts).
+// then time · (project) · what happened. Used by a details page's log
+// (log.ts).
 
 // Contents
 //  1. Day labels
@@ -47,14 +47,17 @@ export function logDaySections(entries: LogEntry[], showProject: boolean): HTMLE
     }
 
     const what = document.createElement("span");
-    const context = [showProject ? entry.project : "", entry.kind].filter(Boolean).join(" · ");
+    // A line with no text of its own ("created") reads as just its kind.
+    const context = [showProject ? entry.project : "", entry.text ? entry.kind : ""]
+      .filter(Boolean)
+      .join(" · ");
     if (context) {
       const muted = document.createElement("span");
       muted.className = "settings-muted";
       muted.textContent = `${context} · `;
       what.appendChild(muted);
     }
-    what.append(entry.text || entry.event);
+    what.append(entry.text || entry.kind);
     if (entry.focus) {
       const focus = document.createElement("span");
       focus.className = "settings-muted";

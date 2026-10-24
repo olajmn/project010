@@ -59,11 +59,8 @@ def test_model_info(api) -> None:
     assert status == 200 and set(info) == {"provider", "model", "temperature"}
 
 
-def test_log_and_timeline(api, project) -> None:
+def test_project_timeline(api, project) -> None:
     pid = project["project_id"]
-    status, log = api.get("/api/log")
-    assert status == 200
-    assert api.get("/api/log?offset=50")[0] == 200
     status, timeline = api.get(f"/api/projects/{pid}/timeline")
     assert status == 200 and isinstance(timeline, list) and timeline
     assert api.get("/api/projects/99/timeline")[0] == 404
