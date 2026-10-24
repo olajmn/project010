@@ -940,6 +940,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Only by converting back; the backup of `app/data/` from before the conversion is outside the repository.
 
+## 79. 2026-10-24 — Enter sends a chat message; the chat no longer adds nodes
+
+**Decision:** In the chat input, Enter sends and Shift+Enter adds a line (`ui/src/panes/chat/enterToSend.ts`); an Enter that ends composing a character (an input method) sends nothing. The shortcut that turned a multi-line message, sent with a node selected, into child nodes is removed from `sendMessage.ts`: everything typed in the chat is a message or a `/` command. Text becomes nodes through the map's Paste, which shows a preview first.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** keeping the shortcut (with Shift+Enter, an ordinary multi-line question would become nodes); turning only pasted text into nodes (less predictable, and the chat would still do two things).
+
+**Why this choice:** Enter to send is what chat inputs do. One input, one job: what is written in the chat goes to the chat, so nothing becomes nodes by accident; the map's Paste already does the other job, with a preview.
+
+**Reversible?** Yes; both are small UI changes.
+
 ## See also
 
 - [[03-architecture]]

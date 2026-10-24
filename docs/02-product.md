@@ -77,8 +77,8 @@ helps but does not take over.
   framed in the thread, and "Show only this" shows them on their own.
   A frame follows the node, not its name: after a rename it shows the
   new name and a line saying what the node was called before.
-  With a node selected, a message of several lines is added as nodes
-  under it.
+  Enter sends a message and Shift+Enter adds a line; a message is
+  always a message, never turned into nodes (that is the map's Paste).
 - **Current state:** the panel above the chat shows the project, when
   it was created, its last change, the size of the map, and changes per
   day (creating the project is not counted as a change); node names in

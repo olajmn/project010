@@ -11,20 +11,6 @@ next.
 
 ## Active
 
-73. **Enter sends, Shift+Enter adds a line** (Step, small) — today Enter
-    only adds a line; sending needs the Send button. Handle `keydown` on
-    `#chat-input` (`ui/src/panes/chat/sendMessage.ts`): Enter without
-    Shift submits the form; not while composing characters
-    (`isComposing`), not when empty or while a send is under way.
-    Decide first: a multi-line message sent while a node is selected is
-    imported as child nodes today (the paste shortcut in
-    `sendMessage.ts`); with Shift+Enter, a written multi-line message
-    would turn into nodes by accident.
-    Where it goes: a new `ui/src/panes/chat/enterToSend.ts`
-    (`installEnterToSend()`, one behavior per file like `growInput.ts`),
-    wired with one line in `ui/src/index.ts` beside
-    `installSendMessage()`; the multi-line rule, if it changes, stays in
-    `sendMessage.ts`. Docs: one line in `docs/chat.md` § 2 (step 1).
 54. **Undo for map edits** (Step) — nothing can be undone today, and the
     history keeps only a short text per change, not the tree, so an
     earlier tree cannot be worked out from it. Shape: snapshots

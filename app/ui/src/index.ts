@@ -23,6 +23,7 @@ import { installCreatePanel } from "./panes/create/createForm.js";
 import { installChatPane } from "./panes/chat/chatPane.js";
 import { installCommandMenu } from "./panes/chat/commands/menu.js";
 import { installCommandHighlight } from "./panes/chat/commands/highlight.js";
+import { installEnterToSend } from "./panes/chat/enterToSend.js";
 import { installInputGrow } from "./panes/chat/growInput.js";
 import { installChatToggle } from "./panes/chat/chatToggle.js";
 import { installSendMessage } from "./panes/chat/sendMessage.js";
@@ -110,6 +111,7 @@ installCommandMenu({
 });
 installCommandHighlight(chatInput);
 installInputGrow(chatInput);
+installEnterToSend(chatInput, chatForm);
 
 installSidebarResize(appShell, sidebarResize);
 const chatRailApi = installChatResize(workspace, chatResize, projectChat);

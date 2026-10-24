@@ -8,7 +8,7 @@ The chat beside the map answers questions about the open project. It does not se
 
 ## 2. One message, start to end
 
-1. **Send** (`ui/src/panes/chat/sendMessage.ts`) posts the text to `POST /api/projects/{id}/chat` with the selected node's id and label, a selected day, or, from a removed node's own conversation, `about_removed`.
+1. **Send** (Enter, or the button; Shift+Enter adds a line — `ui/src/panes/chat/enterToSend.ts`; `sendMessage.ts`) posts the text to `POST /api/projects/{id}/chat` with the selected node's id and label, a selected day, or, from a removed node's own conversation, `about_removed`.
 2. **The route** (`api/app.py`, body `ChatMessage` in `api/request_bodies.py`) loads the project and calls `reply()`.
 3. **`reply()`** (`project/panes/chat/reply.py`) drops a selected node that is no longer in the tree, unless `about_removed`. A message starting with `/` runs a command (`panes/chat/commands/`) and never reaches the model.
 4. **The prompt** is built by `build_messages()` (`model/brief/conversation.py`) and fitted to the model's context by `fit_to_budget()` (`model/brief/budget.py`).
