@@ -10,7 +10,9 @@ import uuid
 # The kinds of id, each a prefix that says what an id belongs to.
 NODE = "node"
 CHANGE = "change"
-KINDS = (NODE, CHANGE)
+PROJECT = "project"
+ACCOUNT = "account"
+KINDS = (NODE, CHANGE, PROJECT, ACCOUNT)
 
 # As many characters as people see, like a short git commit id.
 SHORT_LENGTH = 8
@@ -24,6 +26,16 @@ def new_node_id() -> str:
 def new_change_id() -> str:
     """A change record's id (project/changes/records.py)."""
     return _new(CHANGE)
+
+
+def new_project_id() -> str:
+    """A project's id; also its folder name under data/projects/."""
+    return _new(PROJECT)
+
+
+def new_account_id() -> str:
+    """An account's id."""
+    return _new(ACCOUNT)
 
 
 def kind_of(an_id: str) -> str | None:

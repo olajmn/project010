@@ -2,11 +2,10 @@
 Project persistence: current.json (SoT for map/chat) + events.jsonl
 (slim change tape for Status/Logs) under data/projects/{id}/.
 
-Identity grouping for display lives in create/resolver.py — project_id
-minting stays here. Simulated users (account#N) live in
-accounts_persistence.py and are only referenced via optional account_id.
-Per-account sticky mint `account_n` (map/chrome `#N`) is assigned here;
-global `project_id` stays the wire identity.
+Identity grouping for display lives in create/resolver.py. A new
+project's id comes from backend/identity/ and is also its folder name.
+Accounts live in accounts_persistence.py and are only referenced via
+optional account_id.
 """
 
 # Contents
@@ -15,7 +14,6 @@ global `project_id` stays the wire identity.
 #  2. Project records (current.json + events.jsonl)
 #      - project_dir() / current_path() / events_path()
 #      - _slim_event()
-#      - _next_project_id() / _next_account_n() / _resolve_account_n()
 #      - load_current() / load_project_events() / save_plan()
 #      - load_history() / load_all_currents() / delete_project()
 
@@ -23,6 +21,7 @@ import json
 import shutil
 from pathlib import Path
 
+from backend.identity import new_project_id
 from backend.storage import sandboxes
 from backend.storage.paths import DATA_DIR, DEFAULT_USER_ID, now_utc
 
@@ -34,10 +33,10 @@ PROJECTS_DIR = DATA_DIR / "projects"
 # ============================================================
 
 
-def record_project_id(record: dict) -> int | None:
+def record_project_id(record: dict) -> str | None:
     """A history record's project id, or None when it has none."""
     pid = record.get("project_id")
-    return int(pid) if pid is not None else None
+    return str(pid) if pid is not None else None
 
 
 # ============================================================
@@ -81,16 +80,16 @@ def _projects_dir() -> Path:
     return sandbox / "projects" if sandbox else PROJECTS_DIR
 
 
-def project_dir(project_id: int) -> Path:
+def project_dir(project_id: str) -> Path:
     """data/projects/{id}/ — current + events for one project."""
-    return _projects_dir() / str(int(project_id))
+    return _projects_dir() / project_id
 
 
-def current_path(project_id: int) -> Path:
+def current_path(project_id: str) -> Path:
     return project_dir(project_id) / "current.json"
 
 
-def events_path(project_id: int) -> Path:
+def events_path(project_id: str) -> Path:
     return project_dir(project_id) / "events.jsonl"
 
 
@@ -139,7 +138,7 @@ def _read_json(path: Path) -> dict:
     return data
 
 
-def _write_events(project_id: int, events: list[dict]) -> None:
+def _write_events(project_id: str, events: list[dict]) -> None:
     path = events_path(project_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".jsonl.tmp")
@@ -149,95 +148,40 @@ def _write_events(project_id: int, events: list[dict]) -> None:
     tmp.replace(path)
 
 
-def _append_event(project_id: int, event: dict) -> None:
+def _append_event(project_id: str, event: dict) -> None:
     path = events_path(project_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(event, ensure_ascii=False) + "\n")
 
 
-def _iter_current_paths() -> list[tuple[int, Path]]:
+def _iter_current_paths() -> list[tuple[str, Path]]:
     """(project_id, current.json path) for every on-disk project folder."""
     projects_dir = _projects_dir()
     if not projects_dir.exists():
         return []
-    out: list[tuple[int, Path]] = []
+    out: list[tuple[str, Path]] = []
     for path in projects_dir.iterdir():
-        if path.is_dir() and path.name.isdigit():
-            cur = path / "current.json"
-            if cur.exists():
-                out.append((int(path.name), cur))
+        cur = path / "current.json"
+        if path.is_dir() and cur.exists():
+            out.append((path.name, cur))
     return out
 
 
-def _existing_project_ids() -> list[int]:
-    """Numeric project ids that have a current.json (after migration)."""
+def _existing_project_ids() -> list[str]:
+    """Ids of the projects that have a current.json."""
     return [pid for pid, _ in _iter_current_paths()]
 
 
-def _next_project_id() -> int:
-    """One higher than the largest project id on disk, or 1 if none."""
-    return max(_existing_project_ids(), default=0) + 1
-
-
-def _next_account_n(account_id: int) -> int:
-    """Next sticky per-account mint (never reuses gaps after delete/move).
-
-    Uses the account's account_n_hi high-water mark only — no full
-    projects walk.
-    """
-    from backend.storage.accounts_persistence import account_n_hi, note_account_n
-
-    n = account_n_hi(account_id) + 1
-    note_account_n(account_id, n)
-    return n
-
-
-def _resolve_account_n(
-    *,
-    account_id: int | None,
-    existing: dict | None,
-) -> int | None:
-    """Sticky account_n for this save.
-
-    Keep the previous mint when the owner is unchanged. Mint a new one
-    on create, claim, or move to another account. When unlinking, keep
-    the historical mint on the record.
-    """
-    prev_n = existing.get("account_n") if existing else None
-    prev_n = prev_n if isinstance(prev_n, int) else None
-    if account_id is None:
-        return prev_n
-    prev_sim = existing.get("account_id") if existing else None
-    if prev_n is not None and prev_sim == account_id:
-        return prev_n
-    return _next_account_n(account_id)
-
-
-def _ensure_account_n(record: dict, path: Path) -> dict:
-    """If this one record lacks account_n, mint and rewrite it.
-
-    Only touches the project being loaded — no scan of siblings.
-    """
-    if record.get("account_n") is not None:
-        return record
-    sid = record.get("account_id")
-    if not isinstance(sid, int):
-        return record
-    record["account_n"] = _next_account_n(sid)
-    _write_json(path, record)
-    return record
-
-
-def load_current(project_id: int) -> dict | None:
+def load_current(project_id: str) -> dict | None:
     """The project's current SoT record, or None."""
     path = current_path(project_id)
     if not path.exists():
         return None
-    return _ensure_account_n(_read_json(path), path)
+    return _read_json(path)
 
 
-def load_project_events(project_id: int) -> list[dict]:
+def load_project_events(project_id: str) -> list[dict]:
     """Slim change tape for one project, oldest first."""
     path = events_path(project_id)
     if not path.exists():
@@ -245,7 +189,7 @@ def load_project_events(project_id: int) -> list[dict]:
     return _read_jsonl(path)
 
 
-def load_project_history(project_id: int) -> list[dict]:
+def load_project_history(project_id: str) -> list[dict]:
     """Compatibility alias: the events tape (Status/chat/timeline)."""
     return load_project_events(project_id)
 
@@ -256,8 +200,8 @@ def save_plan(
     feedback: str | None = None,
     completed: bool = False,
     cancelled: bool = False,
-    project_id: int | None = None,
-    account_id: int | None = None,
+    project_id: str | None = None,
+    account_id: str | None = None,
     event: str | None = None,
     sent_at: str | None = None,
     map_focus: str | None = None,
@@ -287,16 +231,13 @@ def save_plan(
 
     Returns the current record that was saved.
     """
-    pid = project_id if project_id is not None else _next_project_id()
-    existing = load_current(pid) if project_id is not None else None
-    account_n = _resolve_account_n(account_id=account_id, existing=existing)
+    pid = project_id if project_id is not None else new_project_id()
     existing_events = load_project_events(pid)
     record = {
         "id": len(existing_events) + 1,
         "user_id": DEFAULT_USER_ID,
         "project_id": pid,
         "account_id": account_id,
-        "account_n": account_n,
         "name": name,
         "plan": plan,
         "feedback": feedback,
@@ -333,7 +274,7 @@ def save_plan(
 
 def load_history() -> list[dict]:
     """Every project's events, oldest first within each project
-    (projects ordered by id)."""
+    (projects in a fixed but meaningless order)."""
     all_records: list[dict] = []
     for pid in sorted(_existing_project_ids()):
         all_records.extend(load_project_events(pid))
@@ -350,7 +291,7 @@ def load_all_currents() -> list[dict]:
     return currents
 
 
-def delete_project(project_id: int) -> bool:
+def delete_project(project_id: str) -> bool:
     """Permanently remove data/projects/{id}/ (current + events).
 
     Returns True if a store was removed, False if none existed.

@@ -58,7 +58,6 @@ def project_view(
         "completed": bool(record.get("completed")),
         "cancelled": bool(record.get("cancelled")),
         "account_id": record.get("account_id"),
-        "account_n": record.get("account_n"),
         "created_at": record.get("created_at"),
         "node": node,
         "thread": thread,
@@ -137,7 +136,7 @@ def map_tree(record: dict) -> dict | None:
     if not children:
         return None
     return {
-        "id": f"project-{pid}",
+        "id": pid,
         "label": record.get("name", ""),
         "status": "done" if record.get("completed") else "open",
         "children": children,

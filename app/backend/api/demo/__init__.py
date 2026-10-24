@@ -6,6 +6,6 @@ request through guard() first, by way of middleware.py.
 """
 
 from backend.api.demo.check import guard
-from backend.api.demo.settings import ENABLED, MAP_START_DEPTH, START_PROJECT_ID
+from backend.api.demo.settings import ENABLED, MAP_START_DEPTH, START_PROJECT
 
-__all__ = ["ENABLED", "MAP_START_DEPTH", "START_PROJECT_ID", "guard"]
+__all__ = ["ENABLED", "MAP_START_DEPTH", "START_PROJECT", "guard"]

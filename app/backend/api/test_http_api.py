@@ -84,7 +84,9 @@ def test_unknown_post_route(api) -> None:
 def test_create_project(api) -> None:
     status, view = api.post("/api/projects", {"text": "  House  "})
     assert status == 200
-    assert view["name"] == "House" and view["project_id"] == 1
+    from backend.identity import kind_of
+
+    assert view["name"] == "House" and kind_of(view["project_id"]) == "project"
     assert view["node"] is None  # an empty map has no tree yet
     assert {"thread", "status", "completed", "cancelled", "account_id"} <= set(view)
     # Empty text picks the next `New project N`.
@@ -136,7 +138,9 @@ def test_project_owner(api, project) -> None:
     assert status == 200 and view["account_id"] == account["id"]
     status, view = api.post(f"/api/projects/{pid}/user", {"account_id": None})
     assert status == 200 and view["account_id"] is None
-    assert api.post(f"/api/projects/{pid}/user", {"account_id": 42})[0] == 404
+    assert (
+        api.post(f"/api/projects/{pid}/user", {"account_id": "account_none"})[0] == 404
+    )
 
 
 # 3. The map

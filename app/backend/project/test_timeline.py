@@ -16,7 +16,7 @@ def test_event_name() -> None:
 def test_to_event() -> None:
     chat = to_event(
         {
-            "project_id": 4,
+            "project_id": "project_4",
             "reply": "Sure.",
             "message": "what next?",
             "created_at": "2026-09-25T18:00:00.000+00:00",
@@ -26,20 +26,28 @@ def test_to_event() -> None:
     )
     assert chat == {
         "at": "2026-09-25T18:00:00.000+00:00",
-        "project_id": 4,
+        "project_id": "project_4",
         "project": "House",
         "event": "chat",
         "kind": "Chat",
         "text": "what next?",
     }
-    created = to_event({"project_id": 4, "feedback": None, "event": "created"}, "House")
+    created = to_event(
+        {"project_id": "project_4", "feedback": None, "event": "created"}, "House"
+    )
     assert (created["kind"], created["text"]) == ("Created", "")
     renamed = to_event(
-        {"project_id": 4, "feedback": "Renamed: Hus → House", "event": "renamed"},
+        {
+            "project_id": "project_4",
+            "feedback": "Renamed: Hus → House",
+            "event": "renamed",
+        },
         "House",
     )
     assert (renamed["kind"], renamed["text"]) == ("Renamed", "Renamed: Hus → House")
-    long = to_event({"project_id": 4, "feedback": "Added step: " + "x" * 300}, "House")
+    long = to_event(
+        {"project_id": "project_4", "feedback": "Added step: " + "x" * 300}, "House"
+    )
     assert long["text"].endswith("…") and len(long["text"]) == 161
 
 
@@ -47,7 +55,7 @@ def test_all_events_pages_newest_first(monkeypatch) -> None:
     # Offset skips what is already shown.
     lines = [
         {
-            "project_id": 1,
+            "project_id": "project_1",
             "event": "node_added",
             "feedback": f"Added step: {n}",
             "created_at": f"2026-09-2{n}T10:00:00",
@@ -58,7 +66,7 @@ def test_all_events_pages_newest_first(monkeypatch) -> None:
     monkeypatch.setattr(
         timeline,
         "get_latest_for_all_projects",
-        lambda: [{"project_id": 1, "name": "P"}],
+        lambda: [{"project_id": "project_1", "name": "P"}],
     )
 
     def texts(events):

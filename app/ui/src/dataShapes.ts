@@ -61,13 +61,11 @@ export interface ProjectStatus {
 }
 
 export interface ProjectView {
-  project_id: number;
+  project_id: string;
   name: string;
   completed: boolean;
   cancelled: boolean;
-  account_id: number | null;
-  /** Sticky per-account mint for map/chrome `#N`. Null when unassigned. */
-  account_n?: number | null;
+  account_id: string | null;
   /** Latest history record timestamp for this project. */
   created_at?: string | null;
   node: MapNode | null;
@@ -83,7 +81,7 @@ export interface ProjectView {
 // 3. Accounts (simulated seats)
 
 export interface AccountView {
-  id: number;
+  id: string;
   text: string;
   archived: boolean;
   created_at: string;
@@ -119,7 +117,7 @@ export interface ModelView {
  * mixed activity feed; `focus` is the map node a chat was about. */
 export interface LogEntry {
   at: string | null;
-  project_id: number | null;
+  project_id: string | null;
   project: string;
   event: string;
   kind: "Created" | "Chat" | "Map" | "Renamed" | "Owner" | "Archived" | "Other";
@@ -146,5 +144,5 @@ export interface SavedTreeView {
 export interface SessionView {
   demo: boolean;
   map_start_depth: number | null;
-  start_project_id: number | null;
+  start_project_id: string | null;
 }

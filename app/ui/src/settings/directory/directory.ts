@@ -26,6 +26,7 @@ import {
   userLabel,
 } from "../../user/activeAccount.js";
 import type { AccountView, ProjectView } from "../../dataShapes.js";
+import { shortId } from "../../ids.js";
 import {
   settingsAction,
   settingsError,
@@ -59,7 +60,7 @@ function textInput(placeholder: string): HTMLInputElement {
 
 /** "New account": a name field and Create in one row. */
 function newAccountSection(onCreate: (name: string) => Promise<void>): HTMLElement {
-  const input = textInput("Optional — blank gives account#N");
+  const input = textInput("Optional — blank gives account#id");
   const create = settingsAction("Create", (btn) => void submit(btn));
   const submit = async (btn: HTMLButtonElement): Promise<void> => {
     setButtonBusy(btn, true);
@@ -77,7 +78,7 @@ function newAccountSection(onCreate: (name: string) => Promise<void>): HTMLEleme
 }
 
 function childProjectRow(project: ProjectView): HTMLElement {
-  const local = project.account_n != null ? `#${project.account_n}` : `#${project.project_id}`;
+  const local = `#${shortId(project.project_id)}`;
   const details = [project.name, shortDate(project.created_at)].filter(Boolean).join(" · ");
   const row = settingsListRow(local, details);
   row.classList.add("is-child");
@@ -89,7 +90,7 @@ function childProjectRow(project: ProjectView): HTMLElement {
 function accountRows(
   user: AccountView,
   projects: ProjectView[],
-  activeId: number | null,
+  activeId: string | null,
   repaint: () => Promise<void>,
   showError: (message: string) => void,
 ): HTMLElement[] {
@@ -132,7 +133,7 @@ function accountRows(
   if (activeId === user.id) row.classList.add("is-active");
 
   const startRename = (): void => {
-    const input = textInput("Name (blank gives account#N)");
+    const input = textInput("Name (blank gives account#id)");
     input.value = editableName(user);
     const cancel = (): void => edit.replaceWith(row);
     const save = settingsAction("Save", async (btn) => {

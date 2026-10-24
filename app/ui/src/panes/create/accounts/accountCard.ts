@@ -17,10 +17,10 @@ const EXPANDED_KEY = "accounts.cardExpanded";
 
 export type AccountCardCallbacks = {
   getUsers: () => AccountView[];
-  getSelectedId: () => number | null;
+  getSelectedId: () => string | null;
   onUsersChanged: (users: AccountView[]) => void;
-  onActiveUserChanged: (userId: number | null) => void;
-  onSelectProject: (projectId: number) => void;
+  onActiveUserChanged: (userId: string | null) => void;
+  onSelectProject: (projectId: string) => void;
   /** Rebuild panel + brand after active-account change. */
   afterChange: () => void;
 };
@@ -39,7 +39,7 @@ function readExpandedMap(): Record<string, boolean> {
   return {};
 }
 
-function writeExpanded(userId: number, open: boolean): void {
+function writeExpanded(userId: string, open: boolean): void {
   try {
     const map = readExpandedMap();
     map[String(userId)] = open;
@@ -51,7 +51,7 @@ function writeExpanded(userId: number, open: boolean): void {
 
 /** Remembered expand state; active account defaults open. */
 export function isAccountCardExpanded(
-  userId: number,
+  userId: string,
   isActive: boolean,
 ): boolean {
   const map = readExpandedMap();

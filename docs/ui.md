@@ -76,7 +76,7 @@ card-style nodes.
 
   | Loud | Quiet | Hidden until needed |
   |---|---|---|
-  | Project title, selected node | `#N`, child nodes, lines | Add / Remove (in ⋯) |
+  | Project title, selected node | `#id`, child nodes, lines | Add / Remove (in ⋯) |
 
 - **Complexity is budgeted.** The canvas may be rich — the tree, menus,
   and lines are the product's own UI. Shell, sidebar, and chat stay calm.

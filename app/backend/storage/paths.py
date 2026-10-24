@@ -3,9 +3,7 @@ Shared on-disk roots for storage.
 
 Project records and accounts both live under DATA_DIR; each has
 its own module (project_persistence / accounts_persistence). Paths and the
-stub operator id live here so neither module needs the other for them
-(project_persistence imports accounts_persistence only lazily, for the
-per-account `account_n` high-water mark).
+stub operator id live here so neither module needs the other for them.
 """
 
 from datetime import UTC, datetime

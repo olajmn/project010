@@ -18,6 +18,7 @@ import { askToConfirm } from "../../panes/canvas/confirmPopover.js";
 import { setButtonBusy } from "../../shell/busyButton.js";
 import { accountWireLabel, userLabel } from "../../user/activeAccount.js";
 import type { AccountView, ProjectView } from "../../dataShapes.js";
+import { shortId } from "../../ids.js";
 import {
   settingsAction,
   settingsError,
@@ -100,7 +101,7 @@ function projectStatus(project: ProjectView): string {
 }
 
 function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): HTMLElement {
-  const local = project.account_n != null ? `#${project.account_n}` : `#${project.project_id}`;
+  const local = `#${shortId(project.project_id)}`;
   const details = [local, projectStatus(project), shortDate(project.created_at)]
     .filter(Boolean)
     .join(" · ");

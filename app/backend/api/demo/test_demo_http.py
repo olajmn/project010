@@ -69,3 +69,14 @@ def test_sandbox_deleted_on_logout(demo_api) -> None:
     box = check.sessions.get(token).sandbox
     demo_api.post("/api/logout")
     assert box not in [p.name for p in (check.sandboxes.ROOT).iterdir()]
+
+
+def test_start_project_is_found_by_name(demo_api, monkeypatch) -> None:
+    from backend.api import demo
+
+    login(demo_api)
+    pid = demo_api.post("/api/projects", {"text": "Start here"})[1]["project_id"]
+    monkeypatch.setattr(demo, "START_PROJECT", "Start here")
+    assert demo_api.get("/api/session")[1]["start_project_id"] == pid
+    monkeypatch.setattr(demo, "START_PROJECT", "Not a project")
+    assert demo_api.get("/api/session")[1]["start_project_id"] is None

@@ -12,10 +12,9 @@ Whether a project counts as "active" or "completed", and how projects
 get grouped or sorted for display, is board-building logic, not project
 identity.
 
-project_id itself is minted in project_persistence.py (_next_project_id()),
-not here - moving it here would create a circular import between the two
-modules. See docs/05-decisions.md for why identity is a minted id, not
-the project's display name.
+A project's id is made in backend/identity/ when it is first saved
+(project_persistence.save_plan()); identity is that id, not the
+project's display name (docs/05-decisions.md #81).
 """
 
 from datetime import datetime
@@ -50,7 +49,7 @@ def created_at_key(record: dict) -> datetime:
 # Read one project
 
 
-def get_history_for_project(project_id: int) -> list[dict]:
+def get_history_for_project(project_id: str) -> list[dict]:
     """
     Return every record for one project_id, oldest first: that
     project's events tape (data/projects/{id}/events.jsonl).
@@ -58,7 +57,7 @@ def get_history_for_project(project_id: int) -> list[dict]:
     return load_project_history(project_id)
 
 
-def get_latest_for_project(project_id: int) -> dict | None:
+def get_latest_for_project(project_id: str) -> dict | None:
     """Return the current SoT record for one project_id, or None."""
     return load_current(project_id)
 

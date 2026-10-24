@@ -107,14 +107,6 @@ next.
 
 ### Map and nodes
 
-74. **Project and account ids as identity** (Step) — like node ids
-    (#78), the global `project_id`, the per-account number
-    (`account_n`, shown as #1, #2), and account ids are counters that
-    show order and count. Make them UUIDs, shown short. Larger than node
-    ids: the project id is in API paths (`/api/projects/{id}/…`), folder
-    names (`data/projects/{id}/`), `DEMO_START_PROJECT_ID`, and the UI.
-    Best done with the clean start in 54 step 2, when little old data
-    is left to convert.
 72. **Node id follow-ups** (Step, when needed) — ids are random UUIDv4
     since 2026-10-24 (#78, `app/backend/project/node/README.md`). Open:
     a Settings overview of every node's id (was 49) — purpose not

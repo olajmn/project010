@@ -59,7 +59,7 @@ type MapPaneOpts = {
   setSelectedDay: (day: string | null) => void;
   onCloseProject: () => void;
   onUpdated: (updated: ProjectView) => void;
-  onArchived: (projectId: number) => void;
+  onArchived: (projectId: string) => void;
   onBrandRender: () => void;
 };
 

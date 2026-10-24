@@ -28,7 +28,7 @@ export function projectsForActiveUser(projects: ProjectView[]): ProjectView[] {
 // 2. Selection
 
 export type SelectionState = {
-  selectedId: number | null;
+  selectedId: string | null;
   selectedNodeId: string | null;
   selectedNodeLabel: string | null;
   /** A selected day of changes (YYYY-MM-DD); never set with a node. */

@@ -14,8 +14,10 @@ The rest of the app treats an id as an opaque string. Nothing reads meaning from
 |---|---|---|---|
 | `node` | `new_node_id()`, called by `project/panes/canvas/edit_map.py` for every new node | each node's `id` in `current.json`; `focus_step_id` on log lines; `source.step_id` of saved trees | the map, the chat, saved trees |
 | `change` | `new_change_id()`, called by `project/changes/records.py` | `change.id` on a map edit's line in `events.jsonl` | undo (`TODO.md` 54) |
+| `project` | `new_project_id()`, called by `save_plan()` in `storage/project_persistence.py` for a new project | the folder name `data/projects/{id}/`; `project_id` in `current.json` and on log lines; the map's top row | API paths (`/api/projects/{id}/…`), the UI, logs |
+| `account` | `new_account_id()`, called by `storage/accounts_persistence.py` | `accounts.json`; `account_id` on projects, log lines, and saved trees | the UI, Settings, saved trees |
 
-Projects and accounts still have counters (`TODO.md` 74); they get kinds here when that changes.
+Projects are listed by `created_at`, not by id.
 
 ## What an id promises
 
@@ -26,4 +28,4 @@ Projects and accounts still have counters (`TODO.md` 74); they get kinds here wh
 
 ## Older ids
 
-Node ids were `p1`, `p2`, … until 2026-10-24, then a bare UUID without a kind. Both are still read wherever they remain; `short_id()` and `kind_of()` handle them. They go when the data is rebuilt (`TODO.md` 54, step 2). Decisions: `docs/05-decisions.md` #78, #81.
+Node ids were `p1`, `p2`, … until 2026-10-24, then a bare UUID without a kind. Both are still read wherever they remain; `short_id()` and `kind_of()` handle them. They go when the data is rebuilt (`TODO.md` 54, step 2). Projects and accounts had counters (`project_id` 1, 2, …, and a per-account `account_n` shown as #1, #2) until 2026-10-24. Decisions: `docs/05-decisions.md` #78, #81, #82.

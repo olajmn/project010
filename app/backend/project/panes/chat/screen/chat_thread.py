@@ -91,7 +91,7 @@ def thread_messages(history: list[dict], steps: list | None = None) -> list[dict
 
 
 def thread_for(
-    project_id: int,
+    project_id: str,
     history: list[dict] | None = None,
     steps: list | None = None,
 ) -> list[dict]:

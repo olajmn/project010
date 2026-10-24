@@ -16,7 +16,7 @@ export type AddFolderPanel = {
 export function buildAddFolderPanel(opts: {
   getParentLabel: () => string | null;
   getParentId: () => string | null;
-  getProjectId: () => number;
+  getProjectId: () => string;
   onImported: (updated: ProjectView) => void;
 }): AddFolderPanel {
   const folderForm = document.createElement("form");

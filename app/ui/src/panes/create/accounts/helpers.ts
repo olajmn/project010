@@ -4,7 +4,7 @@ import { setProjectUser } from "../../../api.js";
 import type { ProjectView } from "../../../dataShapes.js";
 
 export async function claimUnassigned(
-  userId: number,
+  userId: string,
   projects: ProjectView[],
 ): Promise<ProjectView[]> {
   const orphans = projects.filter((p) => p.account_id === null);

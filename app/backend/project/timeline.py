@@ -67,7 +67,7 @@ def event_name(record: dict) -> str:
 # ============================================================
 
 
-def project_timeline(project_id: int) -> list[dict]:
+def project_timeline(project_id: str) -> list[dict]:
     """One project's events, oldest first — its whole history."""
     history = get_history_for_project(project_id)
     current = load_current(project_id)

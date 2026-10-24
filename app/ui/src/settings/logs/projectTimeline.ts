@@ -9,7 +9,7 @@ import { logDaySections } from "./logList.js";
 /** Fill `#logs` with one project's timeline. */
 export async function mountProjectTimeline(
   host: HTMLElement,
-  projectId: number,
+  projectId: string,
 ): Promise<void> {
   try {
     const entries = await fetchProjectTimeline(projectId);

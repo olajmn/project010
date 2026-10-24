@@ -29,11 +29,11 @@ export type AccountsPanelOptions = {
   host: HTMLElement;
   getUsers: () => AccountView[];
   getProjects: () => ProjectView[];
-  getSelectedId: () => number | null;
+  getSelectedId: () => string | null;
   onUsersChanged: (users: AccountView[]) => void;
   onProjectsUpdated: (updated: ProjectView[]) => void;
-  onActiveUserChanged: (userId: number | null) => void;
-  onSelectProject: (projectId: number) => void;
+  onActiveUserChanged: (userId: string | null) => void;
+  onSelectProject: (projectId: string) => void;
 };
 
 export type AccountsPanelApi = {

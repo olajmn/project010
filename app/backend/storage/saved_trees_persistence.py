@@ -73,7 +73,7 @@ def _save(data: dict) -> None:
 def add_saved_tree(
     name: str,
     tree: dict,
-    account_id: int | None,
+    account_id: str | None,
     source: dict | None = None,
 ) -> dict:
     """Store one structure and return its record. `source` records

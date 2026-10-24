@@ -44,7 +44,7 @@ def create_project(typed_text: str, account_id_value: str) -> dict:
     built by hand, pasted, or walked in from a folder. Empty text gets
     `next_default_name()`, so every client names the same way.
     """
-    account_id = int(account_id_value) if account_id_value else None
+    account_id = account_id_value or None
     name = typed_text.strip() or next_default_name(account_id)
     return save_plan(
         name,
@@ -58,7 +58,7 @@ def create_project(typed_text: str, account_id_value: str) -> dict:
 _DEFAULT_NAME_RE = re.compile(r"^new project(?: #?(\d+))?$", re.IGNORECASE)
 
 
-def next_default_name(account_id: int | None) -> str:
+def next_default_name(account_id: str | None) -> str:
     """
     Next unused `New project N` among this account's active projects.
 
@@ -82,7 +82,7 @@ def next_default_name(account_id: int | None) -> str:
 # ============================================================
 
 
-def cancel_project(project_id: int) -> dict | None:
+def cancel_project(project_id: str) -> dict | None:
     """
     Mark a project as cancelled (abandoned) - a distinct terminal status
     from `completed`, not a UI-level relabeling of it and not a third
@@ -121,7 +121,7 @@ def cancel_project(project_id: int) -> dict | None:
     )
 
 
-def restore_project(project_id: int) -> dict | None:
+def restore_project(project_id: str) -> dict | None:
     """Clear cancelled so the project is active again.
 
     No-op if already live. Returns None if missing or completed
@@ -153,6 +153,6 @@ def restore_project(project_id: int) -> dict | None:
     )
 
 
-def delete_project(project_id: int) -> bool:
+def delete_project(project_id: str) -> bool:
     """Permanently erase the project store. True if something was removed."""
     return erase_project_store(project_id)

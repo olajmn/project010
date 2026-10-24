@@ -10,6 +10,8 @@ data/: the `data_dir` fixture points the path constants there.
 
 import pytest
 
+from backend.identity import kind_of
+
 from backend.storage import accounts_persistence as ap
 from backend.storage import paths as storage_paths
 from backend.storage import project_persistence as pp
@@ -41,34 +43,36 @@ def test_save_plan_writes_current_and_events() -> None:
     assert plain_record["account_id"] is None, plain_record["account_id"]
     assert plain_record["name"] == "Make a song"
     assert "goal" not in plain_record
-    assert plain_record["project_id"] == 1
-    assert pp.current_path(1).exists()
-    assert pp.events_path(1).exists()
-    assert "plan" in pp.load_current(1)
-    assert "plan" not in pp.load_project_events(1)[0]
-    assert pp.events_path(1).read_text(encoding="utf-8").count("\n") == 1
+    pid = plain_record["project_id"]
+    assert kind_of(pid) == "project"
+    assert pp.current_path(pid).exists()
+    assert pp.events_path(pid).exists()
+    assert pp.current_path(pid).parent.name == pid  # the id is the folder
+    assert "plan" in pp.load_current(pid)
+    assert "plan" not in pp.load_project_events(pid)[0]
+    assert pp.events_path(pid).read_text(encoding="utf-8").count("\n") == 1
 
 
 def test_accounts_save_rename_and_ids() -> None:
     user = ap.save_account("Improve physical health and quality of life")
     assert user["text"] == "Improve physical health and quality of life"
+    assert kind_of(user["id"]) == "account"
     assert ap.get_account(user["id"]) == user
-    assert ap.get_account(user["id"] + 999) is None
+    assert ap.get_account("account_none") is None
     renamed = ap.rename_account(user["id"], "Health")
     assert renamed is not None and renamed["text"] == "Health"
     assert ap.rename_account(user["id"], "  ")["text"] == "user"
 
     second_user = ap.save_account("Grow as a musician")
-    assert second_user["id"] == user["id"] + 1
+    assert second_user["id"] != user["id"]
     assert [u["id"] for u in ap.load_accounts()] == [user["id"], second_user["id"]]
 
 
-def test_projects_numbered_per_account() -> None:
+def test_projects_of_one_account() -> None:
     user, _, abs_project, cardio_project = _two_projects()
     assert abs_project["account_id"] == cardio_project["account_id"] == user["id"]
     assert abs_project["project_id"] != cardio_project["project_id"]
-    assert abs_project["account_n"] == 1
-    assert cardio_project["account_n"] == 2
+    assert "account_n" not in abs_project  # no per-account counter
     assert "goal_id" not in abs_project
     assert "name" in abs_project
     assert "goal" not in abs_project
@@ -101,11 +105,10 @@ def test_saving_again_appends_one_event() -> None:
         == 1
     )
     assert pp.load_current(abs_project["project_id"])["plan"]["now"] == "again"
-    assert pp.load_current(abs_project["project_id"])["account_n"] == 1
 
 
-def test_owner_change_does_not_reuse_numbers() -> None:
-    user, second_user, abs_project, cardio_project = _two_projects()
+def test_owner_change_keeps_the_project_id() -> None:
+    _, second_user, _, cardio_project = _two_projects()
     moved = pp.save_plan(
         "Improve cardio",
         {"now": "..."},
@@ -113,10 +116,8 @@ def test_owner_change_does_not_reuse_numbers() -> None:
         account_id=second_user["id"],
         event="owner_changed",
     )
-    assert moved["account_n"] == 1  # first under second_user
-    assert pp.load_current(abs_project["project_id"])["account_n"] == 1
-    third = pp.save_plan("Stretch", {"now": "..."}, account_id=user["id"])
-    assert third["account_n"] == 3  # gap from moved cardio not reused
+    assert moved["project_id"] == cardio_project["project_id"]
+    assert moved["account_id"] == second_user["id"]
 
 
 def test_account_archive_restore_delete() -> None:
@@ -133,7 +134,7 @@ def test_account_archive_restore_delete() -> None:
     assert ap.delete_account(seat["id"]) is None
     assert ap.restore_account(seat["id"]) is None
     after = ap.save_account("After delete")
-    assert after["id"] == seat["id"] + 1  # deleted id is never reused
+    assert after["id"] != seat["id"]  # a deleted id is never handed out again
 
 
 def test_project_erase() -> None:
@@ -147,18 +148,27 @@ def test_project_erase() -> None:
 def test_empty_create_name_becomes_next_new_project() -> None:
     from backend.project.panes.create.lifecycle import cancel_project, create_project
 
-    assert create_project("", "1")["name"] == "New project 1"
-    assert create_project("  ", "1")["name"] == "New project 2"
-    assert create_project("", "2")["name"] == "New project 1"  # per account
-    pp.save_plan("New project #7", {"now": "x"}, account_id=1)  # legacy form
-    assert create_project("", "1")["name"] == "New project 8"
-    assert create_project("Typed", "1")["name"] == "Typed"
-    cancel_project(create_project("", "3")["project_id"])
-    assert create_project("", "3")["name"] == "New project 1"  # archived don't count
+    a, b, c = "account_a", "account_b", "account_c"
+    assert create_project("", a)["name"] == "New project 1"
+    assert create_project("  ", a)["name"] == "New project 2"
+    assert create_project("", b)["name"] == "New project 1"  # per account
+    pp.save_plan("New project #7", {"now": "x"}, account_id=a)  # legacy form
+    assert create_project("", a)["name"] == "New project 8"
+    assert create_project("Typed", a)["name"] == "Typed"
+    cancel_project(create_project("", c)["project_id"])
+    assert create_project("", c)["name"] == "New project 1"  # archived don't count
 
 
 def test_a_change_record_goes_to_the_log_not_the_current_state() -> None:
-    change = {"op": "rename", "id": "p1", "from": "A", "to": "B"}
-    pp.save_plan("P", {"now": "x"}, event="node_renamed", change=change)
-    assert pp.load_project_events(1)[-1]["change"] == change
-    assert "change" not in pp.load_current(1)
+    change = {
+        "id": "change_x",
+        "op": "rename",
+        "node_id": "node_1",
+        "from": "A",
+        "to": "B",
+    }
+    pid = pp.save_plan("P", {"now": "x"}, event="node_renamed", change=change)[
+        "project_id"
+    ]
+    assert pp.load_project_events(pid)[-1]["change"] == change
+    assert "change" not in pp.load_current(pid)

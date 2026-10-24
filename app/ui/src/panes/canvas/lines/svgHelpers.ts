@@ -102,7 +102,7 @@ export function measureMapContent(wrap: HTMLElement): { w: number; h: number } {
   return { w, h };
 }
 
-/** Empty project: `#N` / title / add control, no waypoints yet. */
+/** Empty project: `#id` / title / add control, no waypoints yet. */
 export function isEmptyMap(wrap: HTMLElement): boolean {
   return !wrap.querySelector(".progress-trunk-block");
 }

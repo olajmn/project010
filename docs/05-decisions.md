@@ -976,6 +976,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; ids are read as opaque strings, and older ids without a kind are still read.
 
+## 82. 2026-10-24 — Project and account ids are kinds of id, projects listed by date
+
+**Decision:** Projects and accounts get their ids from `backend/identity/` like nodes and changes: `new_project_id()` (`project_…`, also the project's folder name under `data/projects/`) and `new_account_id()` (`account_…`). The global `project_id` counter, the per-account `account_n` (shown as #1, #2), and the account counter are gone. Projects are listed by `created_at`; Directory, Archive, the logs picker, and the map's top row show the short id (`#3f9c2a71`, `ui/src/ids.ts`). The demo's start project is set by name (`DEMO_START_PROJECT`), since its id is no longer known in advance. The demo limits match project paths by any id (`api/demo/check.py`), not only digits.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** keeping `account_n` as a display number beside the id (a second counter to keep in step, and it shows order and count); converting the old data (it is rebuilt from scratch instead, `TODO.md` 54 step 2).
+
+**Why this choice:** Same reasons as #78 and #81: an id identifies one thing and says nothing about order or count, and every id is made in one place. Order comes from the time a project was made, which is what the numbers stood for.
+
+**Reversible?** Yes, but only with a conversion of saved data.
+
 ## See also
 
 - [[03-architecture]]

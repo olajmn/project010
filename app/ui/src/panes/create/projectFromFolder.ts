@@ -15,7 +15,7 @@ import type { ProjectView } from "../../dataShapes.js";
 
 export async function mintFromFolder(opts: {
   typedName: string;
-  userId: number;
+  userId: string;
 }): Promise<ProjectView | null> {
   const path = await chooseFolder();
   if (!path) return null;

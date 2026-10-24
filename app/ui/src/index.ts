@@ -246,7 +246,7 @@ function replaceProject(updated: ProjectView): void {
   renderAll();
 }
 
-async function load(startProjectId: number | null = null): Promise<void> {
+async function load(startProjectId: string | null = null): Promise<void> {
   const [loaded, allUsers] = await Promise.all([
     fetchProjects(),
     fetchAccounts(),
@@ -256,7 +256,7 @@ async function load(startProjectId: number | null = null): Promise<void> {
 
   syncActiveUser(users);
   const params = new URLSearchParams(window.location.search);
-  const want = Number(params.get("id"));
+  const want = params.get("id");
   if (want && projects.some((p) => p.project_id === want)) {
     const wanted = projects.find((p) => p.project_id === want)!;
     if (wanted.account_id != null) {

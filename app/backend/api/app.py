@@ -178,8 +178,17 @@ def get_session() -> dict:
     return {
         "demo": demo.ENABLED,
         "map_start_depth": demo.MAP_START_DEPTH if demo.ENABLED else None,
-        "start_project_id": (demo.START_PROJECT_ID or None) if demo.ENABLED else None,
+        "start_project_id": _start_project_id() if demo.ENABLED else None,
     }
+
+
+def _start_project_id() -> str | None:
+    """The id of the demo's start project (DEMO_START_PROJECT, a name) in
+    this visitor's data, or None."""
+    for record in active_projects():
+        if demo.START_PROJECT and record.get("name") == demo.START_PROJECT:
+            return record["project_id"]
+    return None
 
 
 @app.get("/api/model")
@@ -193,14 +202,14 @@ def get_log(offset: int = 0) -> dict | list:
 
 
 @app.get("/api/projects/{project_id}/timeline")
-def get_timeline(project_id: int) -> list:
+def get_timeline(project_id: str) -> list:
     """Everything that happened in one project, oldest first."""
     _load_project(project_id)
     return project_timeline(project_id)
 
 
 @app.get("/api/projects/{project_id}/saved-trees")
-def get_saved_trees(project_id: int) -> list:
+def get_saved_trees(project_id: str) -> list:
     return [saved_tree_view(t) for t in saved_trees_for(_load_project(project_id))]
 
 
@@ -220,7 +229,7 @@ def post_create_project(
 
 @app.post("/api/projects/{project_id}/name")
 def post_rename_project(
-    project_id: int, body: Annotated[TextBody, Body(default_factory=TextBody)]
+    project_id: str, body: Annotated[TextBody, Body(default_factory=TextBody)]
 ) -> dict:
     record = rename_project(project_id, _text(body))
     if record is None:
@@ -229,7 +238,7 @@ def post_rename_project(
 
 
 @app.post("/api/projects/{project_id}/cancel")
-def post_cancel_project(project_id: int) -> dict:
+def post_cancel_project(project_id: str) -> dict:
     record = cancel_project(project_id)
     if record is None:
         raise fail(404, "no such project, or already completed")
@@ -237,7 +246,7 @@ def post_cancel_project(project_id: int) -> dict:
 
 
 @app.post("/api/projects/{project_id}/restore")
-def post_restore_project(project_id: int) -> dict:
+def post_restore_project(project_id: str) -> dict:
     record = restore_project(project_id)
     if record is None:
         raise fail(404, "no such project, or completed")
@@ -245,7 +254,7 @@ def post_restore_project(project_id: int) -> dict:
 
 
 @app.post("/api/projects/{project_id}/delete")
-def post_delete_project(project_id: int) -> dict:
+def post_delete_project(project_id: str) -> dict:
     if not delete_project(project_id):
         raise fail(404, "no such project")
     return {"ok": True, "project_id": project_id}
@@ -253,7 +262,7 @@ def post_delete_project(project_id: int) -> dict:
 
 @app.post("/api/projects/{project_id}/user")
 def post_project_owner(
-    project_id: int, body: Annotated[ProjectOwner, Body(default_factory=ProjectOwner)]
+    project_id: str, body: Annotated[ProjectOwner, Body(default_factory=ProjectOwner)]
 ) -> dict:
     record = set_project_user(project_id, body.account_id)
     if record is None:
@@ -269,7 +278,7 @@ def post_project_owner(
 
 @app.post("/api/projects/{project_id}/map")
 def post_add_node(
-    project_id: int, body: Annotated[AddNode, Body(default_factory=AddNode)]
+    project_id: str, body: Annotated[AddNode, Body(default_factory=AddNode)]
 ) -> dict:
     """One node the user named."""
     latest = _load_project(project_id)
@@ -284,7 +293,7 @@ def post_add_node(
 
 @app.post("/api/projects/{project_id}/map/import")
 def post_import_outline(
-    project_id: int, body: Annotated[ImportOutline, Body(default_factory=ImportOutline)]
+    project_id: str, body: Annotated[ImportOutline, Body(default_factory=ImportOutline)]
 ) -> dict:
     latest = _load_project(project_id)
     return _map_change(
@@ -300,7 +309,7 @@ def post_import_outline(
 
 @app.post("/api/projects/{project_id}/map/folder")
 def post_add_folder(
-    project_id: int, body: Annotated[AddFolder, Body(default_factory=AddFolder)]
+    project_id: str, body: Annotated[AddFolder, Body(default_factory=AddFolder)]
 ) -> dict:
     """One folder on this computer becomes nodes."""
     latest = _load_project(project_id)
@@ -315,7 +324,7 @@ def post_add_folder(
 
 @app.post("/api/projects/{project_id}/map/insert-tree")
 def post_insert_tree(
-    project_id: int, body: Annotated[InsertTree, Body(default_factory=InsertTree)]
+    project_id: str, body: Annotated[InsertTree, Body(default_factory=InsertTree)]
 ) -> dict:
     """A saved tree becomes new nodes (fresh ids)."""
     latest = _load_project(project_id)
@@ -329,13 +338,13 @@ def post_insert_tree(
 
 
 @app.post("/api/projects/{project_id}/map/{node_id}/remove")
-def post_remove_node(project_id: int, node_id: str) -> dict:
+def post_remove_node(project_id: str, node_id: str) -> dict:
     latest = _load_project(project_id)
     return _map_change(lambda: remove_map_node(latest, node_id))
 
 
 @app.post("/api/projects/{project_id}/map/{node_id}/move-{direction}")
-def post_move_node(project_id: int, node_id: str, direction: str) -> dict:
+def post_move_node(project_id: str, node_id: str, direction: str) -> dict:
     """One place up or down among its siblings."""
     if direction not in ("up", "down"):
         raise fail(404, "Not Found")
@@ -345,7 +354,7 @@ def post_move_node(project_id: int, node_id: str, direction: str) -> dict:
 
 @app.post("/api/projects/{project_id}/map/{node_id}/rename")
 def post_rename_node(
-    project_id: int,
+    project_id: str,
     node_id: str,
     body: Annotated[TextBody, Body(default_factory=TextBody)],
 ) -> dict:
@@ -383,7 +392,7 @@ def post_choose_folder() -> dict:
 
 
 @app.post("/api/projects/{project_id}/map/{node_id}/save-tree")
-def post_save_tree(project_id: int, node_id: str) -> dict:
+def post_save_tree(project_id: str, node_id: str) -> dict:
     """This node and everything under it, as structure."""
     latest = _load_project(project_id)
     try:
@@ -407,7 +416,7 @@ def post_delete_saved_tree(tree_id: str) -> dict:
 
 @app.post("/api/projects/{project_id}/chat")
 def post_chat(
-    project_id: int, body: Annotated[ChatMessage, Body(default_factory=ChatMessage)]
+    project_id: str, body: Annotated[ChatMessage, Body(default_factory=ChatMessage)]
 ) -> dict:
     note = (body.text or "").strip()
     if not note:
@@ -451,7 +460,7 @@ def post_create_account(
 
 @app.post("/api/accounts/{account_id}/rename")
 def post_rename_account(
-    account_id: int, body: Annotated[RenameAccount, Body(default_factory=RenameAccount)]
+    account_id: str, body: Annotated[RenameAccount, Body(default_factory=RenameAccount)]
 ) -> dict:
     if body.text is None:
         raise fail(400, "missing text")
@@ -459,17 +468,17 @@ def post_rename_account(
 
 
 @app.post("/api/accounts/{account_id}/archive")
-def post_archive_account(account_id: int) -> dict:
+def post_archive_account(account_id: str) -> dict:
     return _account_or_404(archive_account(account_id))
 
 
 @app.post("/api/accounts/{account_id}/restore")
-def post_restore_account(account_id: int) -> dict:
+def post_restore_account(account_id: str) -> dict:
     return _account_or_404(restore_account(account_id))
 
 
 @app.post("/api/accounts/{account_id}/delete")
-def post_delete_account(account_id: int) -> dict:
+def post_delete_account(account_id: str) -> dict:
     return _account_or_404(delete_account(account_id))
 
 
@@ -512,7 +521,7 @@ def _text(body: TextBody) -> str:
     return text
 
 
-def _load_project(project_id: int) -> dict:
+def _load_project(project_id: str) -> dict:
     """The project's latest record, or 404."""
     latest = get_latest_for_project(project_id)
     if latest is None:

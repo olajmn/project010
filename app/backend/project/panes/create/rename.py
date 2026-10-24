@@ -9,7 +9,7 @@ from backend.project.panes.create.resolver import get_latest_for_project
 from backend.storage.project_persistence import save_plan
 
 
-def rename_project(project_id: int, name: str) -> dict | None:
+def rename_project(project_id: str, name: str) -> dict | None:
     """The saved rename line, the unchanged latest line when the name is
     the same, or None for empty text or an unknown project."""
     label = name.strip()

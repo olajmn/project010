@@ -33,9 +33,9 @@ MAX_SESSIONS = _number("DEMO_MAX_SESSIONS", 50)
 # demo the map picks a depth that fits the whole tree on screen.
 MAP_START_DEPTH = _number("DEMO_MAP_START_DEPTH", 3)
 
-# The project a first-time visitor sees opened (a project_id from the
-# seed); 0 leaves the choice to the app.
-START_PROJECT_ID = _number("DEMO_START_PROJECT_ID", 0)
+# The project a first-time visitor sees opened, by name (ids are random
+# and change when the seed is rebuilt); empty leaves the choice to the app.
+START_PROJECT = os.environ.get("DEMO_START_PROJECT", "").strip()
 
 # Secure cookies are only sent over HTTPS. DEMO_INSECURE_COOKIE=1 is for
 # trying demo mode on http://localhost, never for the public host.

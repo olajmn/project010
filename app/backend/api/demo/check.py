@@ -60,13 +60,13 @@ class Handler(Protocol):
 COOKIE = "demo_session"
 LOGIN_PAGE = "/login.html"
 
-_CHAT = re.compile(r"^/api/projects/\d+/chat$")
+_CHAT = re.compile(r"^/api/projects/[^/]+/chat$")
 
 # These reach the server's own file system and desktop, not the
 # visitor's data: folder_tree() lists any server path it is given, and
 # choose_folder() runs osascript.
 _BLOCKED = (
-    re.compile(r"^/api/projects/\d+/map/folder$"),
+    re.compile(r"^/api/projects/[^/]+/map/folder$"),
     re.compile(r"^/api/choose-folder$"),
 )
 

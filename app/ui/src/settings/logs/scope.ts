@@ -2,18 +2,17 @@
 // Updates ?project= in the URL so a project tape can be bookmarked.
 
 import { fetchProjects } from "../../api.js";
+import { shortId } from "../../ids.js";
 
 
 export type LogScope =
   | { kind: "all" }
-  | { kind: "project"; projectId: number };
+  | { kind: "project"; projectId: string };
 
 function scopeFromUrl(): LogScope {
   const raw = new URLSearchParams(location.search).get("project");
   if (!raw) return { kind: "all" };
-  const projectId = Number(raw);
-  if (!Number.isInteger(projectId) || projectId < 1) return { kind: "all" };
-  return { kind: "project", projectId };
+  return { kind: "project", projectId: raw };
 }
 
 function writeUrl(scope: LogScope): void {
@@ -21,7 +20,7 @@ function writeUrl(scope: LogScope): void {
   if (scope.kind === "all") {
     url.searchParams.delete("project");
   } else {
-    url.searchParams.set("project", String(scope.projectId));
+    url.searchParams.set("project", scope.projectId);
   }
   history.replaceState(null, "", url);
 }
@@ -53,12 +52,12 @@ export async function mountLogScope(
     const projects = await fetchProjects();
     const open = projects
       .filter((p) => !p.cancelled)
-      .sort((a, b) => a.name.localeCompare(b.name) || a.project_id - b.project_id);
+      .sort((a, b) => a.name.localeCompare(b.name) || a.project_id.localeCompare(b.project_id));
 
     for (const p of open) {
       const opt = document.createElement("option");
-      opt.value = String(p.project_id);
-      opt.textContent = `${p.name} (#${p.project_id})`;
+      opt.value = p.project_id;
+      opt.textContent = `${p.name} (#${shortId(p.project_id)})`;
       select.appendChild(opt);
     }
 
@@ -78,11 +77,11 @@ export async function mountLogScope(
   }
 
   select.value =
-    initial.kind === "project" ? String(initial.projectId) : "";
+    initial.kind === "project" ? initial.projectId : "";
 
   select.addEventListener("change", () => {
     const scope: LogScope = select.value
-      ? { kind: "project", projectId: Number(select.value) }
+      ? { kind: "project", projectId: select.value }
       : { kind: "all" };
     writeUrl(scope);
     onChange(scope);

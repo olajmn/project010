@@ -61,9 +61,9 @@ export async function fetchProjects(): Promise<ProjectView[]> {
 /** Mint a project: `text` is the name, canvas starts empty. */
 export async function createProject(
   text: string,
-  accountId?: number | null,
+  accountId?: string | null,
 ): Promise<ProjectView> {
-  const body: { text: string; account_id?: number } = {
+  const body: { text: string; account_id?: string } = {
     text,
   };
   if (accountId != null) {
@@ -82,7 +82,7 @@ export async function createProject(
 
 /** Replace the project's display name. Identity stays project_id. */
 export async function renameProject(
-  projectId: number,
+  projectId: string,
   text: string,
 ): Promise<ProjectView> {
   const res = await fetch(`/api/projects/${projectId}/name`, {
@@ -96,7 +96,7 @@ export async function renameProject(
   return (await res.json()) as ProjectView;
 }
 
-export async function archiveProject(projectId: number): Promise<ProjectView> {
+export async function archiveProject(projectId: string): Promise<ProjectView> {
   const res = await fetch(`/api/projects/${projectId}/cancel`, { method: "POST" });
   if (!res.ok) {
     throw new Error(`request failed: ${res.status}`);
@@ -112,7 +112,7 @@ export async function fetchArchivedProjects(): Promise<ProjectView[]> {
   return (await res.json()) as ProjectView[];
 }
 
-export async function restoreProject(projectId: number): Promise<ProjectView> {
+export async function restoreProject(projectId: string): Promise<ProjectView> {
   const res = await fetch(`/api/projects/${projectId}/restore`, { method: "POST" });
   if (!res.ok) {
     throw new Error(await httpErrorMessage(res));
@@ -120,14 +120,14 @@ export async function restoreProject(projectId: number): Promise<ProjectView> {
   return (await res.json()) as ProjectView;
 }
 
-export async function deleteProject(projectId: number): Promise<void> {
+export async function deleteProject(projectId: string): Promise<void> {
   const res = await fetch(`/api/projects/${projectId}/delete`, { method: "POST" });
   if (!res.ok) {
     throw new Error(await httpErrorMessage(res));
   }
 }
 
-export async function setProjectUser(projectId: number, accountId: number | null): Promise<ProjectView> {
+export async function setProjectUser(projectId: string, accountId: string | null): Promise<ProjectView> {
   const res = await fetch(`/api/projects/${projectId}/user`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -142,7 +142,7 @@ export async function setProjectUser(projectId: number, accountId: number | null
 // 2. Map
 
 export async function addNode(
-  projectId: number,
+  projectId: string,
   label: string,
   parentId?: string | null,
 ): Promise<ProjectView> {
@@ -164,7 +164,7 @@ export async function addNode(
 
 /** One place up or down among its siblings; id and children go with it. */
 export async function moveNode(
-  projectId: number,
+  projectId: string,
   stepId: string,
   direction: "up" | "down",
 ): Promise<ProjectView> {
@@ -181,7 +181,7 @@ export async function moveNode(
 /** A new name for one node; its id stays. Errors carry the server's
  *  reason (e.g. a sibling already has that name). */
 export async function renameNode(
-  projectId: number,
+  projectId: string,
   stepId: string,
   text: string,
 ): Promise<ProjectView> {
@@ -196,7 +196,7 @@ export async function renameNode(
   return (await res.json()) as ProjectView;
 }
 
-export async function removeNode(projectId: number, stepId: string): Promise<ProjectView> {
+export async function removeNode(projectId: string, stepId: string): Promise<ProjectView> {
   const res = await fetch(`/api/projects/${projectId}/map/${stepId}/remove`, {
     method: "POST",
   });
@@ -208,7 +208,7 @@ export async function removeNode(projectId: number, stepId: string): Promise<Pro
 }
 
 export async function pasteText(
-  projectId: number,
+  projectId: string,
   text: string,
   parentId?: string | null,
   unwrap = true,
@@ -253,7 +253,7 @@ export async function previewPaste(text: string): Promise<PastePreview> {
  * exact shape the user chose (ui/'s preview, after toggling nodes
  * in/out). See import_map_outline()'s own `forest` param. */
 export async function pasteNodes(
-  projectId: number,
+  projectId: string,
   nodes: PastedNode[],
   parentId?: string | null,
 ): Promise<ProjectView> {
@@ -285,7 +285,7 @@ export async function chooseFolder(): Promise<string> {
 }
 
 export async function addFolder(
-  projectId: number,
+  projectId: string,
   folder: string,
   parentId?: string | null,
 ): Promise<ProjectView> {
@@ -308,7 +308,7 @@ export async function addFolder(
 // 3. Chat
 
 export async function sendChatMessage(
-  projectId: number,
+  projectId: string,
   text: string,
   focusLabel?: string | null,
   focusStepId?: string | null,
@@ -370,7 +370,7 @@ export async function createAccount(text: string): Promise<AccountView> {
 
 
 export async function renameAccount(
-  accountId: number,
+  accountId: string,
   text: string,
 ): Promise<AccountView> {
   const res = await fetch(`/api/accounts/${accountId}/rename`, {
@@ -385,7 +385,7 @@ export async function renameAccount(
 }
 
 
-export async function archiveAccount(accountId: number): Promise<AccountView> {
+export async function archiveAccount(accountId: string): Promise<AccountView> {
   const res = await fetch(`/api/accounts/${accountId}/archive`, { method: "POST" });
   if (!res.ok) {
     throw new Error(`request failed: ${res.status}`);
@@ -394,7 +394,7 @@ export async function archiveAccount(accountId: number): Promise<AccountView> {
 }
 
 
-export async function restoreAccount(accountId: number): Promise<AccountView> {
+export async function restoreAccount(accountId: string): Promise<AccountView> {
   const res = await fetch(`/api/accounts/${accountId}/restore`, { method: "POST" });
   if (!res.ok) {
     throw new Error(await httpErrorMessage(res));
@@ -402,7 +402,7 @@ export async function restoreAccount(accountId: number): Promise<AccountView> {
   return (await res.json()) as AccountView;
 }
 
-export async function deleteAccount(accountId: number): Promise<AccountView> {
+export async function deleteAccount(accountId: string): Promise<AccountView> {
   const res = await fetch(`/api/accounts/${accountId}/delete`, { method: "POST" });
   if (!res.ok) {
     throw new Error(await httpErrorMessage(res));
@@ -434,7 +434,7 @@ export async function fetchLog(offset = 0): Promise<LogEntry[]> {
 
 /** One project's full history, oldest first (ungrouped). */
 export async function fetchProjectTimeline(
-  projectId: number,
+  projectId: string,
 ): Promise<LogEntry[]> {
   const res = await fetch(`/api/projects/${projectId}/timeline`);
   if (!res.ok) {
@@ -447,7 +447,7 @@ export async function fetchProjectTimeline(
 
 /** Store this node and everything under it as structure (no ids). */
 export async function saveTree(
-  projectId: number,
+  projectId: string,
   stepId: string,
 ): Promise<SavedTreeView> {
   const res = await fetch(
@@ -462,7 +462,7 @@ export async function saveTree(
 
 /** The saved trees of this project's account, newest first. */
 export async function fetchSavedTrees(
-  projectId: number,
+  projectId: string,
 ): Promise<SavedTreeView[]> {
   const res = await fetch(`/api/projects/${projectId}/saved-trees`);
   if (!res.ok) {
@@ -474,7 +474,7 @@ export async function fetchSavedTrees(
 /** Insert a saved tree as new nodes (fresh ids) under `parentId`, or
  *  at the top level when it is null. */
 export async function insertSavedTree(
-  projectId: number,
+  projectId: string,
   treeId: string,
   parentId: string | null,
 ): Promise<ProjectView> {

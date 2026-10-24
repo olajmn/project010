@@ -42,7 +42,7 @@ default, and then nothing changes. On:
   and writes there for that session's requests
   (`backend/storage/sandboxes.py`); the folder is deleted when the
   session ends, and all are cleared at start.
-- Every login opens the project named by `DEMO_START_PROJECT_ID`, and
+- Every login opens the active project named by `DEMO_START_PROJECT`, and
   maps open 3 levels deep at normal size instead of shrinking the whole
   tree to fit (`GET /api/session`, `ui/src/demo/mapStartDepth.ts`); the
   login page clears the browser's last project, map depth, and Current
@@ -83,19 +83,21 @@ Everything lives in `app/data/` as plain JSON:
 
 | File | Holds |
 |---|---|
-| `projects/{id}/current.json` | The project now: name, account, `account_n`, and `plan.progression.steps` (the nodes) |
+| `projects/{id}/current.json` | The project now: name, account, and `plan.progression.steps` (the nodes) |
 | `projects/{id}/events.jsonl` | One slim line per saved change: event, feedback (a chat turn: `message` and `reply` instead), times, focus; a map edit since 2026-10-24 also its full `change` record (`project/changes/records.py`) — the source for chat history, status, and logs |
 | `accounts.json` | Accounts; a deleted one leaves a tombstone so its id is never reused |
 | `saved_trees.json` | Saved trees per account, with `id_hi` |
 
 - Ids are made only in `backend/identity/` (`ids.py`): a kind and a
-  random UUIDv4 (`node_3f9c…`, `change_8b4e…`), shown as 8 characters;
-  unique beyond a project and never reused ([[05-decisions]] #78, #81;
-  `backend/identity/README.md`). Nodes made before ids had a kind keep
-  a bare UUID until the data is rebuilt (`TODO.md` 54).
-- Other ids that are never reused: saved-tree ids, account ids,
-  per-account project numbers. Global `project_id` is
-  `max + 1`, so deleting the newest project frees its id.
+  random UUIDv4 (`node_3f9c…`, `change_8b4e…`, `project_…`,
+  `account_…`), shown as 8 characters; unique beyond a project and
+  never reused ([[05-decisions]] #78, #81, #82;
+  `backend/identity/README.md`). Projects are listed by `created_at`.
+- `app/data/` and `app/demo_seed/` still hold the older ids (numbered
+  project folders and accounts, bare node UUIDs) until they are rebuilt
+  (`TODO.md` 54, step 2); the code on branch `ids-and-rebuild` expects
+  the new ones, so it is not deployed before then.
+- Saved-tree ids are never reused.
 - Every file is in the current format (converted once, 2026-09-27;
   chat turns split into `message` and `reply` once, and node ids
   `p<N>` replaced by UUIDs once, both 2026-10-24):

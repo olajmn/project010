@@ -66,10 +66,10 @@ type RowAnchor = { row: HTMLElement; top: number };
 
 /** Per-project zoom + pan, for this page load only: carried across
  *  re-renders, while a fresh load still opens at the overview. */
-const poseByProject = new Map<number, CameraPose>();
+const poseByProject = new Map<string, CameraPose>();
 
 /** Per-project grain/view — `localStorage`-backed, survives page refresh. */
-function readSticky(projectId: number): Sticky | undefined {
+function readSticky(projectId: string): Sticky | undefined {
   const rawGrain = localStorage.getItem(`mapGrain:${projectId}`);
   if (rawGrain === null) return undefined;
   const grain: Grain = rawGrain === MAP_GRAIN_ALL ? null : Number(rawGrain);
@@ -81,7 +81,7 @@ function readSticky(projectId: number): Sticky | undefined {
   return { grain, view, viewPinned };
 }
 
-function writeSticky(projectId: number, sticky: Sticky): void {
+function writeSticky(projectId: string, sticky: Sticky): void {
   localStorage.setItem(
     `mapGrain:${projectId}`,
     sticky.grain === null ? MAP_GRAIN_ALL : String(sticky.grain),
@@ -113,7 +113,7 @@ type ScaleOpts = {
 export function installMapScale(
   body: HTMLElement,
   mapEl: HTMLElement,
-  projectId: number,
+  projectId: string,
   opts: ScaleOpts = {},
 ): MapScaleHandle {
   const sticky = readSticky(projectId);

@@ -26,7 +26,7 @@ import { placePopover } from "../placePopover.js";
 // 1. Public API
 
 export type PickerTarget = {
-  projectId: number;
+  projectId: string;
   /** null inserts at the top level of the map. */
   parentId: string | null;
   parentLabel: string | null;

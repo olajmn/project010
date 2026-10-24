@@ -15,13 +15,13 @@ class TextBody(BaseModel):
 
 class CreateProject(BaseModel):
     text: str | None = None
-    account_id: int | None = None
+    account_id: str | None = None
 
 
 class ProjectOwner(BaseModel):
     """account_id null unlinks the project."""
 
-    account_id: int | None = None
+    account_id: str | None = None
 
 
 class AddNode(BaseModel):

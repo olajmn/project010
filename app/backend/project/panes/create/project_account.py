@@ -1,5 +1,5 @@
 """
-Link a project to an account#N, or archive an account and detach its projects.
+Link a project to an account, or archive an account and detach its projects.
 
 Identity writes, not reasoning. Judgment does not own this.
 """
@@ -17,7 +17,7 @@ from backend.storage.accounts_persistence import (
 from backend.storage.project_persistence import save_plan
 
 
-def set_project_user(project_id: int, account_id: int | None) -> dict | None:
+def set_project_user(project_id: str, account_id: str | None) -> dict | None:
     """
     Add, move, or remove a project's account link after mint.
     `account_id=None` removes the project from whichever account it
@@ -76,7 +76,7 @@ def set_project_user(project_id: int, account_id: int | None) -> dict | None:
     )
 
 
-def archive_account(account_id: int) -> dict | None:
+def archive_account(account_id: str) -> dict | None:
     """
     Archive an account (accounts_persistence.archive_account()) and detach it
     from every currently-active project that references it - an archived
