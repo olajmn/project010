@@ -7,29 +7,25 @@ from backend.project.panes.chat.commands import try_command
 EMPTY = {
     "name": "Empty",
     "project_id": 1,
-    "plan": {"progression": {"steps": []}},
+    "nodes": [],
 }
 
 TREE = {
     "name": "T",
     "project_id": 99,
-    "plan": {
-        "progression": {
-            "steps": [
+    "nodes": [
+        {
+            "id": "p1",
+            "label": "CLIENT",
+            "children": [
                 {
-                    "id": "p1",
-                    "label": "CLIENT",
-                    "children": [
-                        {
-                            "id": "p2",
-                            "label": "hey3",
-                            "children": [],
-                        },
-                    ],
-                }
-            ]
+                    "id": "p2",
+                    "label": "hey3",
+                    "children": [],
+                },
+            ],
         }
-    },
+    ],
 }
 
 
@@ -94,7 +90,7 @@ def test_select_by_path() -> None:
 
 
 def test_id_shows_selected_node_or_toggles_map() -> None:
-    shown = try_command(TREE, "/id", focus_step_id="p2")
+    shown = try_command(TREE, "/id", focus_node_id="p2")
     assert shown.reply == "hey3 → p2 (CLIENT / hey3)", shown.reply
     assert not shown.toggle_map_ids and shown.record is None
     toggled = try_command(TREE, "/id")
@@ -105,8 +101,8 @@ def test_clashing_sibling_label_is_numbered(monkeypatch) -> None:
     # Numbered, not refused (decision #53).
     monkeypatch.setattr(
         edit_map,
-        "save_plan",
-        lambda name, plan, **kw: {"name": name, "plan": plan, **kw},
+        "save_project",
+        lambda name, nodes, **kw: {"name": name, "nodes": nodes, **kw},
     )
     dup = try_command(TREE, "/add CLIENT / hey3")
     assert dup is not None and dup.record is not None

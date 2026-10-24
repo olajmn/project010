@@ -32,7 +32,7 @@ export interface ChatMessage {
   /** When it was sent (you) or saved (agent), ISO time. Missing on very old lines. */
   at?: string;
   focus?: string;
-  focus_step_id?: string;
+  focus_node_id?: string;
   /** A turn about one day of changes (YYYY-MM-DD) instead of a node. */
   focus_day?: string;
   /** The node this turn was about is no longer in the project. */

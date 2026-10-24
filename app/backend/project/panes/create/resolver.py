@@ -13,7 +13,7 @@ get grouped or sorted for display, is board-building logic, not project
 identity.
 
 A project's id is made in backend/identity/ when it is first saved
-(project_persistence.save_plan()); identity is that id, not the
+(project_persistence.save_project()); identity is that id, not the
 project's display name (docs/05-decisions.md #81).
 """
 

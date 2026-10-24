@@ -14,7 +14,7 @@ optional account_id.
 #  2. Project records (current.json + events.jsonl)
 #      - project_dir() / current_path() / events_path()
 #      - _slim_event()
-#      - load_current() / load_project_events() / save_plan()
+#      - load_current() / load_project_events() / save_project()
 #      - load_history() / load_all_currents() / delete_project()
 
 import json
@@ -106,7 +106,7 @@ def _slim_event(record: dict) -> dict:
         "feedback",
         "sent_at",
         "map_focus",
-        "focus_step_id",
+        "focus_node_id",
         "focus_day",
         "message",
         "reply",
@@ -184,9 +184,9 @@ def load_project_history(project_id: str) -> list[dict]:
     return load_project_events(project_id)
 
 
-def save_plan(
+def save_project(
     name: str,
-    plan: dict,
+    nodes: list[dict],
     feedback: str | None = None,
     completed: bool = False,
     cancelled: bool = False,
@@ -195,7 +195,7 @@ def save_plan(
     event: str | None = None,
     sent_at: str | None = None,
     map_focus: str | None = None,
-    focus_step_id: str | None = None,
+    focus_node_id: str | None = None,
     focus_day: str | None = None,
     message: str | None = None,
     reply: str | None = None,
@@ -204,9 +204,9 @@ def save_plan(
     """
     Update the project's current SoT and append one slim event.
 
-    Callers still pass the full project fields; only current.json keeps
-    the map. The events tape stores event/feedback/times, not a full
-    plan copy.
+    Callers pass the full project fields; only current.json keeps the
+    map (`nodes`, the top-level nodes with everything under them). The
+    events tape stores event/feedback/times, not a copy of the map.
 
     `map_focus` / `focus_step_id` mark this chat turn as about a selected
     node (About frames + model history); `focus_step_id` alone marks a
@@ -229,7 +229,7 @@ def save_plan(
         "project_id": pid,
         "account_id": account_id,
         "name": name,
-        "plan": plan,
+        "nodes": nodes,
         "feedback": feedback,
         "completed": completed,
         "cancelled": cancelled,
@@ -243,9 +243,9 @@ def save_plan(
     if focus:
         record["map_focus"] = focus
     # Also on its own: a node rename names its node by id only.
-    step = (focus_step_id or "").strip()
-    if step:
-        record["focus_step_id"] = step
+    node = (focus_node_id or "").strip()
+    if node:
+        record["focus_node_id"] = node
     day = (focus_day or "").strip()
     if day:
         record["focus_day"] = day

@@ -1028,6 +1028,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; nothing saved changes.
 
+## 86. 2026-10-24 — A node is called a node, in the code and in saved data
+
+**Decision:** The planner-era word "step" is gone from the backend and from saved data. In code: `Step` is `Node`, `steps_of()` is `nodes_of()` (still the one place that knows where nodes sit on a record), `find_step()` is `find_node()`, `save_plan()` is `save_project()` and takes the list of nodes, and variables follow (`node`, `node_id`, `new_nodes`). In saved data: `current.json` holds the map as `nodes` (an empty map is `[]`), not `plan.progression.steps`; log lines and the page's chat request carry `focus_node_id`, not `focus_step_id`; saved trees name their source as `source.node_id`; Logs reads "Added node", "Removed node", "Moved node", "Renamed node". A one-off script outside the repository converted `app/data/` and `app/demo_seed/` (backed up first); every log still replays to its tree, and a fresh build of the demo matches the converted one apart from ids. Four `Node` methods nothing called (`add_child`, `walk`, `find`, `from_dict`) were removed. `backend/foundation/`, where a step is a step in time, keeps its names. First two steps of `TODO.md` 62.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** renaming only the code (saved files would still say `plan`, `progression`, and `steps`, so the old words would live on where code and files meet); code that reads both old and new keys (two shapes for good, when one conversion is enough).
+
+**Why this choice:** The app has been a tree of nodes since the planner was dropped, and the old words made the code harder to read and to explain. Right after the rebuild (#83) the conversion was small and could be checked by replay.
+
+**Reversible?** Only by renaming and converting back; the data from before the conversion is outside the repository.
+
 ## See also
 
 - [[03-architecture]]

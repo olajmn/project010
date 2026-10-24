@@ -6,45 +6,45 @@ consumer looks at the same tree.
 """
 
 
-def tree_lines(steps: list) -> list[str]:
+def tree_lines(nodes: list) -> list[str]:
     """Indented labels from this forest, every node. A caller with a
     size limit cuts it and says so (model/brief/conversation.py)."""
     lines: list[str] = []
-    _collect(steps, 0, lines)
+    _collect(nodes, 0, lines)
     return lines
 
 
-def tree_of(step: dict) -> list[str]:
+def tree_of(node: dict) -> list[str]:
     """One node and what sits under it."""
-    return tree_lines([step])
+    return tree_lines([node])
 
 
-def find_path(steps: list, step_id: str) -> list[dict] | None:
-    """Root-to-node list of step dicts, or None."""
-    wanted = (step_id or "").strip()
+def find_path(nodes: list, node_id: str) -> list[dict] | None:
+    """Root-to-node list of node dicts, or None."""
+    wanted = (node_id or "").strip()
     if not wanted:
         return None
-    for step in steps:
-        if not isinstance(step, dict):
+    for node in nodes:
+        if not isinstance(node, dict):
             continue
-        if str(step.get("id") or "") == wanted:
-            return [step]
-        children = step.get("children")
+        if str(node.get("id") or "") == wanted:
+            return [node]
+        children = node.get("children")
         if isinstance(children, list):
             rest = find_path(children, wanted)
             if rest is not None:
-                return [step, *rest]
+                return [node, *rest]
     return None
 
 
-def path_lines(steps: list, step_id: str) -> list[str]:
+def path_lines(nodes: list, node_id: str) -> list[str]:
     """Ancestors, this node, and its children — indented labels."""
-    path = find_path(steps, step_id)
+    path = find_path(nodes, node_id)
     if path is None:
         return []
     lines: list[str] = []
-    for depth, step in enumerate(path[:-1]):
-        label = (step.get("label") or "").strip()
+    for depth, node in enumerate(path[:-1]):
+        label = (node.get("label") or "").strip()
         if label:
             lines.append(f"{'  ' * depth}{label}")
     last = path[-1]
@@ -57,31 +57,31 @@ def path_lines(steps: list, step_id: str) -> list[str]:
     return lines
 
 
-def find_step(steps: list, step_id: str) -> dict | None:
-    """The step dict with this id, or None."""
-    wanted = (step_id or "").strip()
+def find_node(nodes: list, node_id: str) -> dict | None:
+    """The node dict with this id, or None."""
+    wanted = (node_id or "").strip()
     if not wanted:
         return None
-    for step in steps:
-        if not isinstance(step, dict):
+    for node in nodes:
+        if not isinstance(node, dict):
             continue
-        if str(step.get("id") or "") == wanted:
-            return step
-        children = step.get("children")
+        if str(node.get("id") or "") == wanted:
+            return node
+        children = node.get("children")
         if isinstance(children, list):
-            found = find_step(children, wanted)
+            found = find_node(children, wanted)
             if found is not None:
                 return found
     return None
 
 
-def _collect(steps: list, depth: int, lines: list[str]) -> None:
-    for step in steps:
-        if not isinstance(step, dict):
+def _collect(nodes: list, depth: int, lines: list[str]) -> None:
+    for node in nodes:
+        if not isinstance(node, dict):
             continue
-        label = (step.get("label") or "").strip()
+        label = (node.get("label") or "").strip()
         if label:
             lines.append(f"{'  ' * depth}{label}")
-        children = step.get("children")
+        children = node.get("children")
         if isinstance(children, list):
             _collect(children, depth + 1, lines)

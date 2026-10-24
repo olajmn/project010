@@ -8,13 +8,9 @@ from backend.model.brief.conversation import (
 
 LATEST = {
     "name": "Garden",
-    "plan": {
-        "progression": {
-            "steps": [
-                {"id": "p1", "label": "Beds", "children": []},
-            ]
-        }
-    },
+    "nodes": [
+        {"id": "p1", "label": "Beds", "children": []},
+    ],
 }
 HISTORY = [
     {"feedback": None},  # first record: no turn
@@ -68,33 +64,29 @@ def test_past_turns_are_capped() -> None:
 def test_map_text_and_selected_path() -> None:
     # As the system text shows them.
     tree = {
-        "plan": {
-            "progression": {
-                "steps": [
+        "nodes": [
+            {
+                "id": "p1",
+                "label": "Sample",
+                "children": [
                     {
-                        "id": "p1",
-                        "label": "Sample",
+                        "id": "p2",
+                        "label": "src",
                         "children": [
-                            {
-                                "id": "p2",
-                                "label": "src",
-                                "children": [
-                                    {"id": "p4", "label": "main.py", "children": []},
-                                ],
-                            },
-                            {"id": "p3", "label": "readme.txt", "children": []},
+                            {"id": "p4", "label": "main.py", "children": []},
                         ],
                     },
-                ]
-            }
-        },
+                    {"id": "p3", "label": "readme.txt", "children": []},
+                ],
+            },
+        ],
     }
     system = build_messages(tree, "hi", [], "main.py", "p4")[0]["content"]
     assert "readme.txt" in system
     assert "what it contains):\nSample\n  src\n    main.py" in system
     loose = build_messages(tree, "hi", [], "loose", None)[0]["content"]
     assert "Nothing is selected" in loose and "loose" not in loose
-    empty = build_messages({"plan": {}}, "hi", [])[0]["content"]
+    empty = build_messages({"nodes": []}, "hi", [])[0]["content"]
     assert "The project has no parts yet." in empty
 
 
@@ -102,7 +94,7 @@ def test_selected_day_of_changes() -> None:
     # Listed in the background, tagged on turns.
     tape = [
         {
-            "feedback": "Added step: Beds",
+            "feedback": "Added node: Beds",
             "event": "node_added",
             "created_at": "2026-09-20T12:00:00",
         },
@@ -116,7 +108,7 @@ def test_selected_day_of_changes() -> None:
     ]
     day = build_messages(LATEST, "and?", tape, focus_day="2026-09-20")
     assert "selected the changes on 20 Sep" in day[0]["content"]
-    assert "Added step: Beds" in day[0]["content"]
+    assert "Added node: Beds" in day[0]["content"]
     assert "Nothing is selected" not in day[0]["content"]
     assert day[1]["content"] == "[about: changes on 20 Sep] what changed?"
     assert day[-1]["content"] == "[about: changes on 20 Sep] and?"
@@ -127,13 +119,9 @@ def test_renamed_node_in_past_turns() -> None:
     # called then.
     renamed_tree = {
         "name": "Garden",
-        "plan": {
-            "progression": {
-                "steps": [
-                    {"id": "p1", "label": "Flower beds", "children": []},
-                ]
-            }
-        },
+        "nodes": [
+            {"id": "p1", "label": "Flower beds", "children": []},
+        ],
     }
     talk = [
         {
@@ -141,7 +129,7 @@ def test_renamed_node_in_past_turns() -> None:
             "message": "what is this",
             "event": "chat",
             "map_focus": "Beds",
-            "focus_step_id": "p1",
+            "focus_node_id": "p1",
         }
     ]
     later = build_messages(renamed_tree, "and now?", talk)
@@ -157,7 +145,7 @@ def test_renamed_node_in_past_turns() -> None:
 
 def test_map_edit_with_note_in_its_text_is_not_a_turn() -> None:
     # Only lines saved as chat are turns, whatever a node is called.
-    edit = {"feedback": "Added step: Site Note: walls", "event": "node_added"}
+    edit = {"feedback": "Added node: Site Note: walls", "event": "node_added"}
     assert past_turns([edit]) == []
 
 
@@ -178,32 +166,28 @@ def test_message_and_reply_are_kept_apart() -> None:
 # "Planning", one under Rooms and one under Garden (docs/05-decisions.md #76).
 HOUSE = {
     "name": "House",
-    "plan": {
-        "progression": {
-            "steps": [
-                {
-                    "id": "p1",
-                    "label": "Rooms",
-                    "children": [{"id": "p3", "label": "Planning", "children": []}],
-                },
-                {
-                    "id": "p2",
-                    "label": "Garden",
-                    "children": [{"id": "p4", "label": "Planning", "children": []}],
-                },
-            ]
-        }
-    },
+    "nodes": [
+        {
+            "id": "p1",
+            "label": "Rooms",
+            "children": [{"id": "p3", "label": "Planning", "children": []}],
+        },
+        {
+            "id": "p2",
+            "label": "Garden",
+            "children": [{"id": "p4", "label": "Planning", "children": []}],
+        },
+    ],
 }
 
 
-def _turn(message: str, label: str, step_id: str) -> dict:
+def _turn(message: str, label: str, node_id: str) -> dict:
     return {
         "event": "chat",
         "message": message,
         "reply": "ok",
         "map_focus": label,
-        "focus_step_id": step_id,
+        "focus_node_id": node_id,
     }
 
 
@@ -251,8 +235,8 @@ def test_asking_about_a_removed_part_on_purpose() -> None:
 
 
 def _wide_tree(n: int) -> dict:
-    steps = [{"id": f"p{i}", "label": f"Part {i}", "children": []} for i in range(n)]
-    return {"name": "Big", "plan": {"progression": {"steps": steps}}}
+    nodes = [{"id": f"p{i}", "label": f"Part {i}", "children": []} for i in range(n)]
+    return {"name": "Big", "nodes": nodes}
 
 
 def test_structure_has_no_fixed_line_cap() -> None:

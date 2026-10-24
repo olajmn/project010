@@ -13,7 +13,7 @@ import json
 import sys
 from pathlib import Path
 
-from backend.project.node import find_path
+from backend.project.node import find_path, nodes_of
 
 # Log lines that change the map; each carries a `change` record.
 MAP_EDITS = {
@@ -33,15 +33,15 @@ def replay(events: list[dict]) -> list[dict]:
     """The top-level nodes after every change in `events`, oldest first.
     Raises ValueError on a map edit without a record, or a record that
     does not fit the tree it is applied to."""
-    steps: list[dict] = []
+    tree: list[dict] = []
     for line in events:
         change = line.get("change")
         if change is None:
             if line.get("event") in MAP_EDITS:
                 raise ValueError(f"line {line.get('id')}: map edit without a record")
             continue
-        apply_change(steps, change)
-    return steps
+        apply_change(tree, change)
+    return tree
 
 
 def mismatch(project_dir: Path) -> str | None:
@@ -58,16 +58,16 @@ def mismatch(project_dir: Path) -> str | None:
         rebuilt = replay([json.loads(line) for line in lines if line.strip()])
     except ValueError as err:
         return str(err)
-    saved = ((current.get("plan") or {}).get("progression") or {}).get("steps") or []
+    saved = nodes_of(current)
     return None if rebuilt == saved else "replayed tree differs from current.json"
 
 
-def apply_change(steps: list[dict], change: dict) -> None:
-    """Apply one record to `steps` (the top-level nodes) in place, as the
+def apply_change(tree: list[dict], change: dict) -> None:
+    """Apply one record to `tree` (the top-level nodes) in place, as the
     edit did. Raises ValueError if the record does not fit the tree."""
     op = change.get("op")
     if op in ("add", "remove"):
-        siblings = children_of(steps, change["parent"])
+        siblings = children_of(tree, change["parent"])
         index, nodes = change["index"], change["nodes"]
         if op == "add":
             if not 0 <= index <= len(siblings):
@@ -82,7 +82,7 @@ def apply_change(steps: list[dict], change: dict) -> None:
             )
         del siblings[index : index + len(nodes)]
     elif op == "move":
-        siblings = children_of(steps, change["parent"])
+        siblings = children_of(tree, change["parent"])
         i, j = change["from"], change["to"]
         if not _at(siblings, i, change["node_id"]) or not 0 <= j < len(siblings):
             raise ValueError(
@@ -90,7 +90,7 @@ def apply_change(steps: list[dict], change: dict) -> None:
             )
         siblings[i], siblings[j] = siblings[j], siblings[i]
     elif op == "rename":
-        path = find_path(steps, change["node_id"])
+        path = find_path(tree, change["node_id"])
         if path is None or path[-1].get("label") != change["from"]:
             raise ValueError(
                 f"{change['id']}: {change['node_id']} is not named {change['from']}"
@@ -100,12 +100,12 @@ def apply_change(steps: list[dict], change: dict) -> None:
         raise ValueError(f"{change.get('id')}: unknown op {op}")
 
 
-def children_of(steps: list[dict], parent_id: str | None) -> list[dict]:
+def children_of(tree: list[dict], parent_id: str | None) -> list[dict]:
     """The sibling list under `parent_id` (the top level for None); a
     node without children gets an empty list to add to."""
     if parent_id is None:
-        return steps
-    path = find_path(steps, parent_id)
+        return tree
+    path = find_path(tree, parent_id)
     if path is None:
         raise ValueError(f"parent not found: {parent_id}")
     return path[-1].setdefault("children", [])

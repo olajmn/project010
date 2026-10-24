@@ -7,7 +7,7 @@ No model. Uses edit_map.add_map_node. Parse:
 - `/add A / B / Child` → walk A → B, add Child under B
 """
 
-from backend.project.node import find_step, steps_of
+from backend.project.node import find_node, nodes_of
 from backend.project.panes.canvas.edit_map import add_map_node
 from backend.project.panes.chat.commands.node_path import (
     args_after_command,
@@ -26,7 +26,7 @@ _USAGE = (
 def run(
     latest: dict,
     note: str,
-    focus_step_id: str | None = None,
+    focus_node_id: str | None = None,
 ) -> CommandResult:
     args = args_after_command(note)
     if not args:
@@ -35,7 +35,7 @@ def run(
     if bad:
         return CommandResult(bad)
 
-    parent_id, child, err = _resolve(latest, args, focus_step_id)
+    parent_id, child, err = _resolve(latest, args, focus_node_id)
     if err:
         return CommandResult(err)
     assert parent_id is not None and child is not None
@@ -44,10 +44,10 @@ def run(
     except ValueError as exc:
         return CommandResult(str(exc))
 
-    parent = find_step(steps_of(latest), parent_id) or {}
+    parent = find_node(nodes_of(latest), parent_id) or {}
     parent_label = (parent.get("label") or parent_id).strip() or parent_id
     # The saved label may carry a " (2)" suffix if a sibling had `child`.
-    saved = (find_step(steps_of(record), parent_id) or {}).get("children") or []
+    saved = (find_node(nodes_of(record), parent_id) or {}).get("children") or []
     added = saved[-1].get("label", child) if saved else child
     return CommandResult(
         reply=f'Added under "{parent_label}": {added}.',
@@ -58,13 +58,13 @@ def run(
 def _resolve(
     latest: dict,
     args: str,
-    focus_step_id: str | None,
+    focus_node_id: str | None,
 ) -> tuple[str | None, str | None, str | None]:
     """(parent_id, child_label, error)."""
     segments = path_segments(args)
     if len(segments) >= 2:
         *path_labels, child = segments
-        parent_id = id_at_path(steps_of(latest), path_labels)
+        parent_id = id_at_path(nodes_of(latest), path_labels)
         if parent_id is None:
             shown = " / ".join(path_labels)
             return None, None, f'No node at path "{shown}".'
@@ -73,9 +73,9 @@ def _resolve(
     child = args.strip()
     if not child:
         return None, None, _USAGE
-    wanted = (focus_step_id or "").strip()
+    wanted = (focus_node_id or "").strip()
     if not wanted:
         return None, None, _USAGE
-    if find_step(steps_of(latest), wanted) is None:
+    if find_node(nodes_of(latest), wanted) is None:
         return None, None, f"Focused node not found: {wanted}"
     return wanted, child, None

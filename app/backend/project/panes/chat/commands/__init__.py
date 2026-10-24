@@ -31,7 +31,7 @@ _ALIASES = {
 def try_command(
     latest: dict,
     note: str,
-    focus_step_id: str | None = None,
+    focus_node_id: str | None = None,
 ) -> CommandResult | None:
     """If `note` starts with `/`, run that command. Otherwise None.
 
@@ -49,4 +49,4 @@ def try_command(
     if runner is None:
         known = ", ".join(_COMMANDS)
         return CommandResult(f"Unknown command {parts[0]}. Commands: {known}.")
-    return runner(latest, note, focus_step_id=focus_step_id)
+    return runner(latest, note, focus_node_id=focus_node_id)

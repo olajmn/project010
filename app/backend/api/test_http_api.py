@@ -196,8 +196,8 @@ def test_undo_and_redo(api, project) -> None:
     # Every undo and redo is a new line in the log; nothing is erased.
     _, timeline = api.get(f"/api/projects/{pid}/timeline")
     texts = [entry["text"] for entry in timeline]
-    assert "Undid: Removed step: Rooms (and 1 under it)" in texts
-    assert "Redid: Renamed step: Garden → Yard" in texts
+    assert "Undid: Removed node: Rooms (and 1 under it)" in texts
+    assert "Redid: Renamed node: Garden → Yard" in texts
 
 
 def test_map_edit_errors(api, project) -> None:
@@ -299,7 +299,7 @@ def test_chat_reply(api, project, monkeypatch) -> None:
         {
             "text": "what is here?",
             "focus_label": "Rooms",
-            "focus_step_id": node["Rooms"],
+            "focus_node_id": node["Rooms"],
         },
     )
     assert status == 200
@@ -307,7 +307,7 @@ def test_chat_reply(api, project, monkeypatch) -> None:
         "what is here?",
         "Two rooms so far.",
     ]
-    assert view["thread"][-2]["focus_step_id"] == node["Rooms"]
+    assert view["thread"][-2]["focus_node_id"] == node["Rooms"]
 
 
 @pytest.mark.parametrize(
@@ -355,12 +355,12 @@ def test_chat_about_a_removed_part_is_saved_without_it(
     pid = project["project_id"]
     status, view = api.post(
         f"/api/projects/{pid}/chat",
-        {"text": "and this?", "focus_label": "Ghost", "focus_step_id": "p99"},
+        {"text": "and this?", "focus_label": "Ghost", "focus_node_id": "p99"},
     )
     assert status == 200
     asked = view["thread"][-2]
     assert asked["text"] == "and this?"
-    assert "focus" not in asked and "focus_step_id" not in asked
+    assert "focus" not in asked and "focus_node_id" not in asked
 
 
 def test_chat_about_a_removed_part_on_purpose(api, project, monkeypatch) -> None:
@@ -372,13 +372,13 @@ def test_chat_about_a_removed_part_on_purpose(api, project, monkeypatch) -> None
         {
             "text": "can we still talk about this?",
             "focus_label": "Ghost",
-            "focus_step_id": "p99",
+            "focus_node_id": "p99",
             "about_removed": True,
         },
     )
     assert status == 200
     asked = view["thread"][-2]
-    assert (asked["focus"], asked["focus_step_id"], asked["removed"]) == (
+    assert (asked["focus"], asked["focus_node_id"], asked["removed"]) == (
         "Ghost",
         "p99",
         True,

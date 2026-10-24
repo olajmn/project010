@@ -38,7 +38,7 @@ NUMBERED_TREE = [
 # only the OUTER wrapper (id line "#41") unwraps; the project name
 # ("mfoaiejf") stays as one top-level bead, since unwrapping is only
 # ever tried once - see text_to_tree's own docstring for why. Air
-# lines are skipped, not read as empty steps.
+# lines are skipped, not read as empty nodes.
 BOX_DRAWING = (
     "#41\n"
     "└── mfoaiejf\n"
@@ -80,10 +80,10 @@ FLAT_TREE = [
 ]
 
 # Tabs for indentation instead of spaces.
-TABS = "Project\n\t- Step A\n\t\t- Sub step\n\t- Step B\n"
+TABS = "Project\n\t- Item A\n\t\t- Sub item\n\t- Item B\n"
 TABS_TREE = [
-    ("Step A", [("Sub step", [])]),
-    ("Step B", []),
+    ("Item A", [("Sub item", [])]),
+    ("Item B", []),
 ]
 
 
@@ -104,6 +104,6 @@ def test_outline(text, tree) -> None:
     assert labels(parse_outline(text)) == tree
 
 
-def test_blank_input_has_no_steps() -> None:
+def test_blank_input_has_no_nodes() -> None:
     assert parse_outline("") == []
     assert parse_outline("   \n\n\t\n") == []

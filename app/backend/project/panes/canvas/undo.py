@@ -10,6 +10,7 @@ import copy
 from backend.project.changes import records
 from backend.project.changes.replay import apply_change
 from backend.project.changes.undo import base_feedback, next_redo, next_undo
+from backend.project.node import nodes_of
 from backend.project.panes.canvas.edit_map import save_map_edit
 from backend.storage.project_persistence import load_project_events
 
@@ -35,16 +36,9 @@ def redo_map_change(latest: dict, since: int) -> dict:
 
 
 def _save(latest: dict, change: dict, feedback: str, event: str) -> dict:
-    plan = copy.deepcopy(latest.get("plan") or {})
-    progression = plan.get("progression")
-    if not isinstance(progression, dict):
-        progression = {"steps": []}
-        plan["progression"] = progression
-    steps = progression.setdefault("steps", [])
-    apply_change(steps, change)
-    if not steps:
-        plan["progression"] = None
+    tree = copy.deepcopy(nodes_of(latest))
+    apply_change(tree, change)
     # A move or rename names its node, so that node's chat shows it.
     return save_map_edit(
-        latest, plan, feedback, event, change, focus_step_id=change.get("node_id")
+        latest, tree, feedback, event, change, focus_node_id=change.get("node_id")
     )

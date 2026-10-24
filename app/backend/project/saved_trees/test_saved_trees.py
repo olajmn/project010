@@ -12,12 +12,12 @@ from backend.project.saved_trees import (
 )
 
 
-def _project(project_id: str, account: str | None, steps: list) -> dict:
+def _project(project_id: str, account: str | None, nodes: list) -> dict:
     return {
         "name": "P",
         "project_id": project_id,
         "account_id": account,
-        "plan": {"progression": {"steps": steps}},
+        "nodes": nodes,
     }
 
 
@@ -48,8 +48,8 @@ def library(tmp_path, monkeypatch):
     monkeypatch.setattr(store, "SAVED_TREES_FILE", tmp_path / "saved_trees.json")
     monkeypatch.setattr(
         edit_map,
-        "save_plan",
-        lambda name, plan, **kw: {"name": name, "plan": plan, **kw},
+        "save_project",
+        lambda name, nodes, **kw: {"name": name, "nodes": nodes, **kw},
     )
 
 
@@ -61,7 +61,7 @@ def saved() -> dict:
 def test_saved_as_structure(saved) -> None:
     # No id, resolved, or path anywhere.
     assert saved["id"] == "t1" and saved["name"] == "Pasta Bolognese"
-    assert saved["source"] == {"project_id": "project_1", "step_id": "node_1"}
+    assert saved["source"] == {"project_id": "project_1", "node_id": "node_1"}
     tree = saved["tree"]
     assert tree["ordered"] is False
     flat = repr(tree)
@@ -90,7 +90,7 @@ def test_insert_under_a_node(saved) -> None:
         ],
     )
     record = insert_saved_tree(target, "t1", "node_5")
-    recipes = record["plan"]["progression"]["steps"][0]["children"]
+    recipes = record["nodes"][0]["children"]
     inserted = recipes[-1]
     assert inserted["label"] == "Pasta Bolognese (2)"
     assert inserted["ordered"] is False and inserted["resolved"] is False
@@ -101,7 +101,7 @@ def test_insert_under_a_node(saved) -> None:
 
 def test_insert_at_top_level(saved) -> None:
     top = insert_saved_tree(_project("project_3", "account_7", []), "t1", None)
-    assert top["plan"]["progression"]["steps"][-1]["label"] == "Pasta Bolognese"
+    assert top["nodes"][-1]["label"] == "Pasta Bolognese"
 
 
 def test_other_accounts_tree_cannot_be_inserted(saved) -> None:

@@ -1,22 +1,21 @@
 """
-User-authored writes on a project's nodes (plan.progression). No model.
+User-authored writes on a project's nodes (the record's `nodes`). No model.
 
-add_map_node() — one Step the user named (no LLM), at the
+add_map_node() — one node the user named (no LLM), at the
 root or under a parent_id.
 import_map_outline() — a whole pasted outline/ASCII tree,
 parsed by text_to_tree.py (no LLM), appended the same way.
 import_map_folder() — one folder on disk, walked by
 add_folder/walk.py, appended the same way. Each node keeps its path.
-remove_map_node() — drop a Step by id (no LLM).
-move_map_node() — swap a Step with the sibling above or below it,
+remove_map_node() — drop a node by id (no LLM).
+move_map_node() — swap a node with the sibling above or below it,
 keeping its id and everything under it (no LLM).
-rename_map_node() — give a Step a new label, keeping its id, so chat
+rename_map_node() — give a node a new label, keeping its id, so chat
 turns about it stay attached (docs/05-decisions.md #52, #71).
 
 New nodes get their ids from backend/identity/. Undo and redo are
 undo.py, saved through the same save_map_edit().
 
-Does not touch the Steps-page scratch tree.
 """
 
 import copy
@@ -24,17 +23,18 @@ import copy
 from backend.identity import new_node_id
 from backend.project.changes import records
 from backend.project.node import (
-    Step,
+    Node,
     count_nodes,
+    find_node,
     find_path,
-    find_step,
     from_nested_labels,
+    nodes_of,
     sibling_label_clash,
     unique_sibling_label,
 )
 from backend.project.panes.canvas.add_folder import folder_tree
 from backend.project.panes.canvas.text_to_tree import parse_outline
-from backend.storage.project_persistence import save_plan
+from backend.storage.project_persistence import save_project
 
 
 def add_map_node(
@@ -43,30 +43,22 @@ def add_map_node(
     parent_id: str | None = None,
 ) -> dict:
     """
-    Append one Step the user named — no model call.
-    Creates plan.progression if missing. Empty/whitespace label raises.
+    Append one node the user named — no model call.
+    Empty/whitespace label raises.
     A label a sibling already uses gets ` (2)`, ` (3)`, … appended.
-    If parent_id is set, append under that step's children; otherwise
-    at the progression root.
+    If parent_id is set, append under that node's children; otherwise
+    at the top level.
     """
     text = (label or "").strip()
     if not text:
-        raise ValueError("step label is empty")
+        raise ValueError("node label is empty")
 
-    plan = copy.deepcopy(latest.get("plan") or {})
-    progression = plan.get("progression")
-    if not isinstance(progression, dict):
-        progression = {"steps": []}
-        plan["progression"] = progression
-    steps = progression.get("steps")
-    if not isinstance(steps, list):
-        steps = []
-        progression["steps"] = steps
+    tree = copy.deepcopy(nodes_of(latest))
 
     if parent_id:
-        parent = find_step(steps, parent_id)
+        parent = find_node(tree, parent_id)
         if parent is None:
-            raise ValueError(f"parent step not found: {parent_id}")
+            raise ValueError(f"parent node not found: {parent_id}")
         children = parent.get("children")
         if not isinstance(children, list):
             children = []
@@ -74,19 +66,19 @@ def add_map_node(
         siblings = children
     else:
         parent = None
-        siblings = steps
+        siblings = tree
 
     text = unique_sibling_label(siblings, text)
 
-    new_step = Step(id=new_node_id(), label=text).to_dict()
-    change = records.added(parent["id"] if parent else None, len(siblings), [new_step])
-    siblings.append(new_step)
+    new_node = Node(id=new_node_id(), label=text).to_dict()
+    change = records.added(parent["id"] if parent else None, len(siblings), [new_node])
+    siblings.append(new_node)
     if parent is not None:
-        feedback = f"Added step under {parent.get('label') or parent_id}: {text}"
+        feedback = f"Added node under {parent.get('label') or parent_id}: {text}"
     else:
-        feedback = f"Added step: {text}"
+        feedback = f"Added node: {text}"
 
-    return save_map_edit(latest, plan, feedback, "node_added", change)
+    return save_map_edit(latest, tree, feedback, "node_added", change)
 
 
 def import_map_outline(
@@ -100,7 +92,7 @@ def import_map_outline(
     """
     Parse a pasted outline/ASCII tree (parse_outline.py — markdown
     bullets, numbered lists, this app's own box-drawing export, or
-    plain lines) and append the whole result as new Steps — no model
+    plain lines) and append the whole result as new nodes — no model
     call, same append-not-replace shape as add_map_node().
     Raises ValueError if nothing recognizable parses out, or if
     parent_id is set but not found.
@@ -110,7 +102,7 @@ def import_map_outline(
     preview route) rather than always accepting the default guess.
 
     Exactly one of `text` or `forest` is used: `text` is parsed fresh
-    (the chat-Send path, which has no preview step to edit first);
+    (the chat-Send path, which has no preview to edit first);
     `forest` is an already-built {"label", "children"} tree the caller
     supplies directly - ui/'s preview builds one of these by toggling
     individual nodes in/out (see outlinePreviewWithToggleableRoot() /
@@ -124,29 +116,21 @@ def import_map_outline(
     else:
         forest = _validate_forest(forest)
     if not forest:
-        raise ValueError("no steps recognized in that text")
+        raise ValueError("no nodes recognized in that text")
 
-    plan = copy.deepcopy(latest.get("plan") or {})
-    progression = plan.get("progression")
-    if not isinstance(progression, dict):
-        progression = {"steps": []}
-        plan["progression"] = progression
-    steps = progression.get("steps")
-    if not isinstance(steps, list):
-        steps = []
-        progression["steps"] = steps
+    tree = copy.deepcopy(nodes_of(latest))
 
-    new_steps = [step.to_dict() for step in from_nested_labels(forest, new_node_id)]
+    new_nodes = [node.to_dict() for node in from_nested_labels(forest, new_node_id)]
     # Every imported node, not just the top level: one paste of a
     # 95-node tree is one change, but it brought in 95 nodes.
-    imported = count_nodes(new_steps)
+    imported = count_nodes(new_nodes)
     what = "1 node" if imported == 1 else f"{imported} nodes"
 
     parent = None
     if parent_id:
-        parent = find_step(steps, parent_id)
+        parent = find_node(tree, parent_id)
         if parent is None:
-            raise ValueError(f"parent step not found: {parent_id}")
+            raise ValueError(f"parent node not found: {parent_id}")
         children = parent.get("children")
         if not isinstance(children, list):
             children = []
@@ -154,13 +138,13 @@ def import_map_outline(
         siblings = children
         feedback = f"Imported {what} under {parent.get('label') or parent_id}"
     else:
-        siblings = steps
+        siblings = tree
         feedback = f"Imported {what}"
-    _number_sibling_clashes(siblings, new_steps)
-    change = records.added(parent["id"] if parent else None, len(siblings), new_steps)
-    siblings.extend(new_steps)
+    _number_sibling_clashes(siblings, new_nodes)
+    change = records.added(parent["id"] if parent else None, len(siblings), new_nodes)
+    siblings.extend(new_nodes)
 
-    return save_map_edit(latest, plan, feedback, event, change)
+    return save_map_edit(latest, tree, feedback, event, change)
 
 
 def import_map_folder(
@@ -178,88 +162,80 @@ def import_map_folder(
     )
 
 
-def remove_map_node(latest: dict, step_id: str) -> dict:
+def remove_map_node(latest: dict, node_id: str) -> dict:
     """
-    Remove `step_id` from plan.progression (top-level or nested).
-    No model call. Raises if missing progression or step.
+    Remove `node_id` (top-level or nested). No model call. Raises if
+    the project has no nodes or the node is missing.
     """
-    plan = copy.deepcopy(latest.get("plan") or {})
-    progression = plan.get("progression")
-    if not isinstance(progression, dict):
-        raise ValueError("project has no nodes")
-    steps = progression.get("steps")
-    if not isinstance(steps, list):
+    tree = copy.deepcopy(nodes_of(latest))
+    if not tree:
         raise ValueError("project has no nodes")
 
     # Where it sat and how much went with it, read before it is gone.
-    path = find_path(steps, step_id)
+    path = find_path(tree, node_id)
     if path is None:
-        raise ValueError(f"step not found: {step_id}")
-    step = path[-1]
+        raise ValueError(f"node not found: {node_id}")
+    node = path[-1]
     parent = path[-2] if len(path) > 1 else None
-    siblings = parent["children"] if parent else steps
-    index = next(n for n, s in enumerate(siblings) if s is step)
-    change = records.removed(parent["id"] if parent else None, index, [step])
+    siblings = parent["children"] if parent else tree
+    index = next(n for n, s in enumerate(siblings) if s is node)
+    change = records.removed(parent["id"] if parent else None, index, [node])
     del siblings[index]
-    label = str(step.get("label") or step_id)
-    below = count_nodes(step.get("children") or [])
+    label = str(node.get("label") or node_id)
+    below = count_nodes(node.get("children") or [])
     feedback = (
-        f"Removed step under {parent.get('label') or ''}: {label}"
+        f"Removed node under {parent.get('label') or ''}: {label}"
         if parent
-        else f"Removed step: {label}"
+        else f"Removed node: {label}"
     )
     if below:
         feedback += f" (and {below} under it)"
 
-    if not steps:
-        plan["progression"] = None
-
-    return save_map_edit(latest, plan, feedback, "node_removed", change)
+    return save_map_edit(latest, tree, feedback, "node_removed", change)
 
 
-def move_map_node(latest: dict, step_id: str, direction: str) -> dict:
+def move_map_node(latest: dict, node_id: str, direction: str) -> dict:
     """
     Move `step_id` one place up or down among its siblings (`direction`
     is "up" or "down"). Same parent, same id, same children - only the
-    order changes. No model call. Raises if the step is missing or
+    order changes. No model call. Raises if the node is missing or
     already first/last.
     """
     if direction not in ("up", "down"):
         raise ValueError(f"unknown direction: {direction}")
-    plan = copy.deepcopy(latest.get("plan") or {})
-    steps = (plan.get("progression") or {}).get("steps")
-    if not isinstance(steps, list):
+    tree = copy.deepcopy(nodes_of(latest))
+    if not tree:
         raise ValueError("project has no nodes")
 
-    path = find_path(steps, step_id)
+    path = find_path(tree, node_id)
     if path is None:
-        raise ValueError(f"step not found: {step_id}")
-    siblings = path[-2]["children"] if len(path) > 1 else steps
+        raise ValueError(f"node not found: {node_id}")
+    siblings = path[-2]["children"] if len(path) > 1 else tree
     i = next(n for n, s in enumerate(siblings) if s is path[-1])
     j = i - 1 if direction == "up" else i + 1
     if not 0 <= j < len(siblings):
         raise ValueError(f"already {'first' if direction == 'up' else 'last'}")
     siblings[i], siblings[j] = siblings[j], siblings[i]
-    change = records.moved(step_id, path[-2]["id"] if len(path) > 1 else None, i, j)
+    change = records.moved(node_id, path[-2]["id"] if len(path) > 1 else None, i, j)
 
     # Which neighbour it passed, so Logs and the chat's model can place it.
-    label = path[-1].get("label") or step_id
+    label = path[-1].get("label") or node_id
     other = siblings[i].get("label") or ""
     where = "above" if direction == "up" else "below"
     feedback = (
-        f"Moved step under {path[-2].get('label') or ''}: {label} {where} {other}"
+        f"Moved node under {path[-2].get('label') or ''}: {label} {where} {other}"
         if len(path) > 1
-        else f"Moved step: {label} {where} {other}"
+        else f"Moved node: {label} {where} {other}"
     )
 
-    return save_map_edit(latest, plan, feedback, "node_moved", change)
+    return save_map_edit(latest, tree, feedback, "node_moved", change)
 
 
-def rename_map_node(latest: dict, step_id: str, label: str) -> dict:
+def rename_map_node(latest: dict, node_id: str, label: str) -> dict:
     """
     Give `step_id` a new label. Its id, place, and children stay, so
     everything that points at the id (chat turns, selection) still finds
-    it. No model call. Raises on an empty label, a missing step, or a
+    it. No model call. Raises on an empty label, a missing node, or a
     label a sibling already uses: unlike add, a rename does not number
     itself, since the user chose that exact name.
 
@@ -268,59 +244,58 @@ def rename_map_node(latest: dict, step_id: str, label: str) -> dict:
     """
     text = (label or "").strip()
     if not text:
-        raise ValueError("step label is empty")
-    plan = copy.deepcopy(latest.get("plan") or {})
-    steps = (plan.get("progression") or {}).get("steps")
-    if not isinstance(steps, list):
+        raise ValueError("node label is empty")
+    tree = copy.deepcopy(nodes_of(latest))
+    if not tree:
         raise ValueError("project has no nodes")
 
-    path = find_path(steps, step_id)
+    path = find_path(tree, node_id)
     if path is None:
-        raise ValueError(f"step not found: {step_id}")
-    step = path[-1]
-    old = (step.get("label") or "").strip()
+        raise ValueError(f"node not found: {node_id}")
+    node = path[-1]
+    old = (node.get("label") or "").strip()
     if text == old:
         return latest
-    siblings = path[-2]["children"] if len(path) > 1 else steps
-    clash = sibling_label_clash([s for s in siblings if s is not step], text)
+    siblings = path[-2]["children"] if len(path) > 1 else tree
+    clash = sibling_label_clash([s for s in siblings if s is not node], text)
     if clash:
         raise ValueError(clash)
-    step["label"] = text
+    node["label"] = text
 
     return save_map_edit(
         latest,
-        plan,
-        f"Renamed step: {old} → {text}",
+        tree,
+        f"Renamed node: {old} → {text}",
         "node_renamed",
-        records.renamed(step_id, old, text),
-        focus_step_id=step_id,
+        records.renamed(node_id, old, text),
+        focus_node_id=node_id,
     )
 
 
 def save_map_edit(
     latest: dict,
-    plan: dict,
+    tree: list[dict],
     feedback: str,
     event: str,
     change: dict,
-    focus_step_id: str | None = None,
+    focus_node_id: str | None = None,
 ) -> dict:
     """Save one map edit: the new tree, its line for Logs and the chat
     (`feedback`), and its full record (`change`, project/changes/). Every
     edit here and every undo and redo (undo.py) saves through this."""
-    return save_plan(
+    return save_project(
         latest["name"],
-        plan,
+        tree,
         feedback=feedback,
         project_id=latest["project_id"],
         account_id=latest.get("account_id"),
         event=event,
-        focus_step_id=focus_step_id,
+        focus_node_id=focus_node_id,
         change=change,
     )
 
 
-def _number_sibling_clashes(siblings: list, new_steps: list[dict]) -> None:
+def _number_sibling_clashes(siblings: list, new_nodes: list[dict]) -> None:
     """Rename in place any new label that collides with existing
     siblings or with an earlier new peer (` (2)`, ` (3)`, …).
 
@@ -328,10 +303,10 @@ def _number_sibling_clashes(siblings: list, new_steps: list[dict]) -> None:
     children among themselves (and so on).
     """
     seen: list = list(siblings)
-    for step in new_steps:
-        step["label"] = unique_sibling_label(seen, step.get("label") or "")
-        seen.append(step)
-        children = step.get("children")
+    for node in new_nodes:
+        node["label"] = unique_sibling_label(seen, node.get("label") or "")
+        seen.append(node)
+        children = node.get("children")
         if isinstance(children, list) and children:
             _number_sibling_clashes([], children)
 

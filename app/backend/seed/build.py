@@ -1,7 +1,7 @@
 """
 Build a data folder (accounts, projects, saved trees) from story.py by
-running each step through the app's own functions, with a clock set to
-the step's time. Every map edit therefore saves the same change record
+running each action through the app's own functions, with a clock set to
+the action's time. Every map edit therefore saves the same change record
 it would in use, and the log replays to each tree (changes/replay.py).
 
 Dates move forward by whole weeks so the story ends on the last working
@@ -40,7 +40,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from backend.project.changes.replay import mismatch
-from backend.project.node import steps_of
+from backend.project.node import nodes_of
 from backend.project.panes.canvas.edit_map import (
     add_map_node,
     import_map_outline,
@@ -83,7 +83,7 @@ class Clock:
     def set(self, day: date, clock: time) -> None:
         local = datetime.combine(day, clock, tzinfo=LOCAL)
         if local.astimezone(UTC) < self.moment:
-            raise ValueError(f"{day} {clock}: earlier than the step before it")
+            raise ValueError(f"{day} {clock}: earlier than the action before it")
         self.moment = local.astimezone(UTC)
 
     def now_utc(self) -> str:
@@ -129,7 +129,7 @@ def build(out: Path, today: date) -> None:
 
 
 def _run_project(name: str, days: list, account_id: str, clock: Clock) -> str:
-    # Projects overlap in time; steps only move forward within one.
+    # Projects overlap in time; actions only move forward within one.
     clock.moment = datetime.min.replace(tzinfo=UTC)
     project_id = ""
     for written, actions in days:
@@ -152,7 +152,7 @@ def _run_project(name: str, days: list, account_id: str, clock: Clock) -> str:
 
 
 def _do(action: dict, latest: dict, clock: Clock) -> None:
-    """One story step on the project saved as `latest`."""
+    """One story action on the project saved as `latest`."""
     do = action["do"]
     if do == "paste":
         parent = _node_id(latest, action["under"]) if action["under"] else None
@@ -185,11 +185,11 @@ def _do(action: dict, latest: dict, clock: Clock) -> None:
             reply,
             sent,
             map_focus=about.split("/")[-1] if about else None,
-            focus_step_id=node_id,
+            focus_node_id=node_id,
             focus_day=clock.day(focus_day).isoformat() if focus_day else None,
         )
     else:
-        raise ValueError(f"unknown story step: {do}")
+        raise ValueError(f"unknown story action: {do}")
 
 
 # ============================================================
@@ -216,7 +216,7 @@ def _use_clock(clock: Clock) -> Callable[[], None]:
 
 def _node_id(latest: dict, path: str) -> str:
     """The id of the node at `path` (labels from the top, "/" between)."""
-    siblings = steps_of(latest)
+    siblings = nodes_of(latest)
     node: dict | None = None
     for label in path.split("/"):
         node = next((s for s in siblings if s.get("label") == label), None)

@@ -19,6 +19,7 @@ until Vision's own shape is decided.
 
 import re
 
+from backend.project.node import nodes_of
 from backend.project.panes.create.resolver import (
     get_latest_for_all_projects,
     get_latest_for_project,
@@ -28,7 +29,7 @@ from backend.storage.project_persistence import (
     delete_project as erase_project_store,
 )
 from backend.storage.project_persistence import (
-    save_plan,
+    save_project,
 )
 
 # ============================================================
@@ -46,9 +47,9 @@ def create_project(typed_text: str, account_id_value: str) -> dict:
     """
     account_id = account_id_value or None
     name = typed_text.strip() or next_default_name(account_id)
-    return save_plan(
+    return save_project(
         name,
-        {"progression": {"steps": []}},
+        [],
         account_id=account_id,
         event="created",
     )
@@ -86,7 +87,7 @@ def cancel_project(project_id: str) -> dict | None:
     """
     Mark a project as cancelled (abandoned) - a distinct terminal status
     from `completed`, not a UI-level relabeling of it and not a third
-    planning decision. Preserves `plan` and `account_id` from the
+    planning decision. Preserves `nodes` and `account_id` from the
     latest record exactly as they were, so the project's own data/history
     is never lost, only marked as no longer being pursued (still
     visible in full in the project's timeline, same as any other project).
@@ -110,9 +111,9 @@ def cancel_project(project_id: str) -> dict | None:
     if latest.get("cancelled"):
         return latest
 
-    return save_plan(
+    return save_project(
         latest["name"],
-        latest["plan"],
+        nodes_of(latest),
         feedback="Cancelled",
         project_id=latest["project_id"],
         account_id=latest.get("account_id"),
@@ -141,9 +142,9 @@ def restore_project(project_id: str) -> dict | None:
     if owner is not None and get_account(owner) is None:
         owner = None
 
-    return save_plan(
+    return save_project(
         latest["name"],
-        latest["plan"],
+        nodes_of(latest),
         feedback="Restored",
         project_id=latest["project_id"],
         account_id=owner,

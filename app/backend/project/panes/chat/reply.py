@@ -14,7 +14,7 @@ reload. The whole path and its rules: docs/chat.md.
 from backend.model.brief.budget import fit_to_budget
 from backend.model.brief.conversation import build_messages
 from backend.model.client import PROMPT_TOKENS, send_chat
-from backend.project.node import find_step, steps_of
+from backend.project.node import find_node, nodes_of
 from backend.project.panes.chat.commands import try_command
 from backend.project.panes.create.resolver import get_history_for_project
 from backend.project.status.build_status import (
@@ -23,14 +23,14 @@ from backend.project.status.build_status import (
     status_text,
 )
 from backend.storage.paths import now_utc
-from backend.storage.project_persistence import save_plan
+from backend.storage.project_persistence import save_project
 
 
 def reply(
     latest: dict,
     note: str,
     map_focus: str | None = None,
-    focus_step_id: str | None = None,
+    focus_node_id: str | None = None,
     focus_day: str | None = None,
     about_removed: bool = False,
 ) -> dict:
@@ -45,16 +45,16 @@ def reply(
     # The screen may still hold a node that was removed; a selection that
     # is not in the tree is no selection, unless the message was sent from
     # that removed node's own conversation (`about_removed`).
-    gone = bool(focus_step_id and find_step(steps_of(latest), focus_step_id) is None)
+    gone = bool(focus_node_id and find_node(nodes_of(latest), focus_node_id) is None)
     if gone and not (about_removed and map_focus):
-        map_focus = focus_step_id = None
+        map_focus = focus_node_id = None
 
-    commanded = try_command(latest, note, focus_step_id=focus_step_id)
+    commanded = try_command(latest, note, focus_node_id=focus_node_id)
     if commanded is not None:
         text = commanded.reply
         # /select (or path /add with UI focus) frames About-focus.
         stamp_label = commanded.select_label or map_focus
-        stamp_id = commanded.select_id or focus_step_id
+        stamp_id = commanded.select_id or focus_node_id
         base = commanded.record if commanded.record is not None else latest
         record = save_chat_turn(
             base,
@@ -62,7 +62,7 @@ def reply(
             text,
             sent_at,
             map_focus=stamp_label,
-            focus_step_id=stamp_id,
+            focus_node_id=stamp_id,
         )
         out: dict = {"record": record}
         if commanded.select_id and commanded.select_label:
@@ -89,7 +89,7 @@ def reply(
         note,
         history,
         map_focus,
-        focus_step_id,
+        focus_node_id,
         status,
         focus_day=focus_day,
         about_removed=gone and about_removed,
@@ -101,7 +101,7 @@ def reply(
         text,
         sent_at,
         map_focus=map_focus,
-        focus_step_id=focus_step_id,
+        focus_node_id=focus_node_id,
         focus_day=focus_day,
     )
     return {"record": record}
@@ -113,15 +113,15 @@ def save_chat_turn(
     text: str,
     sent_at: str,
     map_focus: str | None = None,
-    focus_step_id: str | None = None,
+    focus_node_id: str | None = None,
     focus_day: str | None = None,
 ) -> dict:
     """Keep the map as it is; store the turn's message and reply in their
     own fields, which screen/chat_thread.py and model/brief/conversation.py
     read. The one way a chat turn is saved (also by backend/seed/)."""
-    return save_plan(
+    return save_project(
         latest.get("name") or "",
-        latest.get("plan") or {},
+        nodes_of(latest),
         message=note,
         reply=text,
         project_id=latest["project_id"],
@@ -129,6 +129,6 @@ def save_chat_turn(
         event="chat",
         sent_at=sent_at,
         map_focus=map_focus,
-        focus_step_id=focus_step_id,
+        focus_node_id=focus_node_id,
         focus_day=focus_day,
     )

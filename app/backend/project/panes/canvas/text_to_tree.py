@@ -1,7 +1,7 @@
 """
-Parse a pasted outline or ASCII tree into a forest of Step-shaped
+Parse a pasted outline or ASCII tree into a forest of Node-shaped
 labels — no model call. For pasting a structure built elsewhere (e.g.
-another LLM's own answer) back into plan.progression.
+another LLM's own answer) back into the map's nodes.
 
 Tolerant of several styles at once, since a paste's origin is
 unknown: markdown bullets ("-", "*", "•"), numbered lists ("1.",
@@ -24,13 +24,13 @@ def parse_outline(text: str, unwrap: bool = True) -> list[dict]:
     Returns a forest of {"label": str, "children": [...]} nodes,
     oldest/top first. Blank lines and pure connector "air" lines
     (this app's own export pads between siblings with a lone "│") are
-    skipped, not read as empty steps.
+    skipped, not read as empty nodes.
 
     If parsing produces exactly one root with children (a title line
     followed by a nested list — a common shape for another LLM's
     answer), and `unwrap` is true (the default), that root is unwrapped
     once and its children are returned instead of it, so the title
-    itself doesn't become a spurious top-level step. Only once, not
+    itself doesn't become a spurious top-level node. Only once, not
     repeated: this app's own export nests two labels above real content
     (an id line, then the project name), and unwrapping both would be
     right for reimporting that export - but a generic pasted outline

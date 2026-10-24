@@ -11,7 +11,7 @@ def _node(node_id: str, label: str) -> dict:
 
 
 class Log(list):
-    """Log lines numbered 1, 2, … as save_plan numbers them."""
+    """Log lines numbered 1, 2, … as save_project numbers them."""
 
     def save(self, change: dict) -> dict:
         line = {"id": len(self) + 1, "event": "pasted", "change": change}

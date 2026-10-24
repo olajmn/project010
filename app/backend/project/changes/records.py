@@ -44,22 +44,22 @@ def removed(parent_id: str | None, index: int, nodes: list[dict]) -> dict:
     }
 
 
-def moved(step_id: str, parent_id: str | None, from_index: int, to_index: int) -> dict:
+def moved(node_id: str, parent_id: str | None, from_index: int, to_index: int) -> dict:
     return {
         "id": new_change_id(),
         "op": "move",
-        "node_id": step_id,
+        "node_id": node_id,
         "parent": parent_id,
         "from": from_index,
         "to": to_index,
     }
 
 
-def renamed(step_id: str, old: str, new: str) -> dict:
+def renamed(node_id: str, old: str, new: str) -> dict:
     return {
         "id": new_change_id(),
         "op": "rename",
-        "node_id": step_id,
+        "node_id": node_id,
         "from": old,
         "to": new,
     }

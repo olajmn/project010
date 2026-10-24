@@ -27,18 +27,20 @@ def data_dir(tmp_path, monkeypatch):
 
 def _two_projects():
     """Two accounts; the first owns two projects (after one unassigned)."""
-    pp.save_plan("Make a song", {"now": "Write one line"})
+    pp.save_project("Make a song", [{"label": "Write one line"}])
     user = ap.save_account("Health")
     second_user = ap.save_account("Grow as a musician")
-    abs_project = pp.save_plan("Get visible abs", {"now": "..."}, account_id=user["id"])
-    cardio_project = pp.save_plan(
-        "Improve cardio", {"now": "..."}, account_id=user["id"]
+    abs_project = pp.save_project(
+        "Get visible abs", [{"label": "..."}], account_id=user["id"]
+    )
+    cardio_project = pp.save_project(
+        "Improve cardio", [{"label": "..."}], account_id=user["id"]
     )
     return user, second_user, abs_project, cardio_project
 
 
-def test_save_plan_writes_current_and_events() -> None:
-    plain_record = pp.save_plan("Make a song", {"now": "Write one line"})
+def test_save_project_writes_current_and_events() -> None:
+    plain_record = pp.save_project("Make a song", [{"label": "Write one line"}])
     assert plain_record["account_id"] is None, plain_record["account_id"]
     assert plain_record["name"] == "Make a song"
     assert "goal" not in plain_record
@@ -47,8 +49,8 @@ def test_save_plan_writes_current_and_events() -> None:
     assert pp.current_path(pid).exists()
     assert pp.events_path(pid).exists()
     assert pp.current_path(pid).parent.name == pid  # the id is the folder
-    assert "plan" in pp.load_current(pid)
-    assert "plan" not in pp.load_project_events(pid)[0]
+    assert "nodes" in pp.load_current(pid)
+    assert "nodes" not in pp.load_project_events(pid)[0]
     assert pp.events_path(pid).read_text(encoding="utf-8").count("\n") == 1
 
 
@@ -84,9 +86,9 @@ def test_projects_of_one_account() -> None:
 
 def test_saving_again_appends_one_event() -> None:
     user, _, abs_project, cardio_project = _two_projects()
-    pp.save_plan(
+    pp.save_project(
         "Get visible abs",
-        {"now": "again"},
+        [{"label": "again"}],
         project_id=abs_project["project_id"],
         account_id=user["id"],
         event="chat",
@@ -103,14 +105,14 @@ def test_saving_again_appends_one_event() -> None:
         .count("\n")
         == 1
     )
-    assert pp.load_current(abs_project["project_id"])["plan"]["now"] == "again"
+    assert pp.load_current(abs_project["project_id"])["nodes"][0]["label"] == "again"
 
 
 def test_owner_change_keeps_the_project_id() -> None:
     _, second_user, _, cardio_project = _two_projects()
-    moved = pp.save_plan(
+    moved = pp.save_project(
         "Improve cardio",
-        {"now": "..."},
+        [{"label": "..."}],
         project_id=cardio_project["project_id"],
         account_id=second_user["id"],
         event="owner_changed",
@@ -137,7 +139,7 @@ def test_account_archive_restore_delete() -> None:
 
 
 def test_project_erase() -> None:
-    gone = pp.save_plan("To erase", {"now": "x"}, account_id=None)
+    gone = pp.save_project("To erase", [{"label": "x"}], account_id=None)
     assert pp.current_path(gone["project_id"]).exists()
     assert pp.delete_project(gone["project_id"]) is True
     assert not pp.current_path(gone["project_id"]).exists()
@@ -151,7 +153,7 @@ def test_empty_create_name_becomes_next_new_project() -> None:
     assert create_project("", a)["name"] == "New project 1"
     assert create_project("  ", a)["name"] == "New project 2"
     assert create_project("", b)["name"] == "New project 1"  # per account
-    pp.save_plan("New project #7", {"now": "x"}, account_id=a)  # legacy form
+    pp.save_project("New project #7", [{"label": "x"}], account_id=a)  # legacy form
     assert create_project("", a)["name"] == "New project 8"
     assert create_project("Typed", a)["name"] == "Typed"
     cancel_project(create_project("", c)["project_id"])
@@ -166,7 +168,7 @@ def test_a_change_record_goes_to_the_log_not_the_current_state() -> None:
         "from": "A",
         "to": "B",
     }
-    pid = pp.save_plan("P", {"now": "x"}, event="node_renamed", change=change)[
+    pid = pp.save_project("P", [{"label": "x"}], event="node_renamed", change=change)[
         "project_id"
     ]
     assert pp.load_project_events(pid)[-1]["change"] == change

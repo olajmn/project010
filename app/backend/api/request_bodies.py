@@ -58,7 +58,7 @@ class ChatMessage(BaseModel):
 
     text: str | None = None
     focus_label: str | None = None
-    focus_step_id: str | None = None
+    focus_node_id: str | None = None
     focus_day: str | None = None
     about_removed: bool = False
 

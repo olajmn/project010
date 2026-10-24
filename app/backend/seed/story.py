@@ -556,7 +556,7 @@ Agreement #002
                 chat(
                     None,
                     "What happened here?",
-                    "On {date:2026-10-14} at 11:35 a step under Civic Centre named BIM Objects was moved to sit above Construction in the project structure.",
+                    "On {date:2026-10-14} at 11:35 a part under Civic Centre named BIM Objects was moved to sit above Construction in the project structure.",
                     at="16:05:00",
                     focus_day="2026-10-14",
                 ),

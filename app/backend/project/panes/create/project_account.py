@@ -4,6 +4,7 @@ Link a project to an account, or archive an account and detach its projects.
 Identity writes, not reasoning. Judgment does not own this.
 """
 
+from backend.project.node import nodes_of
 from backend.project.panes.create.resolver import (
     get_latest_for_all_projects,
     get_latest_for_project,
@@ -14,7 +15,7 @@ from backend.storage.accounts_persistence import (
 from backend.storage.accounts_persistence import (
     get_account,
 )
-from backend.storage.project_persistence import save_plan
+from backend.storage.project_persistence import save_project
 
 
 def set_project_user(project_id: str, account_id: str | None) -> dict | None:
@@ -39,9 +40,9 @@ def set_project_user(project_id: str, account_id: str | None) -> dict | None:
     has none, for `account_id=None`) is a genuine no-op - returns
     `latest` unchanged rather than appending an identical record. A
     cancelled project (see cancel_project()) is also a no-op here — never
-    a save_plan() call that could silently revive it.
+    a save_project() call that could silently revive it.
 
-    Preserves `plan` and `completed` from the latest record exactly as
+    Preserves `nodes` and `completed` from the latest record exactly as
     they were -
     this changes which account the project belongs to, nothing about the
     map itself.
@@ -65,9 +66,9 @@ def set_project_user(project_id: str, account_id: str | None) -> dict | None:
         verb = "Moved to" if previous_account_id is not None else "Added to"
         feedback_text = f"{verb} account: {account['text']}"
 
-    return save_plan(
+    return save_project(
         latest["name"],
-        latest["plan"],
+        nodes_of(latest),
         feedback=feedback_text,
         project_id=latest["project_id"],
         completed=latest.get("completed", False),
@@ -82,7 +83,7 @@ def archive_account(account_id: str) -> dict | None:
     from every currently-active project that references it - an archived
     account is no longer an active seat, so an active project
     shouldn't keep showing a current tie to it. Account and project have
-    independent lifecycles: this never changes a project's plan or
+    independent lifecycles: this never changes a project's nodes or
     completed/cancelled status - only which account (if
     any) it currently points to.
 

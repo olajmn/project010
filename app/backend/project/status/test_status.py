@@ -20,14 +20,14 @@ def _local_day(at: str) -> str:
 NOW = datetime(2026, 9, 25, 20, 0, tzinfo=UTC).astimezone()
 
 
-def line(feedback, at, event=None, focus=None, steps=None, name="House", **extra):
+def line(feedback, at, event=None, focus=None, nodes=None, name="House", **extra):
     record = {
         "project_id": 7,
         "name": name,
         "account_id": 3,
         "feedback": feedback,
         "created_at": at,
-        "plan": {"progression": {"steps": steps or []}},
+        "nodes": nodes or [],
     }
     if event:
         record["event"] = event
@@ -40,7 +40,7 @@ def line(feedback, at, event=None, focus=None, steps=None, name="House", **extra
 TAPE = [
     {"feedback": None, "event": "created", "created_at": "2026-09-20T10:00:00"},
     {
-        "feedback": "Imported 1 step(s)",
+        "feedback": "Imported 1 node(s)",
         "event": "pasted",
         "created_at": "2026-09-20T10:05:00",
     },
@@ -61,14 +61,14 @@ def test_build_status() -> None:
     tree = [{"label": "Rooms", "children": [{"label": "Kitchen"}, {"label": "Bath"}]}]
     history = [
         line(None, "2026-09-24T09:00:00.000+00:00", "created"),
-        line("Added step: Rooms", "2026-09-24T09:01:00.000+00:00", "node_added"),
+        line("Added node: Rooms", "2026-09-24T09:01:00.000+00:00", "node_added"),
         line(
-            "Added step under Rooms: Kitchen",
+            "Added node under Rooms: Kitchen",
             "2026-09-25T10:00:00.000+00:00",
             "node_added",
         ),
         line(
-            "Added step under Rooms: Bath",
+            "Added node under Rooms: Bath",
             "2026-09-25T10:01:00.000+00:00",
             "node_added",
         ),
@@ -83,7 +83,7 @@ def test_build_status() -> None:
             "Renamed: House → Home",
             "2026-09-25T12:00:00.000+00:00",
             "renamed",
-            steps=tree,
+            nodes=tree,
             name="Home",
         ),
     ]
@@ -119,7 +119,7 @@ def test_quiet_days_count_as_zero() -> None:
     gap = build_status(
         [
             line(None, "2026-09-20T10:00:00.000+00:00", "created"),
-            line("Added step: A", "2026-09-20T10:05:00.000+00:00", "node_added"),
+            line("Added node: A", "2026-09-20T10:05:00.000+00:00", "node_added"),
         ],
         now=NOW,
     )
@@ -143,10 +143,10 @@ def test_old_timestamps_without_offset() -> None:
             {
                 "project_id": 1,
                 "name": "Old",
-                "feedback": "Imported 1 step(s)",
+                "feedback": "Imported 1 node(s)",
                 "event": "pasted",
                 "created_at": "2026-09-20T10:05:00",
-                "plan": {},
+                "nodes": [],
             },
             {
                 "project_id": 1,
@@ -183,7 +183,7 @@ def test_changes_text() -> None:
     lines = changes_text(TAPE, now=NOW).splitlines()
     assert lines[0] == "Every change saved in this project (newest first):"
     assert lines[1].endswith("— Renamed: A → B"), lines
-    assert lines[2].endswith("— Imported 1 step(s)")
+    assert lines[2].endswith("— Imported 1 node(s)")
     assert lines[3].endswith("— Created")
     assert len(lines) == 4
     assert changes_text(TAPE[2:3], now=NOW) == ""
@@ -193,7 +193,7 @@ def test_changes_text_holds_the_whole_record() -> None:
     # Not only the latest ones: the history is part of the project.
     tape = [
         {
-            "feedback": f"Added step: {n}",
+            "feedback": f"Added node: {n}",
             "event": "node_added",
             "created_at": "2026-09-20T10:00:00",
         }
@@ -201,7 +201,7 @@ def test_changes_text_holds_the_whole_record() -> None:
     ]
     lines = changes_text(tape, now=NOW).splitlines()
     assert len(lines) == 41
-    assert lines[-1].endswith("— Added step: 0")
+    assert lines[-1].endswith("— Added node: 0")
 
 
 def test_changes_on_selected_day() -> None:

@@ -9,7 +9,7 @@ No model.
 """
 
 from backend.identity import short_id
-from backend.project.node import find_path, steps_of
+from backend.project.node import find_path, nodes_of
 from backend.project.panes.chat.commands.result import CommandResult
 
 _TOGGLED = "Map switched between node ids and names. Type /id again to switch back."
@@ -18,15 +18,15 @@ _TOGGLED = "Map switched between node ids and names. Type /id again to switch ba
 def run(
     latest: dict,
     note: str,
-    focus_step_id: str | None = None,
+    focus_node_id: str | None = None,
 ) -> CommandResult:
     del note  # /id takes no arguments
-    if not focus_step_id:
+    if not focus_node_id:
         return CommandResult(_TOGGLED, toggle_map_ids=True)
-    path = find_path(steps_of(latest), focus_step_id)
+    path = find_path(nodes_of(latest), focus_node_id)
     if path is None:
-        return CommandResult(f"No node with id {focus_step_id}.")
-    labels = " / ".join((step.get("label") or "").strip() for step in path)
+        return CommandResult(f"No node with id {focus_node_id}.")
+    labels = " / ".join((part.get("label") or "").strip() for part in path)
     node = path[-1]
     return CommandResult(
         f"{node.get('label')} → {short_id(str(node.get('id')))} ({labels})"

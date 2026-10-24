@@ -12,9 +12,9 @@ The rest of the app treats an id as an opaque string. Nothing reads meaning from
 
 | Kind | Made by | Where it is kept | Who reads it |
 |---|---|---|---|
-| `node` | `new_node_id()`, called by `project/panes/canvas/edit_map.py` for every new node | each node's `id` in `current.json`; `focus_step_id` on log lines; `source.step_id` of saved trees | the map, the chat, saved trees |
+| `node` | `new_node_id()`, called by `project/panes/canvas/edit_map.py` for every new node | each node's `id` in `current.json`; `focus_node_id` on log lines; `source.node_id` of saved trees | the map, the chat, saved trees |
 | `change` | `new_change_id()`, called by `project/changes/records.py` | `change.id` on a map edit's line in `events.jsonl` | undo (`TODO.md` 54) |
-| `project` | `new_project_id()`, called by `save_plan()` in `storage/project_persistence.py` for a new project | the folder name `data/projects/{id}/`; `project_id` in `current.json` and on log lines; the map's top row | API paths (`/api/projects/{id}/…`), the UI, logs |
+| `project` | `new_project_id()`, called by `save_project()` in `storage/project_persistence.py` for a new project | the folder name `data/projects/{id}/`; `project_id` in `current.json` and on log lines; the map's top row | API paths (`/api/projects/{id}/…`), the UI, logs |
 | `account` | `new_account_id()`, called by `storage/accounts_persistence.py` | `accounts.json`; `account_id` on projects, log lines, and saved trees | the UI, Settings, saved trees |
 
 Projects are listed by `created_at`, not by id.
@@ -22,7 +22,7 @@ Projects are listed by `created_at`, not by id.
 ## What an id promises
 
 - **It identifies one thing and nothing else.** It says nothing about when it was made, in what order, or how many came before it.
-- **It is unique beyond its project and this app.** Data from several projects, devices, or other systems can sit side by side without ids colliding; no counter has to be kept in step.
+- **It is unique beyond its project and this app.** Data from several projects, devices, or other systems can sit side by side without ids colliding; no counter has to be kept in sync.
 - **It is never reused.** A removed node's id is retired, not freed: it keeps meaning that one node wherever it is still named — its changes, its chat turns, the source of a saved tree.
 - **It is separate from what it names.** A node's label, place, and children can change; its id does not. A copy (an inserted saved tree) is a new node with a new id.
 

@@ -15,7 +15,7 @@ no product rules.
 #      - map_tree()
 
 from backend.project.changes.undo import undo_state
-from backend.project.node import count_nodes, steps_of
+from backend.project.node import count_nodes, nodes_of
 from backend.project.panes.chat.screen.chat_thread import thread_for
 from backend.project.panes.create.resolver import (
     created_at_key,
@@ -52,7 +52,7 @@ def project_view(
         print(f"(debug: map_tree() failed for project {pid}: {e})")
         node = None
     history = get_history_for_project(pid) if pid is not None else []
-    thread = thread_for(pid, history, steps_of(record)) if pid is not None else []
+    thread = thread_for(pid, history, nodes_of(record)) if pid is not None else []
     view = {
         "project_id": pid,
         "name": record["name"],
@@ -130,12 +130,12 @@ def saved_tree_view(saved: dict) -> dict:
 def map_tree(record: dict) -> dict | None:
     """The map as the browser draws it: {id, label, status, children},
     with the project as the root. None when the map is empty."""
-    steps = steps_of(record)
+    nodes = nodes_of(record)
     pid = record["project_id"]
     children = [
-        _node(step, fallback_id=f"{pid}-p-{i}")
-        for i, step in enumerate(steps)
-        if isinstance(step, dict)
+        _node(node, fallback_id=f"{pid}-p-{i}")
+        for i, node in enumerate(nodes)
+        if isinstance(node, dict)
     ]
     if not children:
         return None
@@ -147,18 +147,18 @@ def map_tree(record: dict) -> dict | None:
     }
 
 
-def _node(step: dict, fallback_id: str) -> dict:
+def _node(node: dict, fallback_id: str) -> dict:
     """One node and everything under it. Stored nodes always have an
     id; the fallback only covers very old records."""
-    step_id = step.get("id") or fallback_id
+    node_id = node.get("id") or fallback_id
     return {
-        "id": str(step_id),
-        "label": step.get("label") or "—",
+        "id": str(node_id),
+        "label": node.get("label") or "—",
         # Nothing writes `resolved` today, so every node shows "open".
-        "status": "done" if step.get("resolved") else "open",
+        "status": "done" if node.get("resolved") else "open",
         "children": [
-            _node(child, fallback_id=f"{step_id}-{j}")
-            for j, child in enumerate(step.get("children") or [])
+            _node(child, fallback_id=f"{node_id}-{j}")
+            for j, child in enumerate(node.get("children") or [])
             if isinstance(child, dict)
         ],
     }

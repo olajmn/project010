@@ -447,7 +447,7 @@ def post_chat(
             latest,
             note,
             map_focus=_clean(body.focus_label),
-            focus_step_id=_clean(body.focus_step_id),
+            focus_node_id=_clean(body.focus_node_id),
             focus_day=_day(body.focus_day),
             about_removed=body.about_removed,
         )

@@ -84,7 +84,7 @@ Everything lives in `app/data/` as plain JSON:
 
 | File | Holds |
 |---|---|
-| `projects/{id}/current.json` | The project now: name, account, and `plan.progression.steps` (the nodes) |
+| `projects/{id}/current.json` | The project now: name, account, and `nodes` (the top-level nodes, each with its children) |
 | `projects/{id}/events.jsonl` | One slim line per saved change: event, feedback (a chat turn: `message` and `reply` instead), times, focus; a map edit since 2026-10-24 also its full `change` record (`project/changes/records.py`) — the source for chat history, status, and logs |
 | `accounts.json` | Accounts; a deleted one leaves a tombstone so its id is never reused |
 | `saved_trees.json` | Saved trees per account, with `id_hi` |

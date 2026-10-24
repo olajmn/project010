@@ -24,25 +24,25 @@ def describe_changes(history: list[dict]) -> dict[int, str]:
     """{log line id: readable line} for every line with a change record.
     Stops describing at a record that does not fit the replayed tree
     (older lines keep their own sentence)."""
-    steps: list[dict] = []
+    tree: list[dict] = []
     out: dict[int, str] = {}
     for line in history:
         change = line.get("change")
         if change is None:
             continue
         try:
-            text = _describe(steps, change, line.get("event"))
-            apply_change(steps, change)
+            text = _describe(tree, change, line.get("event"))
+            apply_change(tree, change)
         except ValueError, KeyError:
             break
         out[line["id"]] = text
     return out
 
 
-def _describe(steps: list[dict], change: dict, event: str | None) -> str:
+def _describe(tree: list[dict], change: dict, event: str | None) -> str:
     """One change, read against the tree just before it."""
     op = change["op"]
-    where = _place(steps, change.get("parent"))
+    where = _place(tree, change.get("parent"))
     if op == "add":
         nodes = change["nodes"]
         count = count_nodes(nodes)
@@ -54,14 +54,14 @@ def _describe(steps: list[dict], change: dict, event: str | None) -> str:
     elif op == "remove":
         text = f"Removed {_names(change['nodes'])} {where}"
     elif op == "move":
-        siblings = children_of(steps, change.get("parent"))
+        siblings = children_of(tree, change.get("parent"))
         node = siblings[change["from"]]["label"]
         other = siblings[change["to"]]["label"]
         side = "above" if change["to"] < change["from"] else "below"
         text = f"Moved {node} {side} {other} {where}"
     else:
-        path = find_path(steps, change["node_id"]) or []
-        where = _place(steps, path[-2]["id"]) if len(path) > 1 else "at the top level"
+        path = find_path(tree, change["node_id"]) or []
+        where = _place(tree, path[-2]["id"]) if len(path) > 1 else "at the top level"
         text = f"Renamed {change['from']} to {change['to']} {where}"
     if change.get("undoes"):
         return f"Undo: {text}"
@@ -70,11 +70,11 @@ def _describe(steps: list[dict], change: dict, event: str | None) -> str:
     return text
 
 
-def _place(steps: list[dict], parent_id: str | None) -> str:
+def _place(tree: list[dict], parent_id: str | None) -> str:
     """'under A > B' for a parent, or 'at the top level'."""
     if parent_id is None:
         return "at the top level"
-    path = find_path(steps, parent_id) or []
+    path = find_path(tree, parent_id) or []
     return "under " + " > ".join(str(s.get("label") or "") for s in path)
 
 

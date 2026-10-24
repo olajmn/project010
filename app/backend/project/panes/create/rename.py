@@ -5,8 +5,9 @@ A rename is saved as its own line (event "renamed"), so the project's
 timeline keeps every name it has had. The chat does not show it.
 """
 
+from backend.project.node import nodes_of
 from backend.project.panes.create.resolver import get_latest_for_project
-from backend.storage.project_persistence import save_plan
+from backend.storage.project_persistence import save_project
 
 
 def rename_project(project_id: str, name: str) -> dict | None:
@@ -21,9 +22,9 @@ def rename_project(project_id: str, name: str) -> dict | None:
     old = latest.get("name") or ""
     if old == label:
         return latest
-    return save_plan(
+    return save_project(
         label,
-        latest.get("plan") or {},
+        nodes_of(latest),
         feedback=f"Renamed: {old} → {label}",
         completed=latest.get("completed", False),
         project_id=latest["project_id"],

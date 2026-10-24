@@ -337,7 +337,7 @@ export async function sendChatMessage(
   const body: {
     text: string;
     focus_label?: string;
-    focus_step_id?: string;
+    focus_node_id?: string;
     focus_day?: string;
     about_removed?: boolean;
   } = { text };
@@ -348,7 +348,7 @@ export async function sendChatMessage(
     body.focus_label = focusLabel;
   }
   if (focusStepId) {
-    body.focus_step_id = focusStepId;
+    body.focus_node_id = focusStepId;
   }
   if (focusDay) {
     body.focus_day = focusDay;

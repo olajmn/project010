@@ -41,7 +41,7 @@ export type IsolateChat = {
 
 export type IsolateChatOptions = {
   threadEl: HTMLDivElement;
-  /** Map a focus label to a step id when history omitted focus_step_id. */
+  /** Map a focus label to a step id when history omitted focus_node_id. */
   resolveStepId?: (label: string) => string | null;
   /** A node's current label from the map, or null if it is gone. */
   labelForStepId?: (stepId: string) => string | null;
@@ -75,7 +75,7 @@ function frameOf(
   labelForStepId?: (stepId: string) => string | null,
 ): Frame | null {
   const focus = message.focus?.trim();
-  const stepId = message.focus_step_id?.trim();
+  const stepId = message.focus_node_id?.trim();
   if (stepId) {
     if (message.removed) {
       const label = focus || stepId;
@@ -155,7 +155,7 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
         if (current) {
           const frame = document.createElement("div");
           frame.className = "chat-focus-section";
-          const stepId = message.focus_step_id?.trim();
+          const stepId = message.focus_node_id?.trim();
           if (focus) frame.dataset.focusLabel = focus;
           if (stepId) frame.dataset.focusStepId = stepId;
           if (current.day && onDayClick) {
@@ -201,10 +201,10 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
       } else if (
         focus &&
         section &&
-        message.focus_step_id &&
+        message.focus_node_id &&
         !section.dataset.focusStepId
       ) {
-        section.dataset.focusStepId = message.focus_step_id.trim();
+        section.dataset.focusStepId = message.focus_node_id.trim();
       }
       (section ?? threadEl).appendChild(messageRow(message));
     }

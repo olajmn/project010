@@ -6,25 +6,25 @@ from backend.project.panes.chat.screen.chat_thread import thread_messages
 def test_only_chat_turns_show() -> None:
     # Only chat turns show: the first record, map edits, and other saved
     # lines that are not chat turns are left to Status.
-    rooms = {"progression": {"steps": [{"label": "Rooms"}]}}
+    rooms = [{"label": "Rooms"}]
     history = [
-        {"name": "House", "plan": {}, "feedback": None, "event": "created"},
+        {"name": "House", "nodes": [], "feedback": None, "event": "created"},
         {
             "name": "House",
-            "plan": rooms,
-            "feedback": "Added step: Rooms",
+            "nodes": rooms,
+            "feedback": "Added node: Rooms",
             "event": "node_added",
         },
         {
             "name": "House",
-            "plan": rooms,
+            "nodes": rooms,
             "reply": "Sure.",
             "message": "what next?",
             "event": "chat",
         },
         {
             "name": "House",
-            "plan": rooms,
+            "nodes": rooms,
             "feedback": "Inserted tree",
             "event": "tree_inserted",
         },
@@ -41,7 +41,7 @@ def test_turn_that_changed_the_map() -> None:
     added = [
         {
             "name": "House",
-            "plan": {},
+            "nodes": [],
             "reply": "Added Kitchen.",
             "message": "/add Kitchen",
             "event": "chat",
@@ -59,7 +59,7 @@ def test_map_focus_tags_each_turn() -> None:
                 "message": "what is this?",
                 "event": "chat",
                 "map_focus": "Rooms",
-                "focus_step_id": "p1",
+                "focus_node_id": "p1",
             },
             {"event": "chat", "reply": "Paint.", "message": "and now?"},
         ]
@@ -68,7 +68,7 @@ def test_map_focus_tags_each_turn() -> None:
         "role": "user",
         "text": "what is this?",
         "focus": "Rooms",
-        "focus_step_id": "p1",
+        "focus_node_id": "p1",
     }
     assert focused[1]["focus"] == "Rooms"
     assert "focus" not in focused[2]
@@ -121,18 +121,18 @@ def test_rename_notes() -> None:
                 "message": "what is this?",
                 "event": "chat",
                 "map_focus": "Surroundings",
-                "focus_step_id": "p6",
+                "focus_node_id": "p6",
             },
             {
-                "feedback": "Renamed step: Surroundings → Landscape",
+                "feedback": "Renamed node: Surroundings → Landscape",
                 "event": "node_renamed",
-                "focus_step_id": "p6",
+                "focus_node_id": "p6",
                 "created_at": "t3",
             },
             {
-                "feedback": "Renamed step: Site → Plot",
+                "feedback": "Renamed node: Site → Plot",
                 "event": "node_renamed",
-                "focus_step_id": "p5",
+                "focus_node_id": "p5",
             },
         ]
     )
@@ -140,7 +140,7 @@ def test_rename_notes() -> None:
         "role": "note",
         "text": "Renamed from “Surroundings” to “Landscape”",
         "focus": "Landscape",
-        "focus_step_id": "p6",
+        "focus_node_id": "p6",
         "at": "t3",
     }
     assert len(renamed) == 3
@@ -148,7 +148,7 @@ def test_rename_notes() -> None:
 
 def test_map_edit_with_note_in_its_text_is_not_a_turn() -> None:
     # Only lines saved as chat are turns, whatever a node is called.
-    edit = {"feedback": "Added step: Site Note: walls", "event": "node_added"}
+    edit = {"feedback": "Added node: Site Note: walls", "event": "node_added"}
     assert thread_messages([edit]) == []
 
 
@@ -166,43 +166,43 @@ def test_message_and_reply_are_kept_apart() -> None:
 
 
 def test_turns_about_a_removed_part_are_marked() -> None:
-    steps = [{"id": "p1", "label": "Rooms", "children": []}]
+    nodes = [{"id": "p1", "label": "Rooms", "children": []}]
     history = [
         {
             "event": "chat",
             "message": "a?",
             "reply": "b",
             "map_focus": "Kitchen",
-            "focus_step_id": "p9",
+            "focus_node_id": "p9",
         },
         {
             "event": "chat",
             "message": "c?",
             "reply": "d",
             "map_focus": "Rooms",
-            "focus_step_id": "p1",
+            "focus_node_id": "p1",
         },
     ]
-    shown = thread_messages(history, steps)
+    shown = thread_messages(history, nodes)
     assert [m.get("removed") for m in shown] == [True, True, None, None]
 
 
-def _turn_about(step_id: str, label: str) -> dict:
+def _turn_about(node_id: str, label: str) -> dict:
     return {
         "event": "chat",
         "message": "what belongs here?",
         "reply": "ok",
         "map_focus": label,
-        "focus_step_id": step_id,
+        "focus_node_id": node_id,
     }
 
 
-def _contexts(steps: list, history: list) -> list:
-    return [m.get("focus_context") for m in thread_messages(history, steps)[::2]]
+def _contexts(nodes: list, history: list) -> list:
+    return [m.get("focus_context") for m in thread_messages(history, nodes)[::2]]
 
 
 def test_a_label_used_twice_shows_its_parent() -> None:
-    steps = [
+    nodes = [
         {
             "id": "p1",
             "label": "Design",
@@ -220,11 +220,11 @@ def test_a_label_used_twice_shows_its_parent() -> None:
         _turn_about("p4", "Concept"),
         _turn_about("p5", "Actors"),
     ]
-    assert _contexts(steps, history) == ["Design", "Development", None]
+    assert _contexts(nodes, history) == ["Design", "Development", None]
 
 
 def test_parents_with_the_same_label_show_one_level_more() -> None:
-    steps = [
+    nodes = [
         {
             "id": "p1",
             "label": "Client A",
@@ -249,12 +249,12 @@ def test_parents_with_the_same_label_show_one_level_more() -> None:
         },
     ]
     history = [_turn_about("p3", "Fees"), _turn_about("p6", "Fees")]
-    assert _contexts(steps, history) == ["Client A / Scope", "Architect A / Scope"]
+    assert _contexts(nodes, history) == ["Client A / Scope", "Architect A / Scope"]
 
 
 def test_turns_carry_their_full_path() -> None:
     # Shown when the pointer rests on a frame's title.
-    steps = [
+    nodes = [
         {
             "id": "p1",
             "label": "Civic Centre",
@@ -268,7 +268,7 @@ def test_turns_carry_their_full_path() -> None:
         },
     ]
     shown = thread_messages(
-        [_turn_about("p3", "Concept"), _turn_about("p9", "Gone")], steps
+        [_turn_about("p3", "Concept"), _turn_about("p9", "Gone")], nodes
     )
     assert [m.get("focus_path") for m in shown] == [
         "Civic Centre / Design / Concept",

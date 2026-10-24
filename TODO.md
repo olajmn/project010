@@ -19,13 +19,15 @@ next.
     Planned 2026-10-24. One commit per step; after each, pytest, the UI
     type check, and `tools/project_check.py` (its replay check catches
     data that no longer matches).
-    1. **Backend names** (`app/backend/`, not `foundation/`): `Step` →
+    1. **Backend names** — done 2026-10-24, with step 2 (#86).
+       (`app/backend/`, not `foundation/`): `Step` →
        `Node`, `steps_of()` → `nodes_of()` (still the one place that
        knows where nodes sit on a record), `find_step()` → `find_node()`,
        `step` / `step_id` / `new_steps` → `node` / `node_id` /
        `new_nodes`, `save_plan()` → `save_project()` with `nodes`
        instead of a `plan` dict. Tests follow.
-    2. **Saved data**, with step 1: `current.json`
+    2. **Saved data** — done 2026-10-24 (#86); the page's
+       `focus_node_id` field changed with it. `current.json`
        `plan.progression.steps` → `nodes` (an empty map is `[]`, not
        `progression: null`); `focus_step_id` → `focus_node_id` on log
        lines; saved trees' `source.step_id` → `source.node_id`. One

@@ -25,7 +25,7 @@ from collections import Counter
 from datetime import date, datetime, timedelta
 
 from backend.project.changes.describe import describe_changes
-from backend.project.node import steps_of
+from backend.project.node import nodes_of
 from backend.project.timeline import to_event
 
 # ============================================================
@@ -277,8 +277,8 @@ def _summary(
     if last:
         rows.append(_row("Last change", f"{_day(last, now)} {last:%H:%M}"))
 
-    steps = steps_of(latest)
-    count, depth = _map_size(steps)
+    nodes = nodes_of(latest)
+    count, depth = _map_size(nodes)
     if count:
         levels = "level" if depth == 1 else "levels"
         rows.append(_row("Map", f"{count} nodes, {depth} {levels}"))
@@ -287,16 +287,16 @@ def _summary(
     return rows
 
 
-def _map_size(steps: list) -> tuple[int, int]:
+def _map_size(nodes: list) -> tuple[int, int]:
     """(node count, depth) of the stored map."""
     count, depth = 0, 0
-    stack = [(s, 1) for s in steps if isinstance(s, dict)]
+    stack = [(s, 1) for s in nodes if isinstance(s, dict)]
     while stack:
-        step, level = stack.pop()
+        node, level = stack.pop()
         count += 1
         depth = max(depth, level)
         stack.extend(
-            (c, level + 1) for c in step.get("children") or [] if isinstance(c, dict)
+            (c, level + 1) for c in node.get("children") or [] if isinstance(c, dict)
         )
     return count, depth
 

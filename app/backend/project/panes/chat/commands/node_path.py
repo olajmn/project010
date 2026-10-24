@@ -40,18 +40,18 @@ def slash_path_error(args: str) -> str | None:
     return None
 
 
-def id_at_path(steps: list, labels: list[str]) -> str | None:
+def id_at_path(nodes: list, labels: list[str]) -> str | None:
     """Walk label path from the forest root; first match at each level."""
-    level = steps
+    level = nodes
     current_id: str | None = None
     for label in labels:
         wanted = label.strip()
         match = None
-        for step in level:
-            if not isinstance(step, dict):
+        for node in level:
+            if not isinstance(node, dict):
                 continue
-            if (step.get("label") or "").strip() == wanted:
-                match = step
+            if (node.get("label") or "").strip() == wanted:
+                match = node
                 break
         if match is None:
             return None

@@ -16,7 +16,7 @@ One position in a project's tree, with a parent and children. The same
 shape is used at every depth: depth is where a node sits, not what kind
 of node it is. Canvas draws
 nodes and chat talks about them; neither owns the shape. `node.py`
-(`Step`) defines it, with no model call and no persistence.
+(`Node`) defines it, with no model call and no persistence.
 
 ## Fields
 
@@ -37,8 +37,8 @@ render time and is never stored.
 Three different things (`docs/05-decisions.md` #52):
 
 - **`id`** is the identity. Every backend write finds a node by id
-  (`find_step()`, `remove_map_node()`, `parent_id`), the UI selects by id,
-  and chat turns about a node store `focus_step_id`.
+  (`find_node()`, `remove_map_node()`, `parent_id`), the UI selects by id,
+  and chat turns about a node store `focus_node_id`.
 - **`label`** is an attribute people use to describe the node. Two nodes
   may share a label.
 - **Name path** (`Parent / Child`) is an addressing mechanism: `/add`
@@ -57,15 +57,15 @@ Node ids, like every id in the app, are made in `backend/identity/`
 
 ## Rules
 - **Sibling labels stay unique**, as an addressing and readability rule,
-  not an identity rule. A user-written clash (+, paste, folder, `/add`,
-  `Step.add_child`) is numbered: `Taco`, `Taco (2)`, `Taco (3)`
+  not an identity rule. A user-written clash (+, paste, folder, `/add`)
+  is numbered: `Taco`, `Taco (2)`, `Taco (3)`
   (`unique_sibling_label()`, `docs/05-decisions.md` #53).
 
 ## Where nodes live
 
-Stored as plain dicts under `plan.progression.steps` in
+Stored as plain dicts under `nodes` in
 `data/projects/{id}/current.json`.
-Read them with `steps_of(record)` in `node.py`, the one place that
+Read them with `nodes_of(record)` in `node.py`, the one place that
 knows where they sit on a record; all writes go through
 `panes/canvas/edit_map.py`. `tree_as_text.py` turns a tree into
 indented labels for the model.

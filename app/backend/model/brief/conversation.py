@@ -15,7 +15,7 @@ No model call, nothing saved. The rules it keeps: docs/chat.md.
 from backend.model.brief.budget import CHARS_PER_TOKEN
 from backend.model.brief.talk_prompt import BEHAVIOR, EXAMPLES, LIMITS, ROLE, TASK
 from backend.model.client import PROMPT_TOKENS
-from backend.project.node import find_path, path_lines, steps_of, tree_lines
+from backend.project.node import find_path, nodes_of, path_lines, tree_lines
 from backend.project.status.build_status import changes_on_day_text, day_name
 
 # Earlier turns kept per Send. Bounds prompt size on a local model;
@@ -34,7 +34,7 @@ def build_messages(
     note: str,
     history: list[dict],
     map_focus: str | None = None,
-    focus_step_id: str | None = None,
+    focus_node_id: str | None = None,
     status: str | None = None,
     focus_day: str | None = None,
     about_removed: bool = False,
@@ -48,19 +48,19 @@ def build_messages(
     part is in the tree now. `about_removed` is the one exception: the
     message was sent from a removed part's own conversation, so that
     part, named by `map_focus`, stays the subject, marked as removed."""
-    steps = steps_of(latest)
+    nodes = nodes_of(latest)
     selected_day = changes_on_day_text(history, focus_day) if focus_day else None
     gone = (map_focus or "").strip() if about_removed else ""
-    if gone and focus_step_id and find_path(steps, focus_step_id) is not None:
+    if gone and focus_node_id and find_path(nodes, focus_node_id) is not None:
         gone = ""  # it is in the tree after all
-    system = _system_text(latest, focus_step_id, status, selected_day, gone)
+    system = _system_text(latest, focus_node_id, status, selected_day, gone)
     messages = [{"role": "system", "content": system}]
-    messages.extend(past_turns(history, steps))
+    messages.extend(past_turns(history, nodes))
     if gone:
         part: str | None = f"{gone}{_REMOVED}"
     else:
         # No saved label to fall back on: a selected part not in the tree is none.
-        part = _part_name(None, focus_step_id, steps)
+        part = _part_name(None, focus_node_id, nodes)
     messages.append(
         {"role": "user", "content": _with_focus(note, part or _day_tag(focus_day))}
     )
@@ -69,13 +69,13 @@ def build_messages(
 
 def past_turns(
     history: list[dict],
-    steps: list | None = None,
+    nodes: list | None = None,
 ) -> list[dict]:
     """Saved chat turns as alternating user/assistant messages, oldest
     first. Map edits and the project's first record carry no chat turn
     and are skipped.
 
-    With `steps` (the tree now), a turn's part is named by its path, as
+    With `nodes` (the tree now), a turn's part is named by its path, as
     it is called today, with its name then after a rename, or marked as
     removed; without, by the label saved with the turn."""
     turns: list[dict] = []
@@ -87,8 +87,8 @@ def past_turns(
         then = record.get("map_focus")
         part = (
             then
-            if steps is None
-            else _part_name(then, record.get("focus_step_id"), steps)
+            if nodes is None
+            else _part_name(then, record.get("focus_node_id"), nodes)
         )
         focus = part or _day_tag(record.get("focus_day"))
         turns.append({"role": "user", "content": _with_focus(note, focus)})
@@ -98,7 +98,7 @@ def past_turns(
 
 def _system_text(
     latest: dict,
-    focus_step_id: str | None,
+    focus_node_id: str | None,
     status: str | None = None,
     selected_day: str | None = None,
     removed_part: str = "",
@@ -111,7 +111,7 @@ def _system_text(
         ("EXAMPLES", EXAMPLES),
         (
             "PROJECT BACKGROUND",
-            _background(latest, focus_step_id, status, selected_day, removed_part),
+            _background(latest, focus_node_id, status, selected_day, removed_part),
         ),
     ]
     return "\n\n".join(f"{title}\n{text}" for title, text in slots if text)
@@ -119,7 +119,7 @@ def _system_text(
 
 def _background(
     latest: dict,
-    focus_step_id: str | None,
+    focus_node_id: str | None,
     status: str | None,
     selected_day: str | None = None,
     removed_part: str = "",
@@ -139,8 +139,8 @@ def _background(
             "Status (computed from the project's saved changes; treat it "
             "as fact):\n" + status
         )
-    steps = steps_of(latest)
-    structure = _within(tree_lines(steps), STRUCTURE_TOKENS, "parts")
+    nodes = nodes_of(latest)
+    structure = _within(tree_lines(nodes), STRUCTURE_TOKENS, "parts")
     parts.append(
         "Structure (names only, each indented under the part it belongs "
         "to):\n" + (structure or "The project has no parts yet.")
@@ -148,8 +148,8 @@ def _background(
     # Path from the top down to the selected part; nothing when the part
     # is not in the tree now.
     selected = (
-        _within(path_lines(steps, focus_step_id), STRUCTURE_TOKENS // 2, "lines")
-        if focus_step_id
+        _within(path_lines(nodes, focus_node_id), STRUCTURE_TOKENS // 2, "lines")
+        if focus_node_id
         else ""
     )
     if selected:
@@ -193,19 +193,19 @@ def _within(lines: list[str], max_tokens: int, unit: str) -> str:
     return text
 
 
-def _part_name(then: str | None, step_id: str | None, steps: list) -> str | None:
+def _part_name(then: str | None, node_id: str | None, nodes: list) -> str | None:
     """A part as the model is told about it: its path from the top
     ("Rooms / Planning"), with "(then called <then>)" after a rename, or
     "<then> (since removed)" when it is no longer in the tree. Without an
     id, the label saved with the turn."""
     then = (then or "").strip()
-    wanted = (step_id or "").strip()
+    wanted = (node_id or "").strip()
     if not wanted:
         return then or None
-    path = find_path(steps, wanted)
+    path = find_path(nodes, wanted)
     if path is None:
         return f"{then}{_REMOVED}" if then else None
-    names = [(step.get("label") or "").strip() for step in path]
+    names = [(node.get("label") or "").strip() for node in path]
     name = " / ".join(names)
     if then and then != names[-1]:
         name += f" (then called {then})"
