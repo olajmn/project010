@@ -84,14 +84,15 @@ Everything lives in `app/data/` as plain JSON:
 | File | Holds |
 |---|---|
 | `projects/{id}/current.json` | The project now: name, account, `account_n`, and `plan.progression.steps` (the nodes) with `plan.node_id_hi` |
-| `projects/{id}/events.jsonl` | One slim line per saved change: event, feedback, times, focus — the source for chat history, status, and logs |
+| `projects/{id}/events.jsonl` | One slim line per saved change: event, feedback (a chat turn: `message` and `reply` instead), times, focus — the source for chat history, status, and logs |
 | `accounts.json` | Accounts; a deleted one leaves a tombstone so its id is never reused |
 | `saved_trees.json` | Saved trees per account, with `id_hi` |
 
 - Ids that are never reused: node ids (per project), saved-tree ids,
   account ids, per-account project numbers. Global `project_id` is
   `max + 1`, so deleting the newest project frees its id.
-- Every file is in the current format (converted once, 2026-09-27):
+- Every file is in the current format (converted once, 2026-09-27;
+  chat turns split into `message` and `reply` once, 2026-10-24):
   there is no code for reading older formats. The `.bak` files in
   `data/` are leftovers from earlier conversions; nothing reads them.
 

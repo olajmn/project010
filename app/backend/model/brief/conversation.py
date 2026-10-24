@@ -20,9 +20,6 @@ from backend.project.status.build_status import changes_on_day_text, day_name
 # older turns stay saved and shown, just not re-sent.
 MAX_TURNS = 20
 
-# Chat turns are saved as "<reply> Note: <user note>" (reply.py).
-_NOTE_MARKER = " Note: "
-
 
 def build_messages(
     latest: dict,
@@ -60,10 +57,10 @@ def past_turns(
     both, so earlier replies that use the old name still make sense."""
     turns: list[dict] = []
     for record in history:
-        feedback = record.get("feedback") or ""
-        if record.get("event") != "chat" or _NOTE_MARKER not in feedback:
+        if record.get("event") != "chat":
             continue
-        reply, note = feedback.split(_NOTE_MARKER, 1)
+        note = record.get("message") or ""
+        reply = record.get("reply") or ""
         focus = _focus_tag(
             _label_now(record, current_labels or {}),
             record.get("focus_day"),

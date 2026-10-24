@@ -105,12 +105,14 @@ def _save_talk(
     focus_step_id: str | None = None,
     focus_day: str | None = None,
 ) -> dict:
-    """Keep the map as it is; store the turn as "<reply> Note: <note>",
-    the shape screen/chat_thread.py and model/brief/conversation.py read."""
+    """Keep the map as it is; store the turn's message and reply in their
+    own fields, which screen/chat_thread.py and model/brief/conversation.py
+    read."""
     return save_plan(
         latest.get("name") or "",
         latest.get("plan") or {},
-        feedback=f"{text} Note: {note}",
+        message=note,
+        reply=text,
         project_id=latest["project_id"],
         account_id=latest.get("account_id"),
         event="chat",

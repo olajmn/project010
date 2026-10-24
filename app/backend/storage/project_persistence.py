@@ -109,6 +109,8 @@ def _slim_event(record: dict) -> dict:
         "map_focus",
         "focus_step_id",
         "focus_day",
+        "message",
+        "reply",
         "name",
         "account_id",
         "completed",
@@ -261,6 +263,8 @@ def save_plan(
     map_focus: str | None = None,
     focus_step_id: str | None = None,
     focus_day: str | None = None,
+    message: str | None = None,
+    reply: str | None = None,
 ) -> dict:
     """
     Update the project's current SoT and append one slim event.
@@ -276,6 +280,7 @@ def save_plan(
     is focused.
     `focus_day` (YYYY-MM-DD) marks a chat turn about one day's changes
     instead, the same way.
+    `message` / `reply` are a chat turn's two sides, each in its own field.
 
     Returns the current record that was saved.
     """
@@ -310,6 +315,10 @@ def save_plan(
     day = (focus_day or "").strip()
     if day:
         record["focus_day"] = day
+    if message is not None:
+        record["message"] = message
+    if reply is not None:
+        record["reply"] = reply
 
     _write_json(current_path(pid), record)
     _append_event(pid, _slim_event(record))

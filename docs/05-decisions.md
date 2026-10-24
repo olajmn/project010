@@ -888,6 +888,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; the tools only read the code. The formatting stays as it is if they are dropped.
 
+## 75. 2026-10-24 — A chat turn is saved as two fields, message and reply
+
+**Decision:** A chat turn is a line saved with `event: "chat"`, holding the user's `message` and the model's `reply` in their own fields (`save_plan()` in `storage/project_persistence.py`, written by `panes/chat/reply.py`). Only such lines are read as turns, by the chat on screen (`screen/chat_thread.py`), by what the model is sent (`model/brief/conversation.py`), and by Logs (`project/timeline.py`). The 19 turns saved before, in `app/data/` and `app/demo_seed/`, were converted once by a one-off script that split each at the first ` Note: `, as the old reading code did, and checked that every project's chat read the same before and after; `app/data/` was backed up first. There is no code for the old shape.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** a less common separator than ` Note: ` (any text can still contain it); reading both shapes (keeps the fragile split in the code for old turns); recognising turns by the text alone (a node named "Site Note: walls" read as a conversation).
+
+**Why this choice:** The reply and the message were one text with ` Note: ` between them, so a reply containing ` Note: ` was split in the wrong place, and a map edit naming such a node showed up as a turn. Separate fields cannot be mixed up by anything written in them. First rule of `TODO.md` 71.
+
+**Reversible?** Only by converting back; the backup of `app/data/` from before the conversion is outside the repository.
+
 ## See also
 
 - [[03-architecture]]

@@ -17,13 +17,8 @@ next.
     Rules to start from: a chat turn is only what was saved as one
     (`event: "chat"`); a node is identified by its id, not its label;
     the model is told when a node it has heard about is gone.
-    1. **Reply and message share one text field.** A turn is saved as
-       `"<reply> Note: <message>"` and split at the first ` Note: `
-       (`panes/chat/reply.py`, `screen/chat_thread.py`,
-       `model/brief/conversation.py`, `project/timeline.py`). A reply
-       that contains ` Note: ` is split in the wrong place. Store reply
-       and message in their own fields; decide whether saved turns in
-       `data/` are converted once or both shapes are read.
+    1. ~~Reply and message share one text field~~ — fixed 2026-10-24:
+       saved as `message` and `reply`; old turns converted once (#75).
     2. ~~A map edit can pass for a chat turn~~ — fixed 2026-10-24:
        only `event: "chat"` lines are read as turns.
     3. **Removed nodes stay in the conversation.** Past turns about a

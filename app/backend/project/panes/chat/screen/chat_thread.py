@@ -1,8 +1,9 @@
 """
 The list of messages shown in the chat panel.
 
-Built from saved chat - no model call. Chat turns are shown: a saved
-"<reply> Note: <note>" is one user line and one agent line. One kind of
+Built from saved chat - no model call. Chat turns are shown: a line
+saved with `event: "chat"` is one user line (its `message`) and one
+agent line (its `reply`). One kind of
 map edit also shows, as a quiet note: renaming a node that has been
 talked about, inside that node's conversation, so earlier turns that use
 the old name still make sense (docs/05-decisions.md #71). Other map
@@ -11,9 +12,6 @@ not here — same rule as model/brief/conversation.past_turns().
 """
 
 from backend.project.panes.create.resolver import get_history_for_project
-
-# Chat turns are saved as "<reply> Note: <user note>" (chat/reply.py).
-_NOTE_MARKER = " Note: "
 
 # A node rename is saved as "Renamed step: <old> → <new>"
 # (panes/canvas/edit_map.rename_map_node()).
@@ -44,14 +42,14 @@ def thread_messages(history: list[dict]) -> list[dict]:
     } - {""}
     messages: list[dict] = []
     for record in history:
-        feedback = record.get("feedback") or ""
         note_line = _rename_note(record, talked_about)
         if note_line:
             messages.append(note_line)
             continue
-        if record.get("event") != "chat" or _NOTE_MARKER not in feedback:
+        if record.get("event") != "chat":
             continue
-        reply, note = feedback.split(_NOTE_MARKER, 1)
+        note = record.get("message") or ""
+        reply = record.get("reply") or ""
         focus = (record.get("map_focus") or "").strip() or None
         step = (record.get("focus_step_id") or "").strip() or None
         extra: dict = {}

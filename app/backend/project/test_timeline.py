@@ -17,7 +17,8 @@ def test_to_event() -> None:
     chat = to_event(
         {
             "project_id": 4,
-            "feedback": "Sure. Note: what next?",
+            "reply": "Sure.",
+            "message": "what next?",
             "created_at": "2026-09-25T18:00:00.000+00:00",
             "event": "chat",
         },

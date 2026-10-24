@@ -5,7 +5,7 @@ from backend.project.panes.chat.screen.chat_thread import thread_messages
 
 def test_only_chat_turns_show() -> None:
     # Only chat turns show: the first record, map edits, and other saved
-    # lines without "<reply> Note: <note>" are left to Status.
+    # lines that are not chat turns are left to Status.
     rooms = {"progression": {"steps": [{"label": "Rooms"}]}}
     history = [
         {"name": "House", "plan": {}, "feedback": None, "event": "created"},
@@ -18,7 +18,8 @@ def test_only_chat_turns_show() -> None:
         {
             "name": "House",
             "plan": rooms,
-            "feedback": "Sure. Note: what next?",
+            "reply": "Sure.",
+            "message": "what next?",
             "event": "chat",
         },
         {
@@ -41,7 +42,8 @@ def test_turn_that_changed_the_map() -> None:
         {
             "name": "House",
             "plan": {},
-            "feedback": "Added Kitchen. Note: /add Kitchen",
+            "reply": "Added Kitchen.",
+            "message": "/add Kitchen",
             "event": "chat",
         },
     ]
@@ -53,12 +55,13 @@ def test_map_focus_tags_each_turn() -> None:
     focused = thread_messages(
         [
             {
-                "feedback": "A room. Note: what is this?",
+                "reply": "A room.",
+                "message": "what is this?",
                 "event": "chat",
                 "map_focus": "Rooms",
                 "focus_step_id": "p1",
             },
-            {"event": "chat", "feedback": "Paint. Note: and now?"},
+            {"event": "chat", "reply": "Paint.", "message": "and now?"},
         ]
     )
     assert focused[0] == {
@@ -78,7 +81,8 @@ def test_turn_about_a_day() -> None:
         [
             {
                 "event": "chat",
-                "feedback": "Two edits. Note: what changed?",
+                "reply": "Two edits.",
+                "message": "what changed?",
                 "focus_day": "2026-09-27",
             }
         ]
@@ -97,7 +101,8 @@ def test_at_times() -> None:
         [
             {
                 "event": "chat",
-                "feedback": "Ok. Note: hi",
+                "reply": "Ok.",
+                "message": "hi",
                 "sent_at": "t1",
                 "created_at": "t2",
             },
@@ -112,7 +117,8 @@ def test_rename_notes() -> None:
     renamed = thread_messages(
         [
             {
-                "feedback": "Outside. Note: what is this?",
+                "reply": "Outside.",
+                "message": "what is this?",
                 "event": "chat",
                 "map_focus": "Surroundings",
                 "focus_step_id": "p6",
@@ -144,3 +150,16 @@ def test_map_edit_with_note_in_its_text_is_not_a_turn() -> None:
     # Only lines saved as chat are turns, whatever a node is called.
     edit = {"feedback": "Added step: Site Note: walls", "event": "node_added"}
     assert thread_messages([edit]) == []
+
+
+def test_message_and_reply_are_kept_apart() -> None:
+    # Saved in their own fields, so no text inside either can split them.
+    turn = {
+        "event": "chat",
+        "message": "what now? Note: walls are wet",
+        "reply": "Paint first. Note: let them dry.",
+    }
+    assert thread_messages([turn]) == [
+        {"role": "user", "text": "what now? Note: walls are wet"},
+        {"role": "agent", "text": "Paint first. Note: let them dry."},
+    ]

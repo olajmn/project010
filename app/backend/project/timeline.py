@@ -101,7 +101,7 @@ def to_event(record: dict, project_name: str) -> dict:
     name = event_name(record)
     feedback = (record.get("feedback") or "").strip()
     if name == "chat":
-        text = feedback.split(" Note: ", 1)[-1]
+        text = (record.get("message") or "").strip()
     elif name in ("created", "archived"):
         text = ""
     else:

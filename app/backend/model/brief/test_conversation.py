@@ -19,10 +19,11 @@ LATEST = {
 HISTORY = [
     {"feedback": None},  # first record: no turn
     {"feedback": "Zoomed into: Beds"},  # map edit: no turn
-    {"event": "chat", "feedback": "Sounds good. Note: hello"},
+    {"event": "chat", "reply": "Sounds good.", "message": "hello"},
     {
         "event": "chat",
-        "feedback": "Beds hold soil. Note: what is this",
+        "reply": "Beds hold soil.",
+        "message": "what is this",
         "map_focus": "Beds",
     },
 ]
@@ -57,7 +58,8 @@ def test_messages_with_nothing_selected() -> None:
 
 def test_past_turns_are_capped() -> None:
     many = [
-        {"event": "chat", "feedback": f"r{i} Note: n{i}"} for i in range(MAX_TURNS + 5)
+        {"event": "chat", "reply": f"r{i}", "message": f"n{i}"}
+        for i in range(MAX_TURNS + 5)
     ]
     assert len(past_turns(many)) == 2 * MAX_TURNS
     assert past_turns(many)[-1]["content"] == f"r{MAX_TURNS + 4}"
@@ -105,7 +107,8 @@ def test_selected_day_of_changes() -> None:
             "created_at": "2026-09-20T12:00:00",
         },
         {
-            "feedback": "Two beds. Note: what changed?",
+            "reply": "Two beds.",
+            "message": "what changed?",
             "event": "chat",
             "created_at": "2026-09-20T13:00:00",
             "focus_day": "2026-09-20",
@@ -134,7 +137,8 @@ def test_renamed_node_in_past_turns() -> None:
     }
     talk = [
         {
-            "feedback": "Beds hold soil. Note: what is this",
+            "reply": "Beds hold soil.",
+            "message": "what is this",
             "event": "chat",
             "map_focus": "Beds",
             "focus_step_id": "p1",
@@ -154,3 +158,16 @@ def test_map_edit_with_note_in_its_text_is_not_a_turn() -> None:
     # Only lines saved as chat are turns, whatever a node is called.
     edit = {"feedback": "Added step: Site Note: walls", "event": "node_added"}
     assert past_turns([edit]) == []
+
+
+def test_message_and_reply_are_kept_apart() -> None:
+    # Saved in their own fields, so no text inside either can split them.
+    turn = {
+        "event": "chat",
+        "message": "what now? Note: walls are wet",
+        "reply": "Paint first. Note: let them dry.",
+    }
+    assert past_turns([turn]) == [
+        {"role": "user", "content": "what now? Note: walls are wet"},
+        {"role": "assistant", "content": "Paint first. Note: let them dry."},
+    ]

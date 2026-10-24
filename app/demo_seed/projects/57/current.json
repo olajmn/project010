@@ -642,12 +642,13 @@
     },
     "node_id_hi": 168
   },
-  "feedback": "This part is a time slot scheduled for Monday at 18:00 to 20:00 under the Plan section of the project. It does not specify what activities are planned for that time yet. Note: What's this?",
   "completed": false,
   "cancelled": false,
   "created_at": "2026-10-16T13:40:00.000+00:00",
   "event": "chat",
   "sent_at": "2026-10-16T13:39:48.000+00:00",
   "map_focus": "18.00-20.00",
-  "focus_step_id": "p109"
+  "focus_step_id": "p109",
+  "message": "What's this?",
+  "reply": "This part is a time slot scheduled for Monday at 18:00 to 20:00 under the Plan section of the project. It does not specify what activities are planned for that time yet."
 }
