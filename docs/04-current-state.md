@@ -131,8 +131,9 @@ How a message is built and sent, and its rules: [[chat]].
   prompt and is cut past that with a note ("the first N of M parts").
   A prompt still over the budget without past turns is reported in the
   terminal.
-- The model sees labels only — not node ids, file contents, or anything
-  outside the project.
+- Besides the project's status and changes, the model sees node names
+  only — not node ids, not what is inside a file or folder a node
+  names, and nothing outside the open project.
 
 ## 5. Known limits
 

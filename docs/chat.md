@@ -49,7 +49,7 @@ Ids are never reused ([[05-decisions]] #52), so a removed node's id keeps meanin
 
 ## 5. What it does not do
 
-- The model sees names only: not node ids, file contents, or anything outside the project.
+- The model sees what § 3 lists and nothing more: no node ids, nothing inside a file or folder a node names (only the name), and nothing outside the open project.
 - It cannot change the project; slash commands (`/add`, `/select`, `/id`) do, without the model.
 - A small model does not always use what it is given well; a reply can still be wrong while the prompt was right. Whether the structure helps at all is `TODO.md` 69; how much context the chat should get, 63.
 
