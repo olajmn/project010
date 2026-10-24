@@ -164,6 +164,17 @@ next.
 
 ### Demo and login
 
+76. **Times written by the server use the server's time zone** (Bug)
+    — times are saved in UTC, and the browser shows them in local time,
+    but text made on the server (Current state's "Last change", the
+    changes the chat's model reads, `project/status/build_status.py`)
+    uses the server's own zone. On Fly.io that is UTC, so the demo is 2
+    hours early in Norway; locally the server is this Mac and is right.
+    Options: set `TZ = "Europe/Oslo"` in `app/fly.toml` (one line, every
+    visitor sees Norwegian time; check the image has time zone data), or
+    the browser sends its zone and the server uses it (each visitor sees
+    their own time).
+
 58. **Login** (Step, **paused** by [[05-decisions]] #70) — one user
     signs in and manages several accounts. Plan: `docs/auth-plan.md`;
     branch `auth`.
