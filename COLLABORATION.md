@@ -23,6 +23,7 @@ Different questions about this project are answered by different documents, with
 | What is the product, concretely? | `docs/02-product.md` | Scope/intent — what's being built, not how |
 | How is it built? | `docs/03-architecture.md` | Layers and boundary rules — verify against the code when it matters |
 | How does the screen look, and where is UI code? | `docs/ui.md` | Layout, look, and the `src/` ↔ `css/` mirror — verify against the UI |
+| How does the chat build what the model is sent? | `docs/chat.md` | The path of one message and the rules its tests check — verify against the code |
 | What is true now? | `docs/04-current-state.md` | Orientation only — verify against relevant code, structure, or runtime behavior when it matters |
 | Why was it done this way? | `docs/05-decisions.md` | Settled, unless explicitly flagged |
 | What happened, and when? | `docs/05-decisions.md` and git history | Accurate for its date — not for today |

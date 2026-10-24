@@ -9,7 +9,7 @@ Puts together what the model is sent when you press Send, in order:
 2. The earlier chat, as real back-and-forth messages.
 3. Your new message.
 
-No model call, nothing saved.
+No model call, nothing saved. The rules it keeps: docs/chat.md.
 """
 
 from backend.model.brief.budget import CHARS_PER_TOKEN

@@ -36,6 +36,8 @@ next.
        `model/client.py`) and fits each prompt itself, dropping the
        oldest turns with a note (`model/brief/budget.py`, #77). Measured
        before: Ollama kept the system text but dropped the oldest turns.
+    Remaining: `docs/chat.md` describes the path and the rules —
+    written 2026-10-24; this item can close once it has been read.
     Related, not part of this item: how much context the chat gets
     (63), whether the structure helps at all (69), and `/select` hints
     (53).

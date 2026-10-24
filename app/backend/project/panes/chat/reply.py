@@ -8,7 +8,7 @@ Cases:
   model/brief/conversation.py puts together.
 
 The message and reply are saved, so the chat is still there after a
-reload.
+reload. The whole path and its rules: docs/chat.md.
 """
 
 from backend.model.brief.budget import fit_to_budget

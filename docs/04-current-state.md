@@ -98,6 +98,8 @@ Everything lives in `app/data/` as plain JSON:
 
 ## 4. The model
 
+How a message is built and sent, and its rules: [[chat]].
+
 - Local **Ollama**, model `qwen3.5:9b`, temperature 0.2
   (`backend/model/client.py`), used for chat replies only. A failed
   reply is not retried; the chat shows the error.

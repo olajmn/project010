@@ -72,6 +72,9 @@ EXPECTED_DOCS = [
     # Deliberately unnumbered - how the public demo works and where its
     # code lives (decision #70).
     "demo.md",
+    # Deliberately unnumbered - how a chat message is built and sent,
+    # and the rules that keep it exact (decisions #75-#77).
+    "chat.md",
 ]
 
 # Files/directories outside docs/ scanned for docs/<name>.md-style
