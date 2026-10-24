@@ -5,14 +5,13 @@ human Print feature. Same shape text_to_tree.py parses so every
 consumer looks at the same tree.
 """
 
-MAX_LINES = 400
-
 
 def tree_lines(steps: list) -> list[str]:
-    """Indented labels from this forest, capped at MAX_LINES."""
+    """Indented labels from this forest, every node. A caller with a
+    size limit cuts it and says so (model/brief/conversation.py)."""
     lines: list[str] = []
     _collect(steps, 0, lines)
-    return lines[:MAX_LINES]
+    return lines
 
 
 def tree_of(step: dict) -> list[str]:
@@ -55,7 +54,7 @@ def path_lines(steps: list, step_id: str) -> list[str]:
         raw = line.lstrip()
         extra = (len(line) - len(raw)) // 2
         lines.append(f"{'  ' * (last_depth + extra)}{raw}")
-    return lines[:MAX_LINES]
+    return lines
 
 
 def find_step(steps: list, step_id: str) -> dict | None:

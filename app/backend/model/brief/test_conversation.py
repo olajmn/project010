@@ -248,3 +248,22 @@ def test_asking_about_a_removed_part_on_purpose() -> None:
     system = messages[0]["content"]
     assert 'asking about "Kitchen", a part that was removed' in system
     assert "Nothing is selected" not in system
+
+
+def _wide_tree(n: int) -> dict:
+    steps = [{"id": f"p{i}", "label": f"Part {i}", "children": []} for i in range(n)]
+    return {"name": "Big", "plan": {"progression": {"steps": steps}}}
+
+
+def test_structure_has_no_fixed_line_cap() -> None:
+    system = build_messages(_wide_tree(500), "hi", [])[0]["content"]
+    assert "Part 499" in system and "Structure cut" not in system
+
+
+def test_structure_cut_only_to_fit_and_says_so(monkeypatch) -> None:
+    from backend.model.brief import conversation
+
+    monkeypatch.setattr(conversation, "STRUCTURE_TOKENS", 100)
+    system = build_messages(_wide_tree(500), "hi", [])[0]["content"]
+    assert "Part 0" in system and "Part 499" not in system
+    assert "of 500 parts are shown; the rest are left out" in system

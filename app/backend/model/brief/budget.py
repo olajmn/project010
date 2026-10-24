@@ -24,7 +24,10 @@ def estimate_tokens(messages: list[dict]) -> int:
 def fit_to_budget(messages: list[dict], budget: int) -> list[dict]:
     """`messages` ([system, past turns..., new message]) cut to `budget`
     tokens by leaving out the oldest past turns."""
-    if estimate_tokens(messages) <= budget or len(messages) < 3:
+    if estimate_tokens(messages) <= budget:
+        return messages
+    if len(messages) < 3:
+        print(f"(debug: prompt over the budget of {budget} tokens with no past turns)")
         return messages
     system, turns, new = messages[0], messages[1:-1], messages[-1]
     dropped = 0
@@ -41,5 +44,11 @@ def fit_to_budget(messages: list[dict], budget: int) -> list[dict]:
             *kept,
             new,
         ]
-        if not kept or estimate_tokens(fitted) <= budget:
+        if estimate_tokens(fitted) <= budget:
+            return fitted
+        if not kept:
+            # Not silent: the instructions and background alone are over.
+            print(
+                f"(debug: prompt over the budget of {budget} tokens even without past turns)"
+            )
             return fitted

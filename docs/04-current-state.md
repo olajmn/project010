@@ -125,7 +125,10 @@ Everything lives in `app/data/` as plain JSON:
   silently. Before sending, `model/brief/budget.py` leaves out the
   oldest turns if a prompt would not fit, and says so in the system
   text; the instructions and background are never cut ([[05-decisions]]
-  #77).
+  #77). The structure has no fixed cap: it may use a third of the
+  prompt and is cut past that with a note ("the first N of M parts").
+  A prompt still over the budget without past turns is reported in the
+  terminal.
 - The model sees labels only — not node ids, file contents, or anything
   outside the project.
 

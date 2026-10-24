@@ -12,13 +12,18 @@ Puts together what the model is sent when you press Send, in order:
 No model call, nothing saved.
 """
 
+from backend.model.brief.budget import CHARS_PER_TOKEN
 from backend.model.brief.talk_prompt import BEHAVIOR, EXAMPLES, LIMITS, ROLE, TASK
+from backend.model.client import PROMPT_TOKENS
 from backend.project.node import find_path, path_lines, steps_of, tree_lines
 from backend.project.status.build_status import changes_on_day_text, day_name
 
 # Earlier turns kept per Send. Bounds prompt size on a local model;
 # older turns stay saved and shown, just not re-sent.
 MAX_TURNS = 20
+
+# The structure's share of the prompt; past that, it is cut with a note.
+STRUCTURE_TOKENS = PROMPT_TOKENS // 3
 
 
 def build_messages(
@@ -132,14 +137,18 @@ def _background(
             "as fact):\n" + status
         )
     steps = steps_of(latest)
-    structure = "\n".join(tree_lines(steps)) or "The project has no parts yet."
+    structure = _within(tree_lines(steps), STRUCTURE_TOKENS, "parts")
     parts.append(
         "Structure (names only, each indented under the part it belongs "
-        "to):\n" + structure
+        "to):\n" + (structure or "The project has no parts yet.")
     )
     # Path from the top down to the selected part; nothing when the part
     # is not in the tree now.
-    selected = "\n".join(path_lines(steps, focus_step_id)) if focus_step_id else ""
+    selected = (
+        _within(path_lines(steps, focus_step_id), STRUCTURE_TOKENS // 2, "lines")
+        if focus_step_id
+        else ""
+    )
     if selected:
         parts.append(
             "The user has selected this part (shown with what it sits under "
@@ -162,6 +171,26 @@ def _background(
 
 
 _REMOVED = " (since removed)"
+
+
+def _within(lines: list[str], max_tokens: int, unit: str) -> str:
+    """`lines` joined, or as many as fit `max_tokens` with a note that
+    says how many of them are shown."""
+    budget = max_tokens * CHARS_PER_TOKEN
+    kept: list[str] = []
+    used = 0
+    for line in lines:
+        used += len(line) + 1
+        if used > budget:
+            break
+        kept.append(line)
+    text = "\n".join(kept)
+    if len(kept) < len(lines):
+        text += (
+            f"\n(Cut to fit: the first {len(kept)} of {len(lines)} {unit} are "
+            "shown; the rest are left out.)"
+        )
+    return text
 
 
 def _part_name(then: str | None, step_id: str | None, steps: list) -> str | None:

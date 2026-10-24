@@ -27,9 +27,10 @@ next.
        it counts as nothing selected, and is not saved with the turn.
     5. ~~Same label in two places~~ — fixed 2026-10-24: turns are tagged
        by path, e.g. `Rooms / Planning`.
-    6. **The structure is cut at 400 lines without saying so**
-       (`MAX_LINES` in `project/node/tree_as_text.py`); the model is
-       told it sees every name.
+    6. ~~The structure is cut at 400 lines without saying so~~ — fixed
+       2026-10-24: no fixed cap; the structure gets a third of the
+       prompt (`STRUCTURE_TOKENS` in `conversation.py`) and is cut only
+       past that, with a note saying how many parts are shown.
     7. ~~Ollama cuts the prompt at 4,096 tokens without saying so~~ —
        fixed 2026-10-24: the app asks for 32,768 (`CONTEXT_TOKENS` in
        `model/client.py`) and fits each prompt itself, dropping the

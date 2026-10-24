@@ -44,3 +44,8 @@ def test_instructions_and_background_are_never_cut() -> None:
     fitted = fit_to_budget(messages, 10)
     assert [m["role"] for m in fitted] == ["system", "user"]
     assert fitted[0]["content"].startswith("S" * 900)
+
+
+def test_a_prompt_too_large_even_alone_is_reported(capsys) -> None:
+    fit_to_budget(_prompt(2), 10)
+    assert "over the budget" in capsys.readouterr().out
