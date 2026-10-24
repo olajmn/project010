@@ -42,6 +42,22 @@ next.
     a decision in `05-decisions.md`. One commit per step, with the UI
     type check and a look in the browser.
 
+77. **A project always has an account** (Step, next after 75) — like
+    an address on a chain, something always holds a project: nothing
+    exists without an owner, and giving one up is a recorded change to
+    another holder, not an empty field. Today a project may have no
+    account (`account_id` null). Where that is allowed: creating a
+    project without one (`panes/create/lifecycle.py`), unlinking one
+    (`panes/create/project_account.py`, `POST /api/projects/{id}/user`
+    with null), and deleting an account, which detaches its projects
+    (`archive_account()` there; `detachArchivedOwners()` in
+    `ui/src/panes/create/projectsForAccount.ts`). The UI that handles
+    the gap goes with it: "Projects without an account" in
+    `settings/directory/directory.ts` and "Assign N unowned" in
+    `panes/create/accounts/` (`panel.ts`, `helpers.ts`). No saved project
+    lacks an account today. Open: what happens to an account's projects
+    when it is deleted (archived with it, or moved to another account).
+
 ## Queue
 
 ### Backend and code
