@@ -1040,6 +1040,8 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Only by renaming and converting back; the data from before the conversion is outside the repository.
 
+**Follow-up (same day, the page):** The UI says node too: `stepId` is `nodeId`, `onAddStep` / `onRemoveStep` / `onStepClick` are `onAddNode` / `onRemoveNode` / `onNodeClick`, `labelForStepId` / `resolveStepId` and their `Live` forms follow, `isProgressionTree` is `isNodeTree`, and map rows carry `data-node-id` (read as `dataset.nodeId`). The empty map's hint reads "Add nodes with + — the map starts empty.", since the chat no longer adds nodes (#79). No stored browser setting changed name.
+
 ## See also
 
 - [[03-architecture]]

@@ -185,10 +185,10 @@ const mapPane = installMapPane({
   mountCreate: () => createPanel.mount(projectMain),
   getSelectedNodeId: () => selection.selectedNodeId,
   getSelectedNodeLabel: () => selection.selectedNodeLabel,
-  setSelectedNode: (stepId, label) => {
-    selection.selectedNodeId = stepId;
+  setSelectedNode: (nodeId, label) => {
+    selection.selectedNodeId = nodeId;
     selection.selectedNodeLabel = label;
-    if (stepId) selection.selectedDay = null;
+    if (nodeId) selection.selectedDay = null;
   },
   getSelectedDay: () => selection.selectedDay,
   setSelectedDay: (day) => {

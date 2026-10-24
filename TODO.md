@@ -34,7 +34,8 @@ next.
        conversion script outside the repository for `app/data/` and
        `app/demo_seed/`, backed up first; `backend/seed/` writes the new
        names. Change records already say `nodes` / `node_id`.
-    3. **UI names** (`app/ui/src/`): `stepId` → `nodeId`, `onAddStep` /
+    3. **UI names** — done 2026-10-24 (#86 follow-up), with
+       `data-step-id` → `data-node-id`. (`app/ui/src/`): `stepId` → `nodeId`, `onAddStep` /
        `onRemoveStep` / `onStepClick` → `…Node…`, `labelForStepId`,
        `resolveStepId(Live)`, `stepIdForLabel`, `stepLayout`,
        `isProgressionTree`, `AddStepHandler` / `RemoveStepHandler`, and

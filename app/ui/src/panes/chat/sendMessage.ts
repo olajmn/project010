@@ -50,7 +50,7 @@ export function installSendMessage(opts: SendMessageOpts): void {
           project.project_id,
           text,
           removed.label,
-          removed.stepId,
+          removed.nodeId,
           null,
           true,
         );

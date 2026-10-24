@@ -290,13 +290,13 @@ export function installMapScale(
       row.classList.toggle("is-grain-lead", d === limit - 1);
     });
 
-    mapEl.querySelectorAll(".progress-row[data-step-id]").forEach((node) => {
+    mapEl.querySelectorAll(".progress-row[data-node-id]").forEach((node) => {
       const row = node as HTMLElement;
       if (row.classList.contains("is-grain-hidden")) {
         row.classList.remove("has-grain-more");
         return;
       }
-      const id = row.dataset.stepId;
+      const id = row.dataset.nodeId;
       if (!id) return;
       const child = mapEl.querySelector(
         `.progress-row.is-grain-hidden[data-parent-id="${CSS.escape(id)}"]`,
@@ -363,7 +363,7 @@ export function installMapScale(
       const parentId: string | undefined = row.dataset.parentId;
       row = parentId
         ? (mapEl.querySelector(
-            `.progress-row[data-step-id="${CSS.escape(parentId)}"]`,
+            `.progress-row[data-node-id="${CSS.escape(parentId)}"]`,
           ) as HTMLElement | null)
         : null;
     }

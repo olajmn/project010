@@ -37,19 +37,19 @@ export type PickerTarget = {
 
 /** From a node's ⋯ menu: insert under that node. */
 export async function openInsertTreePicker(
-  stepId: string,
+  nodeId: string,
   ctx: NodeMenuContext,
 ): Promise<void> {
-  const row = ctx.line.querySelector(`[data-step-id="${CSS.escape(stepId)}"]`);
+  const row = ctx.line.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
   await openSavedTreesPicker({
     projectId: ctx.project.project_id,
-    parentId: stepId,
-    parentLabel: ctx.nodeLabel(stepId),
+    parentId: nodeId,
+    parentLabel: ctx.nodeLabel(nodeId),
     anchor:
       (row?.querySelector(".progress-menu-toggle") as HTMLElement | null) ??
       (row as HTMLElement | null),
     onUpdated: (updated) => ctx.onUpdated(updated),
-    onError: (message) => ctx.markSelected(stepId, message),
+    onError: (message) => ctx.markSelected(nodeId, message),
   });
 }
 

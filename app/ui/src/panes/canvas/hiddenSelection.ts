@@ -17,7 +17,7 @@ export function markHiddenSelection(mapEl: ParentNode): void {
     const parentId = row.dataset.parentId;
     row = parentId
       ? (mapEl.querySelector(
-          `.progress-row[data-step-id="${CSS.escape(parentId)}"]`,
+          `.progress-row[data-node-id="${CSS.escape(parentId)}"]`,
         ) as HTMLElement | null)
       : null;
   }

@@ -19,10 +19,10 @@ import {
   type MapFamilyNode,
 } from "./nodeFamily.js";
 
-export type PlanClickHandler = (stepId: string) => void;
+export type PlanClickHandler = (nodeId: string) => void;
 /** parentId omitted/undefined = add at project root. */
-export type AddStepHandler = (label: string, parentId?: string) => void;
-export type RemoveStepHandler = (stepId: string) => void;
+export type AddNodeHandler = (label: string, parentId?: string) => void;
+export type RemoveNodeHandler = (nodeId: string) => void;
 export type NodeMenuActionId =
   | "register"
   | "remove"
@@ -33,7 +33,7 @@ export type NodeMenuActionId =
   | "paste"
   | "save_tree"
   | "insert_tree";
-export type NodeMenuHandler = (action: NodeMenuActionId, stepId: string) => void;
+export type NodeMenuHandler = (action: NodeMenuActionId, nodeId: string) => void;
 
 const NODE_MENU_ACTIONS: {
   id: NodeMenuActionId;
@@ -96,11 +96,11 @@ function indentWidth(depth: number): string {
   return indentRem(depth);
 }
 
-/** Inline + form that calls onAddStep(label, parentId).
+/** Inline + form that calls onAddNode(label, parentId).
  *  `showButton: false` keeps only the hidden form (opened via ⋯ Add here). */
 function attachAddControl(
   host: HTMLElement,
-  onAddStep: AddStepHandler,
+  onAddNode: AddNodeHandler,
   parentId?: string,
   opts?: { showButton?: boolean },
 ): void {
@@ -158,7 +158,7 @@ function attachAddControl(
     event.preventDefault();
     const label = input.value.trim();
     closeForm();
-    if (label) onAddStep(label, parentId);
+    if (label) onAddNode(label, parentId);
   });
 
   // Menu “Add here” finds this to open the form without a visible +.
@@ -171,9 +171,9 @@ function attachAddControl(
 function fillBeadUnit(
   row: HTMLElement,
   node: MapNode,
-  onStepClick?: PlanClickHandler,
-  onAddStep?: AddStepHandler,
-  _onRemoveStep?: RemoveStepHandler,
+  onNodeClick?: PlanClickHandler,
+  onAddNode?: AddNodeHandler,
+  _onRemoveNode?: RemoveNodeHandler,
   onMenuAction?: NodeMenuHandler,
   layout?: MapFamilyNode,
 ): void {
@@ -185,14 +185,14 @@ function fillBeadUnit(
   // is what everything reading a node's name uses (mapPane beadLabel()).
   const shown = mapShowsIds() ? shortId(node.id) : node.label;
 
-  if (onStepClick) {
+  if (onNodeClick) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "progress-bead-btn";
     button.textContent = shown;
     button.dataset.label = node.label;
     button.title = mapShowsIds() ? node.label : "Talk about this";
-    button.addEventListener("click", () => onStepClick(node.id));
+    button.addEventListener("click", () => onNodeClick(node.id));
     unit.appendChild(button);
   } else {
     const label = document.createElement("span");
@@ -202,8 +202,8 @@ function fillBeadUnit(
     unit.appendChild(label);
   }
 
-  if (onAddStep && canEdit) {
-    attachAddControl(unit, onAddStep, node.id, { showButton: false });
+  if (onAddNode && canEdit) {
+    attachAddControl(unit, onAddNode, node.id, { showButton: false });
   }
 
   if (canEdit && onMenuAction) {
@@ -216,7 +216,7 @@ function fillBeadUnit(
 /** ⋯ menu: Add here / Remove / Move / Rename / Talk about this / Paste / saved trees. */
 function attachNodeMenu(
   row: HTMLElement,
-  stepId: string,
+  nodeId: string,
   onMenuAction?: NodeMenuHandler,
   layout?: MapFamilyNode,
 ): void {
@@ -242,7 +242,7 @@ function attachNodeMenu(
     item.className = "progress-menu-item";
     item.title = action.detail;
     item.dataset.action = action.id;
-    item.dataset.stepId = stepId;
+    item.dataset.nodeId = nodeId;
 
     item.textContent = action.label;
 
@@ -257,7 +257,7 @@ function attachNodeMenu(
       item.addEventListener("click", (event) => {
         event.stopPropagation();
         closeNodeMenu();
-        onMenuAction(action.id, stepId);
+        onMenuAction(action.id, nodeId);
       });
     }
     menu.appendChild(item);
@@ -292,9 +292,9 @@ function appendAsciiDepth(
   children: MapNode[],
   stem: string,
   byId: Map<string, MapFamilyNode>,
-  onStepClick?: PlanClickHandler,
-  onAddStep?: AddStepHandler,
-  onRemoveStep?: RemoveStepHandler,
+  onNodeClick?: PlanClickHandler,
+  onAddNode?: AddNodeHandler,
+  onRemoveNode?: RemoveNodeHandler,
   selectedId?: string | null,
   onMenuAction?: NodeMenuHandler,
 ): void {
@@ -306,7 +306,7 @@ function appendAsciiDepth(
     if (layout) {
       applyFamilyAttrs(row, layout);
     } else {
-      row.dataset.stepId = child.id;
+      row.dataset.nodeId = child.id;
       row.dataset.depth = String(Math.floor(stem.length / 4) + 1);
     }
     if (selectedId && child.id === selectedId) {
@@ -322,9 +322,9 @@ function appendAsciiDepth(
     fillBeadUnit(
       row,
       child,
-      onStepClick,
-      onAddStep,
-      onRemoveStep,
+      onNodeClick,
+      onAddNode,
+      onRemoveNode,
       onMenuAction,
       layout,
     );
@@ -336,9 +336,9 @@ function appendAsciiDepth(
         child.children,
         `${stem}${childGuide(!isLast)}`,
         byId,
-        onStepClick,
-        onAddStep,
-        onRemoveStep,
+        onNodeClick,
+        onAddNode,
+        onRemoveNode,
         selectedId,
         onMenuAction,
       );
@@ -349,14 +349,14 @@ function appendAsciiDepth(
 /**
  * Project map: `id` → title → waypoints ([[ui]] § 2).
  * Id and title are header beads (same box language as tree beads, but
- * not progression nodes — no ⋯). Middle = root children; nested = depth.
+ * not the tree's nodes — no ⋯). Middle = root children; nested = depth.
  */
 export function treeWordsElement(
   nameLabel: string,
   middle: MapNode[],
-  onStepClick?: PlanClickHandler,
-  onAddStep?: AddStepHandler,
-  onRemoveStep?: RemoveStepHandler,
+  onNodeClick?: PlanClickHandler,
+  onAddNode?: AddNodeHandler,
+  onRemoveNode?: RemoveNodeHandler,
   selectedId?: string | null,
   onMenuAction?: NodeMenuHandler,
   identityLabel?: string | null,
@@ -413,20 +413,20 @@ export function treeWordsElement(
     trunk.style.marginLeft = `${2 * NEST_INSET_REM}rem`;
   }
 
-  for (const step of middle) {
+  for (const node of middle) {
     const block = document.createElement("div");
     block.className = "progress-trunk-block";
-    const stepLayout = byId.get(step.id);
+    const nodeLayout = byId.get(node.id);
 
     const row = document.createElement("div");
-    row.className = `progress-row progress-bead node-${step.status}`;
-    if (stepLayout) {
-      applyFamilyAttrs(row, stepLayout);
+    row.className = `progress-row progress-bead node-${node.status}`;
+    if (nodeLayout) {
+      applyFamilyAttrs(row, nodeLayout);
     } else {
-      row.dataset.stepId = step.id;
+      row.dataset.nodeId = node.id;
       row.dataset.depth = "0";
     }
-    if (selectedId && step.id === selectedId) {
+    if (selectedId && node.id === selectedId) {
       row.classList.add("is-selected");
     }
 
@@ -437,25 +437,25 @@ export function treeWordsElement(
 
     fillBeadUnit(
       row,
-      step,
-      onStepClick,
-      onAddStep,
-      onRemoveStep,
+      node,
+      onNodeClick,
+      onAddNode,
+      onRemoveNode,
       onMenuAction,
-      stepLayout,
+      nodeLayout,
     );
 
     block.appendChild(row);
 
-    if (step.children.length > 0) {
+    if (node.children.length > 0) {
       appendAsciiDepth(
         block,
-        step.children,
+        node.children,
         childGuide(false),
         byId,
-        onStepClick,
-        onAddStep,
-        onRemoveStep,
+        onNodeClick,
+        onAddNode,
+        onRemoveNode,
         selectedId,
         onMenuAction,
       );
@@ -463,7 +463,7 @@ export function treeWordsElement(
     trunk.appendChild(block);
   }
 
-  if (onAddStep) {
+  if (onAddNode) {
     const addWrap = document.createElement("div");
     addWrap.className = "progress-row progress-add-wrap";
 
@@ -471,7 +471,7 @@ export function treeWordsElement(
     prefix.className = "progress-branch";
     prefix.style.width = indentWidth(0);
     addWrap.appendChild(prefix);
-    attachAddControl(addWrap, onAddStep);
+    attachAddControl(addWrap, onAddNode);
     trunk.appendChild(addWrap);
   }
 

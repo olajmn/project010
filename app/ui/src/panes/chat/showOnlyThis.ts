@@ -23,7 +23,7 @@ import type { ChatMessage } from "../../dataShapes.js";
 // 1. Types
 
 /** A removed node whose conversation is shown alone. */
-export type RemovedFocus = { stepId: string; label: string };
+export type RemovedFocus = { nodeId: string; label: string };
 
 export type IsolateChat = {
   /** Drop isolation (full thread again). */
@@ -34,17 +34,17 @@ export type IsolateChat = {
   /** Render thread into `threadEl`, applying isolation if set. */
   fill: (
     messages: ChatMessage[],
-    onFocusClick?: (stepId: string, label: string) => void,
+    onFocusClick?: (nodeId: string, label: string) => void,
     onDayClick?: (day: string) => void,
   ) => void;
 };
 
 export type IsolateChatOptions = {
   threadEl: HTMLDivElement;
-  /** Map a focus label to a step id when history omitted focus_node_id. */
-  resolveStepId?: (label: string) => string | null;
+  /** Map a focus label to a node id when history omitted focus_node_id. */
+  resolveNodeId?: (label: string) => string | null;
   /** A node's current label from the map, or null if it is gone. */
-  labelForStepId?: (stepId: string) => string | null;
+  labelForNodeId?: (nodeId: string) => string | null;
   /** Re-render the workspace after isolate / show-full. */
   onChange: () => void;
 };
@@ -72,23 +72,23 @@ function frameTitle(frame: Frame): string {
  * the node's current label when the map still has it. */
 function frameOf(
   message: ChatMessage,
-  labelForStepId?: (stepId: string) => string | null,
+  labelForNodeId?: (nodeId: string) => string | null,
 ): Frame | null {
   const focus = message.focus?.trim();
-  const stepId = message.focus_node_id?.trim();
-  if (stepId) {
+  const nodeId = message.focus_node_id?.trim();
+  if (nodeId) {
     if (message.removed) {
-      const label = focus || stepId;
+      const label = focus || nodeId;
       return {
-        key: `id:${stepId}`,
+        key: `id:${nodeId}`,
         name: `${label} (removed)`,
         day: null,
-        removed: { stepId, label },
+        removed: { nodeId, label },
       };
     }
-    const name = labelForStepId?.(stepId) || focus || stepId;
+    const name = labelForNodeId?.(nodeId) || focus || nodeId;
     return {
-      key: `id:${stepId}`,
+      key: `id:${nodeId}`,
       name,
       day: null,
       context: message.focus_context,
@@ -104,9 +104,9 @@ function frameOf(
 // 3. Public API
 
 export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
-  const { threadEl, resolveStepId, labelForStepId, onChange } = options;
+  const { threadEl, resolveNodeId, labelForNodeId, onChange } = options;
   const frameFor = (message: ChatMessage): Frame | null =>
-    frameOf(message, labelForStepId);
+    frameOf(message, labelForNodeId);
   let isolatedFocus: Frame | null = null;
   let preIsolationScrollTop: number | null = null;
 
@@ -129,7 +129,7 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
 
   function fill(
     messages: ChatMessage[],
-    onFocusClick?: (stepId: string, label: string) => void,
+    onFocusClick?: (nodeId: string, label: string) => void,
     onDayClick?: (day: string) => void,
   ): void {
     threadEl.innerHTML = "";
@@ -155,9 +155,9 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
         if (current) {
           const frame = document.createElement("div");
           frame.className = "chat-focus-section";
-          const stepId = message.focus_node_id?.trim();
+          const nodeId = message.focus_node_id?.trim();
           if (focus) frame.dataset.focusLabel = focus;
-          if (stepId) frame.dataset.focusStepId = stepId;
+          if (nodeId) frame.dataset.focusNodeId = nodeId;
           if (current.day && onDayClick) {
             const day = current.day;
             frame.classList.add("is-clickable");
@@ -169,8 +169,8 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
             frame.addEventListener("click", () => {
               const label = frame.dataset.focusLabel || focus;
               const id =
-                frame.dataset.focusStepId ||
-                resolveStepId?.(label) ||
+                frame.dataset.focusNodeId ||
+                resolveNodeId?.(label) ||
                 null;
               if (id) onFocusClick(id, label);
             });
@@ -202,9 +202,9 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
         focus &&
         section &&
         message.focus_node_id &&
-        !section.dataset.focusStepId
+        !section.dataset.focusNodeId
       ) {
-        section.dataset.focusStepId = message.focus_node_id.trim();
+        section.dataset.focusNodeId = message.focus_node_id.trim();
       }
       (section ?? threadEl).appendChild(messageRow(message));
     }

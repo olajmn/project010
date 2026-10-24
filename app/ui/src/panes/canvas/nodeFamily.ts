@@ -29,7 +29,7 @@ export interface MapFamilyNode {
   ancestorContinues: boolean[];
 }
 
-/** Flat, pre-order walk of the progression middle tree. */
+/** Flat, pre-order walk of the tree under the title. */
 export function layoutFamily(
   middle: MapNode[],
   parentId: string | null = null,
@@ -80,7 +80,7 @@ export function applyFamilyAttrs(
   row: HTMLElement,
   node: MapFamilyNode,
 ): void {
-  row.dataset.stepId = node.id;
+  row.dataset.nodeId = node.id;
   row.dataset.depth = String(node.depth);
   row.dataset.parentId = node.parentId ?? "";
   row.dataset.siblingIndex = String(node.siblingIndex);

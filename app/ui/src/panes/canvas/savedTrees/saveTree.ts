@@ -6,15 +6,15 @@ import { saveTree } from "../../../api.js";
 import type { NodeMenuContext } from "../nodeMenu.js";
 
 export async function saveTreeFromNode(
-  stepId: string,
+  nodeId: string,
   label: string,
   ctx: NodeMenuContext,
 ): Promise<void> {
   try {
-    const saved = await saveTree(ctx.project.project_id, stepId);
+    const saved = await saveTree(ctx.project.project_id, nodeId);
     const nodes = saved.node_count === 1 ? "1 node" : `${saved.node_count} nodes`;
-    ctx.markSelected(stepId, `Saved "${saved.name}" as a tree (${nodes}).`);
+    ctx.markSelected(nodeId, `Saved "${saved.name}" as a tree (${nodes}).`);
   } catch (err) {
-    ctx.markSelected(stepId, `Could not save "${label}": ${(err as Error).message}`);
+    ctx.markSelected(nodeId, `Could not save "${label}": ${(err as Error).message}`);
   }
 }

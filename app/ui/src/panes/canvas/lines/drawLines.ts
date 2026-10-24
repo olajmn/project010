@@ -164,7 +164,7 @@ function paintNestUnder(
   mode: LinePaintMode,
   cls: string,
 ): void {
-  const parentId = parentRow.dataset.stepId;
+  const parentId = parentRow.dataset.nodeId;
   if (!parentId) return;
 
   const childRows = (

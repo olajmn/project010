@@ -211,7 +211,7 @@
 
 /* 4. Poles, beads, menus */
 
-/* Header beads: same box language as tree beads, not progression nodes. */
+/* Header beads: same box language as tree beads, not the tree's nodes. */
 .progress-header-unit {
   pointer-events: none;
 }

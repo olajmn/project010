@@ -165,10 +165,10 @@ export async function addNode(
 /** One place up or down among its siblings; id and children go with it. */
 export async function moveNode(
   projectId: string,
-  stepId: string,
+  nodeId: string,
   direction: "up" | "down",
 ): Promise<ProjectView> {
-  const res = await fetch(`/api/projects/${projectId}/map/${stepId}/move-${direction}`, {
+  const res = await fetch(`/api/projects/${projectId}/map/${nodeId}/move-${direction}`, {
     method: "POST",
   });
   if (!res.ok) {
@@ -182,10 +182,10 @@ export async function moveNode(
  *  reason (e.g. a sibling already has that name). */
 export async function renameNode(
   projectId: string,
-  stepId: string,
+  nodeId: string,
   text: string,
 ): Promise<ProjectView> {
-  const res = await fetch(`/api/projects/${projectId}/map/${stepId}/rename`, {
+  const res = await fetch(`/api/projects/${projectId}/map/${nodeId}/rename`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text }),
@@ -215,8 +215,8 @@ export async function undoMapChange(
   return (await res.json()) as ProjectView;
 }
 
-export async function removeNode(projectId: string, stepId: string): Promise<ProjectView> {
-  const res = await fetch(`/api/projects/${projectId}/map/${stepId}/remove`, {
+export async function removeNode(projectId: string, nodeId: string): Promise<ProjectView> {
+  const res = await fetch(`/api/projects/${projectId}/map/${nodeId}/remove`, {
     method: "POST",
   });
   if (!res.ok) {
@@ -330,7 +330,7 @@ export async function sendChatMessage(
   projectId: string,
   text: string,
   focusLabel?: string | null,
-  focusStepId?: string | null,
+  focusNodeId?: string | null,
   focusDay?: string | null,
   aboutRemoved?: boolean,
 ): Promise<ProjectView> {
@@ -347,8 +347,8 @@ export async function sendChatMessage(
   if (focusLabel) {
     body.focus_label = focusLabel;
   }
-  if (focusStepId) {
-    body.focus_node_id = focusStepId;
+  if (focusNodeId) {
+    body.focus_node_id = focusNodeId;
   }
   if (focusDay) {
     body.focus_day = focusDay;
@@ -467,10 +467,10 @@ export async function fetchProjectTimeline(
 /** Store this node and everything under it as structure (no ids). */
 export async function saveTree(
   projectId: string,
-  stepId: string,
+  nodeId: string,
 ): Promise<SavedTreeView> {
   const res = await fetch(
-    `/api/projects/${projectId}/map/${encodeURIComponent(stepId)}/save-tree`,
+    `/api/projects/${projectId}/map/${encodeURIComponent(nodeId)}/save-tree`,
     { method: "POST" },
   );
   if (!res.ok) {

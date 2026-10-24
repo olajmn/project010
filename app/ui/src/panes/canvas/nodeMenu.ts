@@ -20,9 +20,9 @@ export type NodeMenuContext = {
   line: HTMLElement;
   projectMain: HTMLElement;
   chatInput: HTMLTextAreaElement;
-  markSelected: (stepId: string, note: string) => void;
-  nodeLabel: (stepId: string) => string;
-  removeBead: (stepId: string) => Promise<void>;
+  markSelected: (nodeId: string, note: string) => void;
+  nodeLabel: (nodeId: string) => string;
+  removeBead: (nodeId: string) => Promise<void>;
   openPaste: () => void;
   onUpdated: (updated: ProjectView) => void;
 };
@@ -31,14 +31,14 @@ export type NodeMenuContext = {
 
 export async function handleNodeMenuAction(
   action: NodeMenuActionId,
-  stepId: string,
+  nodeId: string,
   ctx: NodeMenuContext,
 ): Promise<void> {
-  const label = ctx.nodeLabel(stepId);
+  const label = ctx.nodeLabel(nodeId);
   if (action === "register") {
-    ctx.markSelected(stepId, `Add under: ${label}`);
+    ctx.markSelected(nodeId, `Add under: ${label}`);
     const row = ctx.line.querySelector(
-      `[data-step-id="${CSS.escape(stepId)}"]`,
+      `[data-node-id="${CSS.escape(nodeId)}"]`,
     );
     const form = row?.querySelector(
       ".progress-add-form",
@@ -53,13 +53,13 @@ export async function handleNodeMenuAction(
     return;
   }
   if (action === "remove") {
-    await ctx.removeBead(stepId);
+    await ctx.removeBead(nodeId);
     return;
   }
   if (action === "move_up" || action === "move_down") {
     const direction = action === "move_up" ? "up" : "down";
     try {
-      ctx.onUpdated(await moveNode(ctx.project.project_id, stepId, direction));
+      ctx.onUpdated(await moveNode(ctx.project.project_id, nodeId, direction));
     } catch (err) {
       const error = document.createElement("p");
       error.className = "error";
@@ -69,25 +69,25 @@ export async function handleNodeMenuAction(
     return;
   }
   if (action === "rename") {
-    startNodeRename(stepId, ctx);
+    startNodeRename(nodeId, ctx);
     return;
   }
   if (action === "analyze") {
-    ctx.markSelected(stepId, `Talk about: ${label}`);
+    ctx.markSelected(nodeId, `Talk about: ${label}`);
     ctx.chatInput.focus();
     return;
   }
   if (action === "paste") {
-    ctx.markSelected(stepId, `Will import under: ${label}`);
+    ctx.markSelected(nodeId, `Will import under: ${label}`);
     ctx.openPaste();
     return;
   }
   if (action === "save_tree") {
-    await saveTreeFromNode(stepId, label, ctx);
+    await saveTreeFromNode(nodeId, label, ctx);
     return;
   }
   if (action === "insert_tree") {
-    ctx.markSelected(stepId, `Insert a saved tree under: ${label}`);
-    await openInsertTreePicker(stepId, ctx);
+    ctx.markSelected(nodeId, `Insert a saved tree under: ${label}`);
+    await openInsertTreePicker(nodeId, ctx);
   }
 }

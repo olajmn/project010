@@ -5,8 +5,8 @@
 // Contents
 //  1. Types
 //  2. Helpers
-//      - isProgressionTree()
-//      - stepIdForLabel()
+//      - isNodeTree()
+//      - nodeIdForLabel()
 //      - countUnder()
 //  3. Public API
 //      - installMapPane()
@@ -39,7 +39,7 @@ const DEFAULT_CHAT_PLACEHOLDER = "Talk about this project…";
 export type MapPane = {
   render: () => void;
   clearNodeSelection: (scope?: ParentNode) => void;
-  stepIdForLabel: (label: string) => string | null;
+  nodeIdForLabel: (label: string) => string | null;
 };
 
 type MapPaneOpts = {
@@ -54,7 +54,7 @@ type MapPaneOpts = {
   mountCreate: () => void;
   getSelectedNodeId: () => string | null;
   getSelectedNodeLabel: () => string | null;
-  setSelectedNode: (stepId: string | null, label: string | null) => void;
+  setSelectedNode: (nodeId: string | null, label: string | null) => void;
   getSelectedDay: () => string | null;
   /** Select a day of changes (clears the node), or null to let it go. */
   setSelectedDay: (day: string | null) => void;
@@ -66,7 +66,7 @@ type MapPaneOpts = {
 
 // 2. Helpers
 
-export function isProgressionTree(
+export function isNodeTree(
   node: { children: { id: string }[] },
 ): boolean {
   return node.children.some((child) => isNodeId(child.id));
@@ -81,28 +81,28 @@ function beadLabel(row: Element | null | undefined): string | null {
   return bead?.dataset.label ?? bead?.textContent ?? null;
 }
 
-export function stepIdForLabel(
+export function nodeIdForLabel(
   host: ParentNode,
   label: string,
 ): string | null {
-  const rows = host.querySelectorAll(".progress-row[data-step-id]");
+  const rows = host.querySelectorAll(".progress-row[data-node-id]");
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const text = beadLabel(row) ?? "";
     if (text === label) {
-      return row.getAttribute("data-step-id");
+      return row.getAttribute("data-node-id");
     }
   }
   return null;
 }
 
-/** Every node under `stepId`, at any depth; 0 when it has none or is
+/** Every node under `nodeId`, at any depth; 0 when it has none or is
  *  not in the tree. */
-export function countUnder(root: MapNode | null | undefined, stepId: string): number {
+export function countUnder(root: MapNode | null | undefined, nodeId: string): number {
   const all = (n: MapNode): number =>
     n.children.reduce((sum, c) => sum + 1 + all(c), 0);
   const find = (n: MapNode): MapNode | null => {
-    if (n.id === stepId) return n;
+    if (n.id === nodeId) return n;
     for (const c of n.children) {
       const hit = find(c);
       if (hit) return hit;
@@ -150,16 +150,16 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
     body.className = "project-body";
 
     const middle = project.node?.children ?? [];
-    const canSelect = project.node ? isProgressionTree(project.node) : false;
+    const canSelect = project.node ? isNodeTree(project.node) : false;
     let line: HTMLDivElement;
 
-    const markSelected = (stepId: string, note: string) => {
-      const row = line.querySelector(`[data-step-id="${CSS.escape(stepId)}"]`);
-      const label = beadLabel(row) ?? stepId;
+    const markSelected = (nodeId: string, note: string) => {
+      const row = line.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
+      const label = beadLabel(row) ?? nodeId;
       // Picking a node lets a selected day go; redraw so the Status row
       // no longer shows as selected.
       const hadDay = opts.getSelectedDay() !== null;
-      opts.setSelectedNode(stepId, label);
+      opts.setSelectedNode(nodeId, label);
       if (hadDay) {
         render();
         return;
@@ -183,9 +183,9 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
       focus.textContent = note;
     };
 
-    const nodeLabel = (stepId: string): string => {
-      const row = line.querySelector(`[data-step-id="${CSS.escape(stepId)}"]`);
-      return beadLabel(row) ?? stepId;
+    const nodeLabel = (nodeId: string): string => {
+      const row = line.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
+      return beadLabel(row) ?? nodeId;
     };
 
     const addBead = async (trimmed: string, parentId?: string) => {
@@ -206,26 +206,26 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
       }
     };
 
-    const removeBead = async (stepId: string) => {
+    const removeBead = async (nodeId: string) => {
       // Removing takes everything under the node with it and there is
       // no undo yet (TODO 54), so a node with children asks first.
-      const under = countUnder(project.node, stepId);
+      const under = countUnder(project.node, nodeId);
       if (under > 0) {
         const parts = under === 1 ? "the 1 part" : `the ${under} parts`;
         const anchor = line
-          .querySelector(`[data-step-id="${CSS.escape(stepId)}"] .progress-menu-toggle`)
+          .querySelector(`[data-node-id="${CSS.escape(nodeId)}"] .progress-menu-toggle`)
           ?.getBoundingClientRect() ?? null;
         const ok = await askToConfirm(
           anchor,
-          `Remove “${nodeLabel(stepId)}” and ${parts} under it?`,
+          `Remove “${nodeLabel(nodeId)}” and ${parts} under it?`,
           "Remove",
         );
         if (!ok) return;
       }
       line.classList.add("plan-busy");
       try {
-        const updated = await removeNode(project.project_id, stepId);
-        if (stepId === opts.getSelectedNodeId()) {
+        const updated = await removeNode(project.project_id, nodeId);
+        if (nodeId === opts.getSelectedNodeId()) {
           opts.setSelectedNode(null, null);
           opts.chatInput.placeholder = DEFAULT_CHAT_PLACEHOLDER;
         }
@@ -250,9 +250,9 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
 
     const onMenuAction = async (
       action: NodeMenuActionId,
-      stepId: string,
+      nodeId: string,
     ) => {
-      await handleNodeMenuAction(action, stepId, {
+      await handleNodeMenuAction(action, nodeId, {
         project,
         line,
         projectMain: opts.projectMain,
@@ -281,8 +281,8 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
       displayProjectTitle(project.name),
       middle,
       canSelect
-        ? (stepId: string) => {
-            markSelected(stepId, `Looking at: ${nodeLabel(stepId)}`);
+        ? (nodeId: string) => {
+            markSelected(nodeId, `Looking at: ${nodeLabel(nodeId)}`);
             if (bar.paste.isOpen()) bar.paste.updatePasteHint();
             if (bar.folder.isOpen()) bar.folder.updateFolderHint();
           }
@@ -332,7 +332,7 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
       const hint = document.createElement("p");
       hint.className = "project-hint";
       hint.textContent =
-        "Add steps with +, or talk — the map starts empty.";
+        "Add nodes with + — the map starts empty.";
       body.insertBefore(hint, bar.copyRow);
     }
 
@@ -345,12 +345,12 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
         opts.setSelectedDay(day);
         render();
       },
-      resolveStepId: (label) => stepIdForLabel(opts.projectMain, label),
-      labelForStepId: (stepId) => beadLabel(
-        line.querySelector(`.progress-row[data-step-id="${CSS.escape(stepId)}"]`),
+      resolveNodeId: (label) => nodeIdForLabel(opts.projectMain, label),
+      labelForNodeId: (nodeId) => beadLabel(
+        line.querySelector(`.progress-row[data-node-id="${CSS.escape(nodeId)}"]`),
       ),
-      onSelectNode: (stepId, label) => {
-        markSelected(stepId, `Looking at: ${label}`);
+      onSelectNode: (nodeId, label) => {
+        markSelected(nodeId, `Looking at: ${label}`);
         if (bar.paste.isOpen()) bar.paste.updatePasteHint();
         if (bar.folder.isOpen()) bar.folder.updateFolderHint();
       },
@@ -374,6 +374,6 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
   return {
     render,
     clearNodeSelection,
-    stepIdForLabel: (label) => stepIdForLabel(opts.projectMain, label),
+    nodeIdForLabel: (label) => nodeIdForLabel(opts.projectMain, label),
   };
 }

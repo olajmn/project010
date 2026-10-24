@@ -12,9 +12,9 @@ export type RenameNodeContext = {
   onUpdated: (updated: ProjectView) => void;
 };
 
-export function startNodeRename(stepId: string, ctx: RenameNodeContext): void {
+export function startNodeRename(nodeId: string, ctx: RenameNodeContext): void {
   const row = ctx.line.querySelector(
-    `.progress-row[data-step-id="${CSS.escape(stepId)}"]`,
+    `.progress-row[data-node-id="${CSS.escape(nodeId)}"]`,
   );
   const nameEl = row?.querySelector(
     ".progress-bead-btn, .progress-bead-label",
@@ -44,7 +44,7 @@ export function startNodeRename(stepId: string, ctx: RenameNodeContext): void {
       return;
     }
     try {
-      ctx.onUpdated(await renameNode(ctx.project.project_id, stepId, next));
+      ctx.onUpdated(await renameNode(ctx.project.project_id, nodeId, next));
     } catch (err) {
       restore();
       // e.g. a sibling already has that name; shown under the node.
