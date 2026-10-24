@@ -7,8 +7,8 @@ from datetime import UTC, datetime
 from backend.project.status.build_status import (
     build_status,
     changes_on_day_text,
+    changes_text,
     day_name,
-    recent_changes_text,
     status_text,
 )
 
@@ -178,16 +178,30 @@ def test_empty_history() -> None:
     assert build_status([]) == {"summary": [], "history": [], "earlier": 0}
 
 
-def test_recent_changes() -> None:
-    # Recent changes: what each one was, newest first, chat left out.
-    recent = recent_changes_text(TAPE, now=NOW).splitlines()
-    assert recent[0] == "Recent changes (newest first):"
-    assert recent[1].endswith("— Renamed: A → B"), recent
-    assert recent[2].endswith("— Imported 1 step(s)")
-    assert recent[3].endswith("— Created")
-    assert len(recent) == 4
-    assert len(recent_changes_text(TAPE, now=NOW, limit=1).splitlines()) == 2
-    assert recent_changes_text(TAPE[2:3], now=NOW) == ""
+def test_changes_text() -> None:
+    # What each change was, newest first, chat left out.
+    lines = changes_text(TAPE, now=NOW).splitlines()
+    assert lines[0] == "Every change saved in this project (newest first):"
+    assert lines[1].endswith("— Renamed: A → B"), lines
+    assert lines[2].endswith("— Imported 1 step(s)")
+    assert lines[3].endswith("— Created")
+    assert len(lines) == 4
+    assert changes_text(TAPE[2:3], now=NOW) == ""
+
+
+def test_changes_text_holds_the_whole_record() -> None:
+    # Not only the latest ones: the history is part of the project.
+    tape = [
+        {
+            "feedback": f"Added step: {n}",
+            "event": "node_added",
+            "created_at": "2026-09-20T10:00:00",
+        }
+        for n in range(40)
+    ]
+    lines = changes_text(tape, now=NOW).splitlines()
+    assert len(lines) == 41
+    assert lines[-1].endswith("— Added step: 0")
 
 
 def test_changes_on_selected_day() -> None:

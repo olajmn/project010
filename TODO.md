@@ -99,12 +99,14 @@ next.
 ### Chat
 
 63. **How much context the chat gets** (Question) — the goal is that
-    the chat can use the whole map and history. Today it gets a fixed
-    slice: every label, the last 10 changes, a selected day, and the
-    last 20 turns ([[04-current-state]] § 4); not what is behind a node
-    (was 33). Sending everything does not scale (speed, a small model,
-    cost on the demo). Candidates: a summary of older history, lookup
-    on demand, or richer events (38).
+    the chat can use the whole map and history. Since 2026-10-24 it gets
+    every label and every change (no longer the last 10), a selected
+    day, and the last 20 turns ([[04-current-state]] § 4); not what is
+    behind a node (was 33). A prompt that would not fit is cut by
+    leaving out the oldest turns, with a note (#77). Open: the 20-turn
+    cap, and what to do when a project's history alone outgrows the
+    context. Candidates: a summary of older history, lookup on demand,
+    or richer events (38).
 69. **Does the structure help the chat?** (Question) — the README's
     central claim is untested. Ask about 10 realistic questions on a
     demo project with and without the structure and history, and score

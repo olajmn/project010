@@ -108,8 +108,8 @@ Everything lives in `app/data/` as plain JSON:
   #70); unset, the chat uses Ollama. An unknown value stops the server at
   start. `GET /api/model` shows the provider in use.
 - A chat message sends: fixed instructions (`model/brief/talk_prompt.py`:
-  role, task, behavior, limits), the project's status, its last 10
-  changes (`recent_changes_text()`), every label on the map, the
+  role, task, behavior, limits), the project's status, every change
+  saved in it (`changes_text()`), every label on the map, the
   selected node's path or every change on the selected day
   (`changes_on_day_text()`, up to 100), the last 20 turns, and the new
   message. The model is told to answer from the project only.
@@ -142,7 +142,7 @@ Everything lives in `app/data/` as plain JSON:
 - Node ids are sequential per project (`p1`, `p2`, …), not globally
   unique (`TODO.md` Queue 50).
 - The chat answers from the project's names and status only; it gives no
-  general advice. It sees the last 10 changes, but their saved text is
+  general advice. It sees every change, but their saved text is
   thin ("Imported 95 nodes" counts every node but does not say which) (`TODO.md` Queue 38). What it must handle: [[02-product]] § 2.iii.
 
 ## 6. Open questions

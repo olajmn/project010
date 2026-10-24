@@ -19,7 +19,7 @@ from backend.project.panes.chat.commands import try_command
 from backend.project.panes.create.resolver import get_history_for_project
 from backend.project.status.build_status import (
     build_status,
-    recent_changes_text,
+    changes_text,
     status_text,
 )
 from backend.storage.paths import now_utc
@@ -80,7 +80,7 @@ def reply(
             None,
             [
                 status_text(build_status(history, current=latest)),
-                recent_changes_text(history),
+                changes_text(history),
             ],
         )
     )

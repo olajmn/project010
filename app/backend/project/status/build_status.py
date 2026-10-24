@@ -5,18 +5,18 @@ the pulse counts non-chat events per calendar day — no model, nothing
 saved — so it can never disagree with the tape.
 
 Shown in the UI as the **Current state** panel (`build_status()`) and
-given to the chat's model (`status_text()`, `recent_changes_text()`,
+given to the chat's model (`status_text()`, `changes_text()`,
 `changes_on_day_text()` when a day is selected). docs/05-decisions.md #36–37, #41.
 """
 
 # Contents
 #  1. Settings
-#      - HISTORY_DAYS / RECENT_CHANGES / DAY_CHANGES
+#      - HISTORY_DAYS / DAY_CHANGES
 #      - _CHAT_EVENTS / _NOT_CHANGES
 #  2. The status
 #      - build_status()
 #      - status_text()
-#      - recent_changes_text()
+#      - changes_text()
 #      - changes_on_day_text() / day_name()
 #  3. Summary facts / day pulse
 #      - _summary() / _change_pulse() / _map_size()
@@ -34,10 +34,6 @@ from backend.project.timeline import to_event
 # Calendar days kept in the change pulse, newest first. Older days are
 # only counted in `earlier`.
 HISTORY_DAYS = 25
-
-# Individual changes the chat's model is told about, newest first. The
-# day pulse only counts them; this says what each one was.
-RECENT_CHANGES = 10
 
 # Ceiling for one selected day's changes; a guard for a very busy day,
 # not a target.
@@ -84,24 +80,23 @@ def build_status(
 def status_text(status: dict) -> str:
     """The summary rows as plain text, for the chat's model. The day
     pulse is left out: the model gets the changes themselves from
-    recent_changes_text(), and a count beside the list read as more
+    changes_text(), and a count beside the list read as more
     changes."""
     return "\n".join(f"{row['label']}: {row['text']}" for row in status["summary"])
 
 
-def recent_changes_text(
-    history: list[dict],
-    now: datetime | None = None,
-    limit: int = RECENT_CHANGES,
-) -> str:
-    """The last `limit` non-chat changes as plain text, newest first,
-    for the chat's model. Empty when there are none. Chat turns are left
-    out: the model already gets them as the conversation."""
+def changes_text(history: list[dict], now: datetime | None = None) -> str:
+    """Every non-chat change as plain text, newest first, for the chat's
+    model: the whole record, not the latest few (model/brief/budget.py
+    keeps the prompt within the model's context). Empty when there are
+    none. Chat turns are left out: the model already gets them as the
+    conversation."""
     now = now or datetime.now().astimezone()
-    work = _work_events(history)[-limit:]
+    work = _work_events(history)
     if not work:
         return ""
-    return "\n".join(["Recent changes (newest first):", *_change_lines(work, now)])
+    heading = "Every change saved in this project (newest first):"
+    return "\n".join([heading, *_change_lines(work, now)])
 
 
 def changes_on_day_text(
