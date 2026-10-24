@@ -11,8 +11,36 @@ next.
 
 ## Active
 
-None chosen; the next one is 75 (a details window). Old names (62)
-were renamed and ids lost their kind in front on 2026-10-24 (#86, #87).
+75. **A details page per project and account** (Step) — what is about
+    the system rather than for people moves out of the Directory and
+    Archive rows into its own Settings page: kind, full id, dates, and a
+    project's log. The rows then show names and dates only. Kind is shown
+    from where the page was opened, not read from the id (#87). Planned
+    2026-10-24; node details are 72, not this.
+    1. **The page.** `app/ui/settings/details.html` with
+       `src/settings/details/` (`page.ts`, `details.ts`), like the other
+       Settings pages. `?project=<id>`: Kind "project", the full id,
+       made (`started_at`), last changed (`created_at`), its account (a
+       link to that account's page), archived or not, and its whole log
+       below, reusing `settings/logs/projectTimeline.ts`. `?account=<id>`:
+       Kind "account", the full id, made, and its projects (each a link
+       to its page). A link back to the tab it came from (`&from=`).
+       Read from what the API already gives (`fetchProjects()`,
+       `fetchArchivedProjects()`, `fetchAccounts()`,
+       `fetchProjectTimeline()`); no backend change.
+    2. **The rows.** Directory and Archive rows drop the short id and
+       the word "account" before a named account: a project row reads
+       `Building Project · made 3 Aug 2026 · changed 24 Oct 2026`, an
+       account row `John Doe · 3 Aug 2026`, each with a quiet "Details"
+       action that opens its page. An account with no name still shows
+       its short id, as its only label (`userLabel()`).
+    3. **Logs.** Open: whether Settings → Logs keeps its one-project
+       picker (`settings/logs/scope.ts`) beside the project's page, or
+       keeps "All activity" only and sends one project to its page. Two
+       ways to read one project's log would be a parallel path.
+    Docs: `docs/ui.md` (Settings pages), `docs/04-current-state.md` § 2,
+    a decision in `05-decisions.md`. One commit per step, with the UI
+    type check and a look in the browser.
 
 ## Queue
 
@@ -49,26 +77,15 @@ were renamed and ids lost their kind in front on 2026-10-24 (#86, #87).
     (stays web and TypeScript), or Flutter as a new project on the same
     API. Either way the frontend is rewritten.
 
-### Settings
-
-75. **A details window per project and account** (Step, **next after 62**) — a Details button opens
-    what is about the system rather than for people: its kind and id,
-    made and changed dates, and the project's log (now under Settings →
-    Logs). The rows in Directory and Archive would then show names only.
-    The kind is shown from where the details were opened (a project row
-    says "project"), not read from the id (62 step 5). Open: how it
-    scales: projects and accounts are few and can each have a Details
-    window in Settings; nodes can be many, so a node's details likely
-    belong on the node itself (its ⋯ menu on the map) rather than in a
-    list of every node (cf. 72).
-
 ### Map and nodes
 
 72. **Node id follow-ups** (Step, when needed) — ids are random UUIDv4
     since 2026-10-24 (#78, `app/backend/project/node/README.md`). Open:
-    a Settings overview of every node's id (was 49) — purpose not
-    decided; most likely an inspection list for development (project,
-    short id, label, path), not a feature for users; a check that walks
+    a node's details on the node itself (its ⋯ menu on the map: id,
+    path, when made, its changes), the way 75 does it for projects and
+    accounts; a Settings overview of every node's id (was 49) — purpose
+    not decided; most likely an inspection list for development
+    (project, short id, label, path), not a feature for users; a check that walks
     `data/projects/*/` for duplicate ids and references to ids that
     never existed; which side mints ids if another app shares the data.
 53. **`/select` gives no hint when it fails** (Step) — matching stays
