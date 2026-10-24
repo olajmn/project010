@@ -55,10 +55,18 @@ next.
 
 ### Backend and code
 
-66. **Parked Time code: keep, branch, or remove** (Question) —
-    `backend/foundation/` (about 1,800 lines) is used by nothing in the
-    product ([[04-current-state]]): `week_windows()` / `day_windows()`
-    and `step_plan` (P1, P2). Only relevant if time returns to the map.
+66. **What the app understands about time** (Question) — one place for
+    time, nothing started.
+    1. **The parked code:** `backend/foundation/` (about 1,800 lines:
+       `week_windows()` / `day_windows()`, `step_plan`; P1, P2) is used
+       by nothing in the product ([[04-current-state]]). It is kept on
+       purpose, as the parked home for the time sense the chat and the
+       agent may need later (when things happened, how often to step
+       in); keep, move to a branch, or remove is still open.
+    2. **What a session or visit is** (was 27): if the app needs one,
+       build on `created_at` in project history, not server starts.
+    3. **Practices have no shape** (was 17): recurring open-ended
+       commitments ("10 push-ups a day") fit no current axis.
 62. **Old names left in code** (Step, not crucial) — "Talk" is "the
     chat" in docs since 2026-10-14 but remains in `TALK_PROVIDER` (also
     in `app/fly.toml`, so a rename needs a deploy), `talk_prompt.py`,
@@ -71,7 +79,7 @@ next.
     ([[03-architecture]] § 5); only Storage changes. To decide: tables,
     migrating existing data, and what a demo sandbox copies. Node ids
     are UUIDs since #78, so they can be keys as they are.
-68. **Frontend framework** (Question, not before 65) — React or Svelte
+68. **Frontend framework** (Question) — React or Svelte
     (stays web and TypeScript), or Flutter as a new project on the same
     API. Either way the frontend is rewritten.
 
@@ -140,13 +148,6 @@ next.
     (`app/backend/api/demo/settings.py`, [[demo]]).
 61. **Zero data retention for the demo's chat** (Question) — whether to
     require ZDR at OpenRouter ([[05-decisions]] #70).
-
-### Product questions
-
-17. **Practices have no shape** (Question) — recurring open-ended
-    commitments ("10 push-ups a day") fit no current axis.
-27. **What counts as a session / visit** (Question) — if the app needs
-    one, build on `created_at` in project history, not server starts.
 
 ## Ideas (not decided)
 

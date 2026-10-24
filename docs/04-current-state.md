@@ -161,7 +161,7 @@ How a message is built and sent, and its rules: [[chat]].
 - How much conversation the model should get — today the last 20 turns,
   all nodes mixed and tagged. Part of a wider question: how the chat can
   use the whole map and history as context (`TODO.md` Queue 63).
-- What a "visit" is, if the app ever needs one (`TODO.md` Queue 27).
+- What a "visit" is, if the app ever needs one (`TODO.md` Queue 66).
 
 ## See also
 
