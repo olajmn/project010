@@ -68,11 +68,27 @@ next.
     "Current state" in the UI but not in `project/status/` or
     `build_status`. Rename with the tests when there is a reason to
     touch them.
-67. **A real database** (Step, shape open) — storage is JSON files
-    under `data/`. Candidate: SQLite, still a local file
-    ([[03-architecture]] § 5); only Storage changes. To decide: tables,
-    migrating existing data, and what a demo sandbox copies. Node ids
-    are UUIDs since #78, so they can be keys as they are.
+67. **A real database** (Step, not needed yet) — when JSON files stop
+    being enough, and what replaces them.
+    1. **Today:** JSON files under `app/data/`: per project a
+       `current.json` (the project now) and an `events.jsonl` that only
+       grows. Only `backend/storage/` reads or writes them
+       ([[03-architecture]] § 3), and "no database until a real need
+       shows up" (§ 5).
+    2. **What makes it needed:** several writers on one project at once
+       (more users, or tabs; the files have no locking, so one save can
+       overwrite another); questions across much data (every change in
+       every project last week); size (thousands of projects, very long
+       logs). None applies yet: one user locally, and a separate copy
+       per demo visitor.
+    3. **The target:** SQLite in the app, still one local file, so the
+       data stays on the user's machine; a server database (e.g.
+       PostgreSQL) only if it becomes a hosted service with many users.
+    4. **What does not change:** changes appended to a log beside a
+       current state; UUID node ids (#78), which can be keys as they
+       are; only Storage knowing how data is kept.
+    To decide when it comes: the tables, moving the existing data, and
+    what a demo sandbox copies.
 68. **Frontend framework** (Question) — React or Svelte
     (stays web and TypeScript), or Flutter as a new project on the same
     API. Either way the frontend is rewritten.
