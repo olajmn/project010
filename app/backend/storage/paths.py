@@ -33,6 +33,5 @@ def ensure_data_dir() -> None:
 def now_utc() -> str:
     """The current time as text, in UTC with its offset
     ("2026-09-25T18:27:51.305+00:00"), so it means the same moment on any
-    machine. Records saved before 2026-09-25 hold local time without an
-    offset; resolver.created_at_key() reads both."""
+    machine."""
     return datetime.now(UTC).isoformat(timespec="milliseconds")

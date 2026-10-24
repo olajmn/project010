@@ -29,21 +29,10 @@ from backend.storage.project_persistence import (
 
 
 def created_at_key(record: dict) -> datetime:
-    """
-    Make created_at values comparable across old and new formats.
-
-    Records saved since 2026-09-25 hold UTC with an offset ("…+00:00",
-    paths.now_utc()); older ones hold naive local time. Comparing an
-    aware and a naive datetime raises TypeError, so aware timestamps are
-    converted to local time and stripped of tzinfo here.
-
-    Public (not `_`-prefixed) because timeline.py and
-    api/answers_to_browser.py sort by it.
-    """
-    parsed = datetime.fromisoformat(record["created_at"])
-    if parsed.tzinfo is not None:
-        parsed = parsed.astimezone().replace(tzinfo=None)
-    return parsed
+    """A record's `created_at` as a datetime, to sort by. Every record
+    holds UTC with its offset (paths.now_utc()). Public because
+    timeline.py and api/answers_to_browser.py sort by it."""
+    return datetime.fromisoformat(record["created_at"])
 
 
 # Read one project

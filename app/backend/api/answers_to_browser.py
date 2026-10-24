@@ -130,35 +130,27 @@ def saved_tree_view(saved: dict) -> dict:
 def map_tree(record: dict) -> dict | None:
     """The map as the browser draws it: {id, label, status, children},
     with the project as the root. None when the map is empty."""
-    nodes = nodes_of(record)
-    pid = record["project_id"]
-    children = [
-        _node(node, fallback_id=f"{pid}-p-{i}")
-        for i, node in enumerate(nodes)
-        if isinstance(node, dict)
-    ]
+    children = [_node(node) for node in nodes_of(record) if isinstance(node, dict)]
     if not children:
         return None
     return {
-        "id": pid,
+        "id": record["project_id"],
         "label": record.get("name", ""),
         "status": "done" if record.get("completed") else "open",
         "children": children,
     }
 
 
-def _node(node: dict, fallback_id: str) -> dict:
-    """One node and everything under it. Stored nodes always have an
-    id; the fallback only covers very old records."""
-    node_id = node.get("id") or fallback_id
+def _node(node: dict) -> dict:
+    """One node and everything under it."""
     return {
-        "id": str(node_id),
+        "id": str(node["id"]),
         "label": node.get("label") or "—",
         # Nothing writes `resolved` today, so every node shows "open".
         "status": "done" if node.get("resolved") else "open",
         "children": [
-            _node(child, fallback_id=f"{node_id}-{j}")
-            for j, child in enumerate(node.get("children") or [])
+            _node(child)
+            for child in node.get("children") or []
             if isinstance(child, dict)
         ],
     }
