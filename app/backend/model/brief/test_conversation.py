@@ -175,7 +175,7 @@ def test_message_and_reply_are_kept_apart() -> None:
 
 
 # A house where Kitchen (p9) was removed and two parts share the label
-# "Planning", one under Rooms and one under Garden (TODO 71.3, 71.5).
+# "Planning", one under Rooms and one under Garden (docs/05-decisions.md #76).
 HOUSE = {
     "name": "House",
     "plan": {

@@ -2,7 +2,7 @@
 Fits a prompt into the model's context before it is sent, so nothing is
 cut where no one sees it. When too long, the oldest past turns go first,
 in pairs, and the system text says how many; the instructions, the
-project background, and the new message are never cut (TODO.md 71.7).
+project background, and the new message are never cut (docs/05-decisions.md #77).
 
 No tokenizer: sizes are estimated from characters, on the large side.
 """

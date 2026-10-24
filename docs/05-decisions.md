@@ -926,6 +926,8 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; both are constants in `model/client.py`.
 
+**Follow-up (same day):** With the budget in place, two fixed caps went. The model gets every change saved in the project, not the last 10 (`changes_text()` in `project/status/build_status.py`), and the structure has no 400-line cap: it may use a third of the prompt (`STRUCTURE_TOKENS` in `model/brief/conversation.py`) and is cut past that with a note saying how many parts are shown. A prompt still over the budget without past turns is reported in the terminal, not sent silently.
+
 ## See also
 
 - [[03-architecture]]

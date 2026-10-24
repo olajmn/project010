@@ -308,7 +308,7 @@ def test_accounts(api) -> None:
 def test_chat_about_a_removed_part_is_saved_without_it(
     api, project, monkeypatch
 ) -> None:
-    # The screen may still hold a part that was removed (TODO 71.4).
+    # The screen may still hold a part that was removed (docs/05-decisions.md #76).
     monkeypatch.setattr(reply_module, "send_chat", lambda messages: "Fine.")
     pid = project["project_id"]
     status, view = api.post(

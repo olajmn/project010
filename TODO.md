@@ -11,36 +11,7 @@ next.
 
 ## Active
 
-71. **Chat logic watertight** (Bug) — how the chat reads saved turns
-    and uses nodes, found 2026-10-24. Work through it in order: agree
-    the rules, pin each hole with a test that fails today, then fix.
-    Rules to start from: a chat turn is only what was saved as one
-    (`event: "chat"`); a node is identified by its id, not its label;
-    the model is told when a node it has heard about is gone.
-    1. ~~Reply and message share one text field~~ — fixed 2026-10-24:
-       saved as `message` and `reply`; old turns converted once (#75).
-    2. ~~A map edit can pass for a chat turn~~ — fixed 2026-10-24:
-       only `event: "chat"` lines are read as turns.
-    3. ~~Removed nodes stay in the conversation~~ — fixed 2026-10-24:
-       "(since removed)" for the model, "(removed)" on screen (#76).
-    4. ~~A selected node that no longer exists~~ — fixed 2026-10-24:
-       it counts as nothing selected, and is not saved with the turn.
-    5. ~~Same label in two places~~ — fixed 2026-10-24: turns are tagged
-       by path, e.g. `Rooms / Planning`.
-    6. ~~The structure is cut at 400 lines without saying so~~ — fixed
-       2026-10-24: no fixed cap; the structure gets a third of the
-       prompt (`STRUCTURE_TOKENS` in `conversation.py`) and is cut only
-       past that, with a note saying how many parts are shown.
-    7. ~~Ollama cuts the prompt at 4,096 tokens without saying so~~ —
-       fixed 2026-10-24: the app asks for 32,768 (`CONTEXT_TOKENS` in
-       `model/client.py`) and fits each prompt itself, dropping the
-       oldest turns with a note (`model/brief/budget.py`, #77). Measured
-       before: Ollama kept the system text but dropped the oldest turns.
-    Remaining: `docs/chat.md` describes the path and the rules —
-    written 2026-10-24; this item can close once it has been read.
-    Related, not part of this item: how much context the chat gets
-    (63), whether the structure helps at all (69), and `/select` hints
-    (53).
+Nothing chosen yet; pick the next item from the Queue.
 
 ## Queue
 
