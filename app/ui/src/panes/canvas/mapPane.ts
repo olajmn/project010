@@ -207,7 +207,7 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
 
     const removeBead = async (stepId: string) => {
       // Removing takes everything under the node with it and there is
-      // no undo yet (TODO Queue 54), so a node with children asks first.
+      // no undo yet (TODO 54), so a node with children asks first.
       const under = countUnder(project.node, stepId);
       if (under > 0) {
         const parts = under === 1 ? "the 1 part" : `the ${under} parts`;

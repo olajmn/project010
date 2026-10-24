@@ -1,4 +1,4 @@
-// Whether the map shows node ids (p1, p12, …) instead of labels.
+// Whether the map shows node ids (short form, nodeId.ts) instead of labels.
 // Toggled by the chat's `/id` with no node selected. Display only, per page
 // load: nothing is saved, and the tree itself does not change.
 

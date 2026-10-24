@@ -20,6 +20,11 @@ next.
     imported as child nodes today (the paste shortcut in
     `sendMessage.ts`); with Shift+Enter, a written multi-line message
     would turn into nodes by accident.
+    Where it goes: a new `ui/src/panes/chat/enterToSend.ts`
+    (`installEnterToSend()`, one behavior per file like `growInput.ts`),
+    wired with one line in `ui/src/index.ts` beside
+    `installSendMessage()`; the multi-line rule, if it changes, stays in
+    `sendMessage.ts`. Docs: one line in `docs/chat.md` § 2 (step 1).
 54. **Undo for map edits** (Step) — nothing can be undone today, and the
     history keeps only a short text per change, not the tree, so an
     earlier tree cannot be worked out from it. Shape: snapshots
@@ -33,6 +38,18 @@ next.
     Undo button right after a remove, after which the remove
     confirmation may go. Also open: removing a node but keeping its
     children (moved up a level).
+    Where it goes: a new folder `app/backend/project/undo/`
+    (`undo.py`: take a snapshot before an edit, put the previous one
+    back; `test_undo.py`), like `project/saved_trees/`. Every map edit
+    in `panes/canvas/edit_map.py` calls it once, through one helper,
+    not at each call site. If snapshots survive a reload, their file
+    belongs to Storage (`storage/undo_persistence.py`, e.g.
+    `data/projects/{id}/snapshots.jsonl`). Route
+    `POST /api/projects/{id}/undo` in `api/app.py`, HTTP test in
+    `api/test_http_api.py`; UI in a new `ui/src/panes/canvas/undo.ts`
+    (Ctrl+Z on the map, the Undo button) and one call in `api.ts`.
+    Docs: decision in `05-decisions.md`, rows in `04-current-state.md`
+    § 2-3.
 
 ## Queue
 

@@ -154,8 +154,8 @@ def from_nested_labels(entries: list[dict], mint_id: Callable[[], str]) -> list[
     recursing to whatever depth that list actually has. Copies `path`
     when present (folder walk) and `ordered` when present (saved tree).
 
-    `mint_id` is passed in so ids stay unique across a whole project,
-    not just within one call.
+    `mint_id` makes each new id; callers pass identity.new_node_id, the
+    one place node ids are minted.
     """
     steps: list[Step] = []
     for entry in entries:
