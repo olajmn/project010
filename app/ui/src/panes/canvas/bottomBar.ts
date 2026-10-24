@@ -11,7 +11,7 @@
 
 import { archiveProject } from "../../api.js";
 import { displayProjectTitle } from "../create/defaultNames.js";
-import { projectChromeHash } from "../create/projectOrder.js";
+import { projectChromeId } from "../create/projectOrder.js";
 import { setTip } from "../../shell/tip.js";
 import { buildAddMenu } from "./addMenu.js";
 import { copyAsText } from "./copyAsText.js";
@@ -65,7 +65,7 @@ export function mountBottomBar(opts: BottomBarOpts): BottomBar {
     const text = copyAsText(
       project.name,
       middle,
-      projectChromeHash(project),
+      projectChromeId(project),
     );
     // Brief feedback in the icon itself (a check), then back to copy.
     try {

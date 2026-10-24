@@ -190,6 +190,10 @@ choice.
   (`text_to_tree.py`); box diagrams need another path (was 25).
 - **Export / share a structure** — a branch or project as a file others
   can open.
+- **A details window per project and account** — a Details button opens
+  what is about the system rather than for people: ids, made and changed
+  dates, and the project's log (now under Settings → Logs). The rows in
+  Directory and Archive would then show names only.
 - **Sync across devices** with end-to-end encryption, the local copy
   staying the real one (`docs/03-architecture.md` § 5).
 - **Other front ends on the same data** — the node data is portable.

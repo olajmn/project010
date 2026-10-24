@@ -102,7 +102,7 @@ function projectStatus(project: ProjectView): string {
 }
 
 function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): HTMLElement {
-  const local = `#${shortId(project.project_id)}`;
+  const local = shortId(project.project_id);
   const details = [local, projectStatus(project), madeAndChanged(project.started_at, project.created_at)]
     .filter(Boolean)
     .join(" · ");

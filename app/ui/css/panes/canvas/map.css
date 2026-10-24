@@ -232,7 +232,7 @@
 .progress-name-label.is-renamable,
 .progress-name-input {
   /* Header beads are pointer-events: none so the camera can pan
-     over #id / title. The rename target has to take clicks. */
+     over id / title. The rename target has to take clicks. */
   pointer-events: auto;
 }
 

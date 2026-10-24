@@ -1,6 +1,6 @@
 /**
  * Write the words on the live project map (DOM rows + controls).
- * Layout: [[ui]] § 2 — `#id` → title → spine beads; depth under beads.
+ * Layout: [[ui]] § 2 — `id` → title → spine beads; depth under beads.
  * Who-under-who from nodeFamily; lines from mapLines; indent from spacing.ts.
  */
 
@@ -347,7 +347,7 @@ function appendAsciiDepth(
 }
 
 /**
- * Project map: `#id` → title → waypoints ([[ui]] § 2).
+ * Project map: `id` → title → waypoints ([[ui]] § 2).
  * Id and title are header beads (same box language as tree beads, but
  * not progression nodes — no ⋯). Middle = root children; nested = depth.
  */
@@ -387,7 +387,7 @@ export function treeWordsElement(
   if (identity) {
     const namePrefix = document.createElement("span");
     namePrefix.className = "progress-branch";
-    // Sit on the nest spine under #id (inset), then a short tick into the box.
+    // Sit on the nest spine under the id (inset), then a short tick into the box.
     namePrefix.style.width = `${NEST_INSET_REM}rem`;
     nameRow.appendChild(namePrefix);
   }

@@ -57,7 +57,7 @@ export async function mountLogScope(
     for (const p of open) {
       const opt = document.createElement("option");
       opt.value = p.project_id;
-      opt.textContent = `${p.name} (#${shortId(p.project_id)})`;
+      opt.textContent = `${p.name} (${shortId(p.project_id)})`;
       select.appendChild(opt);
     }
 

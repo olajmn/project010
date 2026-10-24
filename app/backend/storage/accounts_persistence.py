@@ -119,7 +119,7 @@ def get_account(account_id: str) -> dict | None:
 def rename_account(account_id: str, text: str) -> dict | None:
     """
     Set the display label on an account. Empty / whitespace becomes
-    the default "user" so the UI falls back to account#<short id>. Returns the
+    the default "user" so the UI falls back to account <short id>. Returns the
     record, or None if id doesn't resolve. Archived accounts can still be
     renamed (label only).
     """

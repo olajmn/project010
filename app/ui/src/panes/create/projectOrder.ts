@@ -6,7 +6,7 @@
 //      - projectsChronologicalForUser()
 //      - projectsNewestFirst()
 //  2. Labels (map chrome)
-//      - projectChromeHash()
+//      - projectChromeId()
 
 import type { ProjectView } from "../../dataShapes.js";
 import { shortId } from "../../ids.js";
@@ -34,7 +34,7 @@ export function projectsNewestFirst(
 
 // 2. Labels
 
-/** Map bead / copy chrome: `#` and the project's short id. */
-export function projectChromeHash(project: ProjectView): string {
-  return `#${shortId(project.project_id)}`;
+/** Map bead / copy chrome: the project's short id. */
+export function projectChromeId(project: ProjectView): string {
+  return shortId(project.project_id);
 }
