@@ -131,7 +131,7 @@
   color: var(--color-text-muted);
 }
 
-/* The active account: a small static accent dot after its id. */
+/* The active account: a small static accent dot after its name. */
 .settings-item.is-active .settings-item-label::after {
   content: "";
   display: inline-block;

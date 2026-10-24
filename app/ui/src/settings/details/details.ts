@@ -8,6 +8,7 @@
 //      - mountDetails()
 //      - detailsHref()
 //      - markFromTab()
+//      - detailsAction()
 //  2. A project
 //      - projectDetails()
 //  3. An account
@@ -74,7 +75,12 @@ export function markFromTab(from: string | null): void {
     ?.setAttribute("aria-current", "page");
 }
 
-function openAction(kind: "project" | "account", id: string, from: string | null): HTMLButtonElement {
+/** A row's quiet "Details" button that opens this page for it. */
+export function detailsAction(
+  kind: "project" | "account",
+  id: string,
+  from: string | null,
+): HTMLButtonElement {
   return settingsAction("Details", () => {
     location.href = detailsHref(kind, id, from);
   });
@@ -93,7 +99,7 @@ function projectDetails(project: ProjectView, accounts: AccountView[], from: str
     settingsRow("State", state),
   ];
   if (account) {
-    rows.push(settingsRow("Account", userLabel(account), [openAction("account", account.id, from)]));
+    rows.push(settingsRow("Account", userLabel(account), [detailsAction("account", account.id, from)]));
   }
   const log = document.createElement("div");
   void mountProjectTimeline(log, project.project_id);
@@ -114,7 +120,7 @@ function accountDetails(account: AccountView, projects: ProjectView[], from: str
     .sort((a, b) => (a.started_at ?? "").localeCompare(b.started_at ?? ""));
   const list = own.length
     ? settingsGroup(
-        own.map((p) => settingsRow(p.name, shortDate(p.started_at ?? p.created_at), [openAction("project", p.project_id, from)])),
+        own.map((p) => settingsRow(p.name, shortDate(p.started_at ?? p.created_at), [detailsAction("project", p.project_id, from)])),
       )
     : settingsHint("No projects.");
   return [settingsSection(userLabel(account), settingsGroup(rows)), settingsSection("Projects", list)];

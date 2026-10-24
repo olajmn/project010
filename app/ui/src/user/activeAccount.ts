@@ -1,5 +1,5 @@
 // Active simulated account seat. Wire: account_id. Display: Accounts /
-// account <short id> (see userLabel / accountWireLabel).
+// its name, or account <short id> without one (userLabel).
 
 import { shortId } from "../ids.js";
 
@@ -42,14 +42,10 @@ export function setLastProjectId(userId: string, projectId: string | null): void
   localStorage.setItem(LAST_PROJECT_KEY_PREFIX + userId, projectId);
 }
 
-/** Id label — always `account <short id>`, even when a custom name is set. */
-export function accountWireLabel(id: string): string {
-  return `account ${shortId(id)}`;
-}
-
-/** Display name for one sim user — custom label, or its id label. */
+/** Display name for one account — its name, or `account <short id>`
+ *  when it has none. */
 export function userLabel(user: { id: string; text?: string | null }): string {
   const t = user.text?.trim();
   if (t && t !== "user") return t;
-  return accountWireLabel(user.id);
+  return `account ${shortId(user.id)}`;
 }

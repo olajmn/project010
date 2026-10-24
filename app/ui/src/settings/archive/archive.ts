@@ -16,9 +16,9 @@ import {
 } from "../../api.js";
 import { askToConfirm } from "../../panes/canvas/confirmPopover.js";
 import { setButtonBusy } from "../../shell/busyButton.js";
-import { accountWireLabel, userLabel } from "../../user/activeAccount.js";
+import { userLabel } from "../../user/activeAccount.js";
 import type { AccountView, ProjectView } from "../../dataShapes.js";
-import { shortId } from "../../ids.js";
+import { detailsAction } from "../details/details.js";
 import {
   settingsAction,
   settingsError,
@@ -71,17 +71,9 @@ function actions(
 }
 
 function accountRow(account: AccountView, repaint: () => Promise<void>): HTMLElement {
-  // The id leads, so every account reads the same; its own name follows
-  // only when it has one (an unnamed account's label is just its id).
-  const name = userLabel(account);
-  const id = accountWireLabel(account.id);
-  const details = [name === id ? "" : name, shortDate(account.created_at)]
-    .filter(Boolean)
-    .join(" · ");
-  return settingsListRow(
-    id,
-    details,
-    actions(
+  return settingsListRow(userLabel(account), shortDate(account.created_at), [
+    detailsAction("account", account.id, "archive"),
+    ...actions(
       `“${userLabel(account)}”`,
       async () => {
         await restoreAccount(account.id);
@@ -92,7 +84,7 @@ function accountRow(account: AccountView, repaint: () => Promise<void>): HTMLEle
         await repaint();
       },
     ),
-  );
+  ]);
 }
 
 function projectStatus(project: ProjectView): string {
@@ -102,15 +94,13 @@ function projectStatus(project: ProjectView): string {
 }
 
 function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): HTMLElement {
-  const local = shortId(project.project_id);
-  const details = [local, projectStatus(project), madeAndChanged(project.started_at, project.created_at)]
+  const details = [projectStatus(project), madeAndChanged(project.started_at, project.created_at)]
     .filter(Boolean)
     .join(" · ");
   const canRestore = project.cancelled && !project.completed;
-  return settingsListRow(
-    project.name,
-    details,
-    actions(
+  return settingsListRow(project.name, details, [
+    detailsAction("project", project.project_id, "archive"),
+    ...actions(
       `“${project.name}”`,
       canRestore
         ? async () => {
@@ -123,7 +113,7 @@ function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): H
         await repaint();
       },
     ),
-  );
+  ]);
 }
 
 // 2. mountArchive()

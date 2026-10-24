@@ -20,13 +20,12 @@ import { askToConfirm } from "../../panes/canvas/confirmPopover.js";
 import { projectsChronologicalForUser } from "../../panes/create/projectOrder.js";
 import { setButtonBusy } from "../../shell/busyButton.js";
 import {
-  accountWireLabel,
   getActiveUserId,
   setActiveUserId,
   userLabel,
 } from "../../user/activeAccount.js";
 import type { AccountView, ProjectView } from "../../dataShapes.js";
-import { shortId } from "../../ids.js";
+import { detailsAction } from "../details/details.js";
 import {
   settingsAction,
   settingsError,
@@ -79,15 +78,17 @@ function newAccountSection(onCreate: (name: string) => Promise<void>): HTMLEleme
 }
 
 function childProjectRow(project: ProjectView): HTMLElement {
-  const local = shortId(project.project_id);
-  const details = [project.name, madeAndChanged(project.started_at, project.created_at)].filter(Boolean).join(" · ");
-  const row = settingsListRow(local, details);
+  const row = settingsListRow(
+    project.name,
+    madeAndChanged(project.started_at, project.created_at),
+    [detailsAction("project", project.project_id, "directory")],
+  );
   row.classList.add("is-child");
   return row;
 }
 
-/** An account's row (id first, name and date after; Rename, Delete),
- *  then its projects under it. Rename swaps the row for an edit row. */
+/** An account's row (its name and date; Details, Rename, Delete), then
+ *  its projects under it. Rename swaps the row for an edit row. */
 function accountRows(
   user: AccountView,
   projects: ProjectView[],
@@ -96,10 +97,6 @@ function accountRows(
   showError: (message: string) => void,
 ): HTMLElement[] {
   const name = userLabel(user);
-  const id = accountWireLabel(user.id);
-  const details = [name === id ? "" : name, shortDate(user.created_at)]
-    .filter(Boolean)
-    .join(" · ");
 
   const rename = settingsAction("Rename", () => startRename());
   const remove = settingsAction(
@@ -107,7 +104,7 @@ function accountRows(
     async (btn) => {
       const ok = await askToConfirm(
         btn.getBoundingClientRect(),
-        `Delete ${name === id ? id : `“${name}”`}? It moves to Archive; its projects stay, without this account.`,
+        `Delete “${name}”? It moves to Archive; its projects stay, without this account.`,
         "Delete",
       );
       if (!ok) return;
@@ -129,7 +126,11 @@ function accountRows(
     true,
   );
 
-  const row = settingsListRow(id, details, [rename, remove]);
+  const row = settingsListRow(name, shortDate(user.created_at), [
+    detailsAction("account", user.id, "directory"),
+    rename,
+    remove,
+  ]);
   row.dataset.accountId = String(user.id);
   if (activeId === user.id) row.classList.add("is-active");
 
@@ -147,7 +148,7 @@ function accountRows(
         showError((err as Error).message);
       }
     });
-    const edit = settingsRow(id, input, [save, settingsAction("Cancel", cancel)]);
+    const edit = settingsRow(name, input, [save, settingsAction("Cancel", cancel)]);
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") save.click();
       if (event.key === "Escape") cancel();
