@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings — Details</title>
+<script>
+(function () {
+  var t = null;
+  try { t = localStorage.getItem("ui.theme"); } catch (e) {}
+  document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
+})();
+</script>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="settings-body">
+<main>
+  <a class="settings-back" href="/">Projects</a>
+  <nav>
+    <a href="/settings/general.html">General</a>
+    <a href="/settings/directory.html">Directory</a>
+    <a href="/settings/archive.html">Archive</a>
+    <a href="/settings/logs.html">Logs</a>
+  </nav>
+
+  <div class="settings-stack">
+    <section class="settings-lists" id="details" aria-label="Details"></section>
+  </div>
+</main>
+<script type="module" src="/dist/settings/details/page.js"></script>
+</body>
+</html>
