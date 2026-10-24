@@ -24,7 +24,7 @@ In this order, every time:
 |---|---|---|
 | Instructions: role, task, behavior, limits, examples | `model/brief/talk_prompt.py` | Fixed text |
 | Project status: name, created, last change, map size | `status_text()` in `project/status/build_status.py` | None |
-| Every change saved in the project, newest first | `changes_text()`, same file | None |
+| Every change saved in the project, newest first, each by node names and their path at the time (`project/changes/describe.py`) | `changes_text()`, same file | None per project; one change lists up to 40 names, then says how many more |
 | The structure: every node name, indented | `tree_lines()` in `project/node/tree_as_text.py` | A third of the prompt; past that, cut with a note |
 | The selected node with its path and what is under it, a removed node asked about on purpose, a selected day's changes, or "nothing is selected" | `_background()` in `conversation.py` | Half the structure's share |
 | Past turns, oldest first, each tagged with the node or day it was about | `past_turns()`, same file | The last 20; the oldest go first if the prompt would not fit |
@@ -43,9 +43,10 @@ Each rule is checked by the tests named after it.
 | A selected node that is not in the tree is no selection, unless the message comes from that node's own conversation; then the model is told it was removed | `test_selected_part_that_no_longer_exists_is_no_selection`, `test_asking_about_a_removed_part_on_purpose`, `test_chat_about_a_removed_part_is_saved_without_it`, `test_chat_about_a_removed_part_on_purpose` |
 | Nothing is cut where no one sees it: what does not fit is left out by the app, which says so; the instructions and background are never cut | `test_oldest_turns_go_first_and_the_model_is_told`, `test_instructions_and_background_are_never_cut`, `test_structure_cut_only_to_fit_and_says_so`, `test_a_prompt_too_large_even_alone_is_reported` |
 | The model sees the project's whole record of changes, not a recent slice | `test_changes_text_holds_the_whole_record` |
+| Each change names the nodes it touched and where they were, never by id; a long list is cut with a note | `test_each_kind_names_its_nodes_and_where`, `test_a_long_list_is_cut_with_a_note` |
 | A removed node's conversation stays, marked "(removed)" on screen | `test_turns_about_a_removed_part_are_marked` |
 
-Ids are never reused ([[05-decisions]] #52), so a removed node's id keeps meaning that one node. A new node with the same name is a different node and does not take over the old conversation; a node brought back with its old id (undo, `TODO.md` 54, not built) would get its conversation back, unmarked.
+Ids are never reused ([[05-decisions]] #52), so a removed node's id keeps meaning that one node. A new node with the same name is a different node and does not take over the old conversation; a node brought back with its old id by undo ([[05-decisions]] #84) gets its conversation back, unmarked.
 
 ## 5. What it does not do
 

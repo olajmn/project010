@@ -112,6 +112,9 @@ Everything lives in `app/data/` as plain JSON:
   reverses or repeats an earlier one (`undoes`, `redoes`); they reach
   only changes after the log line the page opened at (`since`,
   [[05-decisions]] #84).
+- The chat's model reads each change from its record, by node names
+  and paths at that moment (`project/changes/describe.py`, #85); Logs
+  keeps the short sentence saved with the line.
 
 ## 4. The model
 

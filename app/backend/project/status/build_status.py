@@ -24,6 +24,7 @@ given to the chat's model (`status_text()`, `changes_text()`,
 from collections import Counter
 from datetime import date, datetime, timedelta
 
+from backend.project.changes.describe import describe_changes
 from backend.project.node import steps_of
 from backend.project.timeline import to_event
 
@@ -140,8 +141,16 @@ def day_name(day: str, now: datetime | None = None) -> str:
 
 
 def _work_events(history: list[dict]) -> list[dict]:
-    """Saved lines as timeline events, oldest first, chat left out."""
-    events = [to_event(record, "") for record in history]
+    """Saved lines as timeline events, oldest first, chat left out. A
+    map edit with a change record reads as that record, by names and
+    paths (changes/describe.py), not its short sentence."""
+    described = describe_changes(history)
+    events = []
+    for record in history:
+        event = to_event(record, "")
+        if record.get("id") in described:
+            event["text"] = described[record["id"]]
+        events.append(event)
     return [e for e in events if e.get("event") not in _CHAT_EVENTS]
 
 

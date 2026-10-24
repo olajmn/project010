@@ -8,6 +8,8 @@ the chat read them.
 Files:
   records.py — the shape of one change record
   replay.py — a log rebuilt into its tree, and the check against current.json
+  undo.py — which change undo and redo act on, read from the log
+  describe.py — each change as a line the chat's model reads
 """
 
 from backend.project.changes import records

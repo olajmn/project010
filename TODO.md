@@ -11,44 +11,8 @@ next.
 
 ## Active
 
-54. **Change records, then undo** (Step) — every map edit saves what it
-    actually did, not only a sentence about it; undo, replay, and the
-    chat's history all read those records (event sourcing). Today each
-    line in `events.jsonl` describes a change ("Removed step under
-    Actors: Client") but cannot repeat or reverse it, and the tree in
-    `current.json` cannot be rebuilt from the history. Planned
-    2026-10-24, replaces the earlier plan of keeping tree copies.
-    1. **Change records** — done 2026-10-24 (#80). Each map edit line in `events.jsonl` gets a
-       `change` field beside its `feedback`: add (node, parent, place),
-       remove (the whole removed branch with its ids, parent, place),
-       move (id, from, to), rename (id, old, new), import / folder /
-       insert tree (every node brought in, parent). Written once, in
-       `panes/canvas/edit_map.py` through one helper; kept by
-       `save_plan()` (`storage/project_persistence.py`). Each record
-       has its own `change_…` id (#81); the account that made it is the
-       line's `account_id`.
-    2. **A history that replays from the start** — done 2026-10-24
-       (#83). The demo is built from empty by `backend/seed/build.py`
-       through the app's own edits, and is also the local data; the old
-       `app/data/` is archived. `tools/project_check.py` checks that
-       each log replays to `current.json` (`project/changes/replay.py`).
-    3. **Undo and redo** — done 2026-10-24 (#84):
-       `POST /api/projects/{id}/undo` and `/redo` with `since`, the log
-       line the page opened at.
-    4. **The UI** — done 2026-10-24 (#84): undo and redo arrows after ×
-       in the map's top bar, white when they can act and grey when not;
-       Ctrl+Z / Ctrl+Shift+Z outside text fields (`panes/canvas/undo.ts`).
-       No notice after a remove, so the remove confirmation stays.
-    5. **The chat reads them.** A readable line per change for the
-       model ("Removed Client under Actors, with Client A, …"), names
-       and paths, not ids, cut with a note when long (`docs/chat.md`
-       rules). Closes the import part of 38; part of 63.
-    Where it goes: a new folder `app/backend/project/changes/`
-    (`records.py`: build a record; `undo.py`: its opposite;
-    `replay.py`: the tree from the log; their tests), like
-    `project/saved_trees/`. Docs: a decision in `05-decisions.md`, the
-    data rows in `04-current-state.md` § 3, `docs/chat.md`. Order: 1, 2,
-    3, 4, 5; each step is usable on its own.
+None chosen; the next one comes from the Queue. Change records, undo,
+and redo (54) were finished 2026-10-24 (#80, #83, #84, #85).
 
 ## Queue
 
@@ -143,10 +107,9 @@ next.
     Now that what the model is sent is exact (`docs/chat.md`), a test
     measures the model, not gaps in the prompt.
 38. **Changes on the map** (Step, parked) — a day in Current state
-    already selects its changes for the chat ([[05-decisions]] #62).
-    Open: highlight the nodes touched that day, and say which nodes an
-    import added ("Imported 95 nodes" does not). The import text matters
-    more since 2026-10-24: the model now reads every change.
+    already selects its changes for the chat ([[05-decisions]] #62), and
+    the model reads which nodes each change touched (#85). Open:
+    highlight the nodes touched that day on the map.
 
 ### Demo and login
 

@@ -1016,6 +1016,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Follow-up (same day, the page):** Undo and redo are two drawn arrows right after × in the map's top bar, white when they can act and grey when not, and Ctrl+Z / Ctrl+Shift+Z (Cmd on a Mac) outside text fields (`ui/src/panes/canvas/undo.ts`). There is no notice after a remove, so the confirmation before a remove stays.
 
+## 85. 2026-10-24 — The chat's model reads each change from its record
+
+**Decision:** The list of changes the model gets (`changes_text()`, and a selected day's changes) describes each map edit from its change record, not its saved sentence: which nodes were added, removed, moved, or renamed, by name and with their path in the tree at that moment, never by id ("Imported 7 nodes under Civic Centre: Construction (Building (Structure, Envelope, Interior), Systems, Site)"; "Undo: …" for an undo). The log is replayed as the lines are read (`project/changes/describe.py`), so a path is where the node was then. One change lists up to 40 names and then says how many more. Logs in Settings keeps the short sentence saved with each line.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** longer saved sentences (would fix only new lines, and the Logs page would get long); ids in the lines (the model answers people, who know names).
+
+**Why this choice:** "Imported 90 nodes" did not say which, so the model could not answer what changed. The record holds exactly what happened, so the description is complete and matches the tree. Last step of `TODO.md` 54.
+
+**Reversible?** Yes; nothing saved changes.
+
 ## See also
 
 - [[03-architecture]]
