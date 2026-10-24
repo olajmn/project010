@@ -57,7 +57,10 @@ next.
     `panes/create/accounts/` (`panel.ts`, `helpers.ts`). No saved project
     lacks an account today. Chosen 2026-10-24: deleting an account moves
     it to Archive *with* its projects, still held by it; restoring the
-    account brings them back, so nothing is lost by accident. Open:
+    account brings them back, so nothing is lost by accident. Moving a
+    project to another account stays possible (the backend already
+    saves it as `owner_changed`); its control moves to the project's
+    details page ("Move…" by Account), replacing "Assign N unowned". Open:
     deleting an archived account for good while it still holds projects
     (likely refused, or only with an explicit "and its N projects").
 
