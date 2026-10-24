@@ -12,7 +12,7 @@ The chat beside the map answers questions about the open project. It does not se
 2. **The route** (`api/app.py`, body `ChatMessage` in `api/request_bodies.py`) loads the project and calls `reply()`.
 3. **`reply()`** (`project/panes/chat/reply.py`) drops a selected node that is no longer in the tree, unless `about_removed`. A message starting with `/` runs a command (`panes/chat/commands/`) and never reaches the model.
 4. **The prompt** is built by `build_messages()` (`model/brief/conversation.py`) and fitted to the model's context by `fit_to_budget()` (`model/brief/budget.py`).
-5. **The model** is called by `send_chat()` (`model/client.py`): Ollama locally, OpenRouter in the public demo ([[demo]]).
+5. **The model** is called by `send_chat()` (`model/client.py`), the one place that knows which provider answers; which ones are in use: [[04-current-state]] § 4.
 6. **The turn is saved** as one line in `events.jsonl` with `event: "chat"`, the user's `message`, the model's `reply`, and the node or day it was about.
 7. **The screen** rebuilds the thread from saved lines (`screen/chat_thread.py`) and frames turns by the node they were about (`ui/src/panes/chat/showOnlyThis.ts`).
 
@@ -30,7 +30,7 @@ In this order, every time:
 | Past turns, oldest first, each tagged with the node or day it was about | `past_turns()`, same file | The last 20; the oldest go first if the prompt would not fit |
 | The new message, tagged the same way | `build_messages()`, same file | — |
 
-The prompt may use 30,720 tokens (`PROMPT_TOKENS`) of the 32,768 the local model is asked for (`CONTEXT_TOKENS`); the rest is left for the reply. Sizes are estimated from characters, on the large side.
+The prompt may use the context the app asks for (`CONTEXT_TOKENS`) less room for the reply (`PROMPT_TOKENS`), whichever provider answers; the numbers are in `model/client.py`. The same limit keeps the cost of one message bounded where a provider charges per token. Sizes are estimated from characters, on the large side.
 
 ## 4. The rules
 
@@ -45,7 +45,7 @@ Each rule is checked by the tests named after it.
 | The model sees the project's whole record of changes, not a recent slice | `test_changes_text_holds_the_whole_record` |
 | A removed node's conversation stays, marked "(removed)" on screen | `test_turns_about_a_removed_part_are_marked` |
 
-Ids are never reused ([[05-decisions]] #52), so a removed node's id keeps meaning that one node.
+Ids are never reused ([[05-decisions]] #52), so a removed node's id keeps meaning that one node. A new node with the same name is a different node and does not take over the old conversation; a node brought back with its old id (undo, `TODO.md` 54, not built) would get its conversation back, unmarked.
 
 ## 5. What it does not do
 
