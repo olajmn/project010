@@ -55,8 +55,11 @@ next.
     the gap goes with it: "Projects without an account" in
     `settings/directory/directory.ts` and "Assign N unowned" in
     `panes/create/accounts/` (`panel.ts`, `helpers.ts`). No saved project
-    lacks an account today. Open: what happens to an account's projects
-    when it is deleted (archived with it, or moved to another account).
+    lacks an account today. Chosen 2026-10-24: deleting an account moves
+    it to Archive *with* its projects, still held by it; restoring the
+    account brings them back, so nothing is lost by accident. Open:
+    deleting an archived account for good while it still holds projects
+    (likely refused, or only with an explicit "and its N projects").
 
 ## Queue
 
