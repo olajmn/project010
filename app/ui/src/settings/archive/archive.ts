@@ -72,7 +72,6 @@ function actions(
 
 function accountRow(account: AccountView, repaint: () => Promise<void>): HTMLElement {
   return settingsListRow(userLabel(account), shortDate(account.created_at), [
-    detailsAction("account", account.id, "archive"),
     ...actions(
       `“${userLabel(account)}”`,
       async () => {
@@ -84,6 +83,7 @@ function accountRow(account: AccountView, repaint: () => Promise<void>): HTMLEle
         await repaint();
       },
     ),
+    detailsAction("account", account.id, "archive"),
   ]);
 }
 
@@ -99,7 +99,6 @@ function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): H
     .join(" · ");
   const canRestore = project.cancelled && !project.completed;
   return settingsListRow(project.name, details, [
-    detailsAction("project", project.project_id, "archive"),
     ...actions(
       `“${project.name}”`,
       canRestore
@@ -113,6 +112,7 @@ function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): H
         await repaint();
       },
     ),
+    detailsAction("project", project.project_id, "archive"),
   ]);
 }
 

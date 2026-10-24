@@ -15,12 +15,9 @@
 </head>
 <body class="settings-body">
 <main>
-  <a class="settings-back" href="/">Projects</a>
-  <nav>
-    <a href="/settings/general.html">General</a>
-    <a href="/settings/directory.html">Directory</a>
-    <a href="/settings/archive.html">Archive</a>
-  </nav>
+  <!-- A level below a tab: the way back goes to that tab (page.ts sets it). -->
+  <a class="settings-back" id="details-back" href="/settings/directory.html">Directory</a>
+  <nav></nav>
 
   <div class="settings-stack">
     <section class="settings-lists" id="details" aria-label="Details"></section>

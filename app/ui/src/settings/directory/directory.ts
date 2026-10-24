@@ -87,7 +87,7 @@ function childProjectRow(project: ProjectView): HTMLElement {
   return row;
 }
 
-/** An account's row (its name and date; Details, Rename, Delete), then
+/** An account's row (its name and date; Rename, Delete, Details), then
  *  its projects under it. Rename swaps the row for an edit row. */
 function accountRows(
   user: AccountView,
@@ -126,10 +126,11 @@ function accountRows(
     true,
   );
 
+  // Details last, so it lines up with the project rows' Details below.
   const row = settingsListRow(name, shortDate(user.created_at), [
-    detailsAction("account", user.id, "directory"),
     rename,
     remove,
+    detailsAction("account", user.id, "directory"),
   ]);
   row.dataset.accountId = String(user.id);
   if (activeId === user.id) row.classList.add("is-active");

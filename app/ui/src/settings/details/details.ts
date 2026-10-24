@@ -7,7 +7,7 @@
 //  1. Entry
 //      - mountDetails()
 //      - detailsHref()
-//      - markFromTab()
+//      - setWayBack()
 //      - detailsAction()
 //  2. A project
 //      - projectDetails()
@@ -67,12 +67,13 @@ export function detailsHref(kind: "project" | "account", id: string, from: strin
   return `/settings/details.html?${query}`;
 }
 
-/** Show the tab the page was opened from as the current one. */
-export function markFromTab(from: string | null): void {
-  if (!from) return;
-  document
-    .querySelector(`main > nav a[href="/settings/${CSS.escape(from)}.html"]`)
-    ?.setAttribute("aria-current", "page");
+/** Point the way back (top left) at the tab the page was opened from. */
+export function setWayBack(from: string | null): void {
+  const back = document.getElementById("details-back");
+  if (!(back instanceof HTMLAnchorElement)) return;
+  const tab = from === "archive" ? "archive" : "directory";
+  back.href = `/settings/${tab}.html`;
+  back.textContent = tab === "archive" ? "Archive" : "Directory";
 }
 
 /** A row's quiet "Details" button that opens this page for it. */

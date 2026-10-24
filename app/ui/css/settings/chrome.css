@@ -72,6 +72,11 @@ body.settings-body main > .settings-back::after {
   border-left: 1px solid var(--color-border);
 }
 
+/* A details page has no tabs: no divider after the way back. */
+body.settings-body main > .settings-back:has(+ nav:empty)::after {
+  display: none;
+}
+
 body.settings-body main > nav {
   gap: var(--space-4);
   padding: 0 var(--space-4) 0 var(--space-3);

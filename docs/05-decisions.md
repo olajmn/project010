@@ -1070,6 +1070,8 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; nothing saved changes.
 
+**Follow-up (same day):** A details page sits a level below its tab, so it shows no tabs, only a way back to the tab it was opened from ("‹ Directory" or "‹ Archive"). "Details" is the last action on every row, so it lines up down the list.
+
 ## See also
 
 - [[03-architecture]]
