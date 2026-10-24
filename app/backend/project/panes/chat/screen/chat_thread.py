@@ -1,14 +1,14 @@
 """
 The list of messages shown in the chat panel.
 
-Built from saved chat - no model call. Chat turns are shown: a line
-saved with `event: "chat"` is one user line (its `message`) and one
-agent line (its `reply`). One kind of
-map edit also shows, as a quiet note: renaming a node that has been
-talked about, inside that node's conversation, so earlier turns that use
-the old name still make sense (docs/05-decisions.md #71). Other map
-edits, archive lines, and the project's first record belong in Status,
-not here — same rule as model/brief/conversation.past_turns().
+Built from saved chat - no model call. A line saved with
+`event: "chat"` is one user line (its `message`) and one agent line
+(its `reply`). One kind of map edit also shows, as a quiet note:
+renaming a node that has been talked about, inside that node's
+conversation, so earlier turns that use the old name still make sense
+(docs/05-decisions.md #71). Other map edits, archive lines, and the
+project's first record belong in Status, not here — same rule as
+model/brief/conversation.past_turns().
 """
 
 from backend.project.node import find_path
@@ -96,8 +96,8 @@ def thread_for(
     steps: list | None = None,
 ) -> list[dict]:
     """Live thread for one project. Pass `history` when the caller
-    already loaded it, and `steps` (the tree now) to mark turns about
-    removed nodes."""
+    already loaded it, and `steps` (the tree now) for what
+    thread_messages() adds from it: removed, path, and context."""
     if history is None:
         history = get_history_for_project(project_id)
     return thread_messages(history, steps)

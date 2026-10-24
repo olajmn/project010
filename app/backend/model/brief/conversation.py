@@ -2,7 +2,7 @@
 Puts together what the model is sent when you press Send, in order:
 
 1. The system text: the fixed slots from talk_prompt.py, then the
-   project background — its summary rows and last changes
+   project background — its summary rows and every change
    (project/status/; the panel above the chat shows the summary and a
    per-day count instead), every name in its structure, and the part
    or the day of changes you have selected.
@@ -24,6 +24,9 @@ MAX_TURNS = 20
 
 # The structure's share of the prompt; past that, it is cut with a note.
 STRUCTURE_TOKENS = PROMPT_TOKENS // 3
+
+# How a part that is no longer in the tree is named to the model.
+_REMOVED = " (since removed)"
 
 
 def build_messages(
@@ -168,9 +171,6 @@ def _background(
             "whole, not about a part from earlier in the conversation."
         )
     return "\n\n".join(parts)
-
-
-_REMOVED = " (since removed)"
 
 
 def _within(lines: list[str], max_tokens: int, unit: str) -> str:

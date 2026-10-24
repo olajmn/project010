@@ -11,7 +11,7 @@
 //      - installChatPane()
 
 import type { ProjectView } from "../../dataShapes.js";
-import { createIsolateChat } from "./showOnlyThis.js";
+import { createIsolateChat, type RemovedFocus } from "./showOnlyThis.js";
 import { createStatusPanel } from "./statusPanel/statusPanel.js";
 
 // 1. Types
@@ -31,7 +31,7 @@ export type ChatPane = {
   }) => void;
   clearIsolate: () => void;
   /** The removed node whose conversation is shown alone, if any. */
-  removedFocus: () => { stepId: string; label: string } | null;
+  removedFocus: () => RemovedFocus | null;
   readonly threadEl: HTMLDivElement;
 };
 

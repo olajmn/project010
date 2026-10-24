@@ -7,9 +7,11 @@
 
 // Contents
 //  1. Types
+//      - RemovedFocus
 //      - IsolateChat
 //      - IsolateChatOptions
 //  2. Helpers
+//      - frameTitle()
 //      - frameOf()
 //  3. Public API
 //      - createIsolateChat()
@@ -20,12 +22,15 @@ import type { ChatMessage } from "../../dataShapes.js";
 
 // 1. Types
 
+/** A removed node whose conversation is shown alone. */
+export type RemovedFocus = { stepId: string; label: string };
+
 export type IsolateChat = {
   /** Drop isolation (full thread again). */
   clear: () => void;
   /** The removed node whose conversation is shown alone, if any: a
    * message sent now is about it. */
-  removedFocus: () => { stepId: string; label: string } | null;
+  removedFocus: () => RemovedFocus | null;
   /** Render thread into `threadEl`, applying isolation if set. */
   fill: (
     messages: ChatMessage[],
@@ -50,7 +55,7 @@ type Frame = {
   key: string;
   name: string;
   day: string | null;
-  removed?: { stepId: string; label: string };
+  removed?: RemovedFocus;
   /** The labels above the node when another node has the same label. */
   context?: string;
   /** The node's labels from the top, shown on hover. */
@@ -74,7 +79,12 @@ function frameOf(
   if (stepId) {
     if (message.removed) {
       const label = focus || stepId;
-      return { key: `id:${stepId}`, name: `${label} (removed)`, day: null, removed: { stepId, label } };
+      return {
+        key: `id:${stepId}`,
+        name: `${label} (removed)`,
+        day: null,
+        removed: { stepId, label },
+      };
     }
     const name = labelForStepId?.(stepId) || focus || stepId;
     return {

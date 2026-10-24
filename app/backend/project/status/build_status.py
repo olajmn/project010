@@ -87,10 +87,10 @@ def status_text(status: dict) -> str:
 
 def changes_text(history: list[dict], now: datetime | None = None) -> str:
     """Every non-chat change as plain text, newest first, for the chat's
-    model: the whole record, not the latest few (model/brief/budget.py
-    keeps the prompt within the model's context). Empty when there are
-    none. Chat turns are left out: the model already gets them as the
-    conversation."""
+    model: the whole record, not the latest few. It is never cut; a
+    prompt that would not fit even without past turns is reported
+    (model/brief/budget.py; TODO.md 63). Empty when there are none. Chat
+    turns are left out: the model already gets them as the conversation."""
     now = now or datetime.now().astimezone()
     work = _work_events(history)
     if not work:

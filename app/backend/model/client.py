@@ -33,8 +33,9 @@ OPENROUTER_MODEL = "qwen/qwen3.5-9b"
 TEMPERATURE = 0.2
 
 # Context the local model is asked for; Ollama's own default is 4,096
-# tokens and cuts the start of a longer prompt without saying so. 32,768
-# costs about 0.6 GB more memory than the default (measured 2026-10-24).
+# tokens and drops the oldest turns of a longer prompt without saying so.
+# 32,768 costs about 0.6 GB more memory than the default (measured
+# 2026-10-24, docs/05-decisions.md #77).
 CONTEXT_TOKENS = 32_768
 # What a prompt may use, leaving room for the reply (model/brief/budget.py).
 PROMPT_TOKENS = CONTEXT_TOKENS - 2_048

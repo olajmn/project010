@@ -8,6 +8,7 @@
 import { pasteText, sendChatMessage } from "../../api.js";
 import type { ProjectView } from "../../dataShapes.js";
 import { setButtonBusy } from "../../shell/busyButton.js";
+import type { RemovedFocus } from "./showOnlyThis.js";
 
 type SendMessageOpts = {
   form: HTMLFormElement;
@@ -18,7 +19,7 @@ type SendMessageOpts = {
   getSelectedNodeLabel: () => string | null;
   getSelectedDay: () => string | null;
   /** A removed node whose conversation is shown alone: the message is about it. */
-  getRemovedFocus: () => { stepId: string; label: string } | null;
+  getRemovedFocus: () => RemovedFocus | null;
   onUpdated: (updated: ProjectView) => void;
 };
 
