@@ -7,7 +7,7 @@ Built from saved chat - no model call. A line saved with
 renaming a node that has been talked about, inside that node's
 conversation, so earlier turns that use the old name still make sense
 (docs/05-decisions.md #71). Other map edits, archive lines, and the
-project's first record belong in Status, not here — same rule as
+project's first record belong in Current state, not here — same rule as
 model/brief/conversation.past_turns().
 """
 

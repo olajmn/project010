@@ -1,26 +1,26 @@
-// Draws a project's status: summary rows, then a day-by-day change
+// Draws a project's current state: summary rows, then a day-by-day change
 // pulse (chat excluded). Node names in the summary become buttons that
 // select that node on the map; a day with changes selects that day for
 // the chat, and a second click on it, or a click on empty space in the
 // panel, lets it go (the map lets it go the same way, mapPane.ts).
 //
 // Contents
-//  1. drawStatus()
+//  1. drawCurrentState()
 //  2. Clickable node names
 //      - withNodeButtons()
 
-import type { ProjectStatus } from "../../../dataShapes.js";
+import type { CurrentState } from "../../../dataShapes.js";
 
-// 1. drawStatus()
+// 1. drawCurrentState()
 
-export function drawStatus(
-  status: ProjectStatus,
+export function drawCurrentState(
+  state: CurrentState,
   onNode: (label: string) => void,
   selectedDay: string | null,
   onDay: (day: string | null) => void,
 ): HTMLElement {
   const root = document.createElement("div");
-  root.className = "status";
+  root.className = "current-state";
   if (selectedDay) {
     // Empty space lets the selected day go, like empty map lets a node go.
     root.addEventListener("click", (event) => {
@@ -30,8 +30,8 @@ export function drawStatus(
   }
 
   const summary = document.createElement("dl");
-  summary.className = "status-summary";
-  for (const row of status.summary) {
+  summary.className = "current-state-summary";
+  for (const row of state.summary) {
     const label = document.createElement("dt");
     label.textContent = row.label;
     const value = document.createElement("dd");
@@ -40,22 +40,22 @@ export function drawStatus(
   }
   root.append(summary);
 
-  if (status.history.length > 0) {
+  if (state.history.length > 0) {
     const heading = document.createElement("p");
-    heading.className = "status-heading";
+    heading.className = "current-state-heading";
     heading.textContent = "Changes";
     root.append(heading);
   }
 
   const list = document.createElement("ul");
-  list.className = "status-lines status-days";
-  for (const line of status.history) {
+  list.className = "current-state-lines current-state-days";
+  for (const line of state.history) {
     const item = document.createElement("li");
     const day = document.createElement("span");
-    day.className = "status-day-label";
+    day.className = "current-state-day-label";
     day.textContent = line.day;
     const text = document.createElement("span");
-    text.className = "status-text";
+    text.className = "current-state-text";
     text.textContent = line.text;
     if (line.changes === 0) {
       item.classList.add("is-quiet");
@@ -79,14 +79,14 @@ export function drawStatus(
     item.append(day, text);
     list.append(item);
   }
-  if (status.history.length > 0) {
+  if (state.history.length > 0) {
     root.append(list);
   }
 
-  if (status.earlier > 0) {
+  if (state.earlier > 0) {
     const earlier = document.createElement("p");
-    earlier.className = "status-earlier";
-    earlier.textContent = `… ${status.earlier} earlier days`;
+    earlier.className = "current-state-earlier";
+    earlier.textContent = `… ${state.earlier} earlier days`;
     root.append(earlier);
   }
   return root;
@@ -111,7 +111,7 @@ function withNodeButtons(
       if (!names.includes(part)) return document.createTextNode(part);
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "status-node";
+      button.className = "current-state-node";
       button.textContent = part;
       button.title = `Select "${part}" on the map`;
       button.addEventListener("click", () => onNode(part));

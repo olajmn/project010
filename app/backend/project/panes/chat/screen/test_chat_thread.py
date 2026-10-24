@@ -5,7 +5,7 @@ from backend.project.panes.chat.screen.chat_thread import thread_messages
 
 def test_only_chat_turns_show() -> None:
     # Only chat turns show: the first record, map edits, and other saved
-    # lines that are not chat turns are left to Status.
+    # lines that are not chat turns are left to Current state.
     rooms = [{"label": "Rooms"}]
     history = [
         {"name": "House", "nodes": [], "feedback": None, "event": "created"},

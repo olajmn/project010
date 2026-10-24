@@ -3,7 +3,7 @@ Puts together what the model is sent when you press Send, in order:
 
 1. The system text: the fixed slots from chat_prompt.py, then the
    project background — its summary rows and every change
-   (project/status/; the panel above the chat shows the summary and a
+   (project/current_state/; the panel above the chat shows the summary and a
    per-day count instead), every name in its structure, and the part
    or the day of changes you have selected.
 2. The earlier chat, as real back-and-forth messages.
@@ -15,8 +15,11 @@ No model call, nothing saved. The rules it keeps: docs/chat.md.
 from backend.model.brief.budget import CHARS_PER_TOKEN
 from backend.model.brief.chat_prompt import BEHAVIOR, EXAMPLES, LIMITS, ROLE, TASK
 from backend.model.client import PROMPT_TOKENS
+from backend.project.current_state.build_current_state import (
+    changes_on_day_text,
+    day_name,
+)
 from backend.project.node import find_path, nodes_of, path_lines, tree_lines
-from backend.project.status.build_status import changes_on_day_text, day_name
 
 # Earlier turns kept per Send. Bounds prompt size on a local model;
 # older turns stay saved and shown, just not re-sent.
@@ -35,12 +38,12 @@ def build_messages(
     history: list[dict],
     map_focus: str | None = None,
     focus_node_id: str | None = None,
-    status: str | None = None,
+    current_state: str | None = None,
     focus_day: str | None = None,
     about_removed: bool = False,
 ) -> list[dict]:
-    """[{role, content}] for model.client.send_chat(). `status` is the
-    project's status text (status/build_status.status_text()).
+    """[{role, content}] for model.client.send_chat(). `current_state` is the
+    project's current state as text (current_state/build_current_state.current_state_text()).
     `focus_day` (YYYY-MM-DD) is a selected day of changes; that day's
     changes are read from `history`.
 
@@ -53,7 +56,7 @@ def build_messages(
     gone = (map_focus or "").strip() if about_removed else ""
     if gone and focus_node_id and find_path(nodes, focus_node_id) is not None:
         gone = ""  # it is in the tree after all
-    system = _system_text(latest, focus_node_id, status, selected_day, gone)
+    system = _system_text(latest, focus_node_id, current_state, selected_day, gone)
     messages = [{"role": "system", "content": system}]
     messages.extend(past_turns(history, nodes))
     if gone:
@@ -99,7 +102,7 @@ def past_turns(
 def _system_text(
     latest: dict,
     focus_node_id: str | None,
-    status: str | None = None,
+    current_state: str | None = None,
     selected_day: str | None = None,
     removed_part: str = "",
 ) -> str:
@@ -111,7 +114,9 @@ def _system_text(
         ("EXAMPLES", EXAMPLES),
         (
             "PROJECT BACKGROUND",
-            _background(latest, focus_node_id, status, selected_day, removed_part),
+            _background(
+                latest, focus_node_id, current_state, selected_day, removed_part
+            ),
         ),
     ]
     return "\n\n".join(f"{title}\n{text}" for title, text in slots if text)
@@ -120,11 +125,11 @@ def _system_text(
 def _background(
     latest: dict,
     focus_node_id: str | None,
-    status: str | None,
+    current_state: str | None,
     selected_day: str | None = None,
     removed_part: str = "",
 ) -> str:
-    """The project as reference for this Send: name, status, map, and
+    """The project as reference for this Send: name, current state, map, and
     the selected node, removed part, or day of changes."""
     name = (latest.get("name") or "").strip() or "untitled"
     parts = [
@@ -132,12 +137,12 @@ def _background(
         "question needs it.",
         f'Project: "{name}"',
     ]
-    if status:
+    if current_state:
         # Computed from the project's saved changes, so it is fact; the
         # chat below is conversation.
         parts.append(
-            "Status (computed from the project's saved changes; treat it "
-            "as fact):\n" + status
+            "Current state (computed from the project's saved changes; treat "
+            "it as fact):\n" + current_state
         )
     nodes = nodes_of(latest)
     structure = _within(tree_lines(nodes), STRUCTURE_TOKENS, "parts")

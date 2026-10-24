@@ -46,9 +46,9 @@ const sidebarAccountsHost = document.getElementById(
 const projectMain = document.getElementById("project-main") as HTMLElement;
 const mainEmpty = document.getElementById("main-empty") as HTMLParagraphElement;
 const projectChat = document.getElementById("project-chat") as HTMLElement;
-const statusToggle = document.getElementById("status-toggle") as HTMLButtonElement;
-const statusEl = document.getElementById("status-panel") as HTMLElement;
-const statusResize = document.getElementById("status-resize") as HTMLElement;
+const currentStateToggle = document.getElementById("current-state-toggle") as HTMLButtonElement;
+const currentStateEl = document.getElementById("current-state-panel") as HTMLElement;
+const currentStateResize = document.getElementById("current-state-resize") as HTMLElement;
 const chatThread = document.getElementById("chat-thread") as HTMLDivElement;
 const chatForm = document.getElementById("chat-form") as HTMLFormElement;
 const chatInput = document.getElementById("chat-input") as HTMLTextAreaElement;
@@ -86,9 +86,9 @@ function renderAll(): void {
 // 2. Install panes
 
 const chatPane = installChatPane({
-  statusPanel: statusEl,
-  statusResize,
-  statusToggle,
+  currentStatePanel: currentStateEl,
+  currentStateResize,
+  currentStateToggle,
   threadEl: chatThread,
   onIsolateChange: () => mapPane.render(),
 });

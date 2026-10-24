@@ -43,10 +43,10 @@ export interface ChatMessage {
   focus_path?: string;
 }
 
-/** A project's status (backend/project/status/build_status.py): the
+/** A project's current state (backend/project/current_state/build_current_state.py): the
  * summary on top, then a day-by-day change pulse (newest first; chat
  * excluded). `nodes` on summary rows are clickable map labels. */
-export interface ProjectStatus {
+export interface CurrentState {
   summary: { label: string; text: string; nodes: string[] }[];
   history: {
     day: string;
@@ -74,7 +74,7 @@ export interface ProjectView {
   undo: { log_lines: number; undo_line: number | null; redo_line: number | null };
   node: MapNode | null;
   thread: ChatMessage[];
-  status: ProjectStatus;
+  current_state: CurrentState;
   /** Set by `/select` — UI should focus this map node. */
   select?: { id: string; label: string };
   /** Set by `/id` with no node selected — switch map ids ↔ labels. */

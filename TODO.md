@@ -46,8 +46,10 @@ next.
        `TALK_PROVIDER` → `CHAT_PROVIDER` (also `app/fly.toml`; live after
        the next deploy), the demo's `TALK_PER_*` → `CHAT_PER_*`. The
        English verb stays where it is the words ("Talk about this", the
-       model's instructions). b. **Status**: "Status" is "Current
-       state": `project/status/` and `build_status`.
+       model's instructions). b. **Status** — done 2026-10-24 (#86 follow-up): "Status" is
+       "Current state": `project/current_state/`, `build_current_state()`,
+       `current_state_text()`, the view's `current_state` field, and the
+       page's `panes/chat/currentState/` and `currentState.css`.
     5. **Ids without a kind in front**, with step 2's conversion: an id
        is a bare UUIDv4, and what it belongs to is known from where it
        is kept (a node in `nodes`, an account in `accounts.json`, a
@@ -174,7 +176,7 @@ next.
 76. **Times written by the server use the server's time zone** (Bug)
     — times are saved in UTC, and the browser shows them in local time,
     but text made on the server (Current state's "Last change", the
-    changes the chat's model reads, `project/status/build_status.py`)
+    changes the chat's model reads, `project/current_state/build_current_state.py`)
     uses the server's own zone. On Fly.io that is UTC, so the demo is 2
     hours early in Norway; locally the server is this Mac and is right.
     Options: set `TZ = "Europe/Oslo"` in `app/fly.toml` (one line, every
@@ -235,7 +237,7 @@ when a path is deleted, rewired, or reclassified.
 | P1 | Week grain vs session grain | Time Faculty only | `week_windows()` / `day_windows()`; nothing in the product calls them — Queue 66 |
 | P2 | Even-slice `step_plan` vs dates on the step | Time Faculty only | `frozen_duration.step_plan`; nothing in the product calls it — Queue 66 |
 | P4 | Tree as text: indented labels vs ASCII tree | Deliberate, one per side | `project/node/tree_as_text.py` (`tree_lines()`, for the model) vs `ui/src/panes/canvas/copyAsText.ts` (clipboard); same walk, the model side cannot run in the browser and the clipboard should not need a server round trip |
-| P5 | Event kind → word: Logs titles vs day tally | Deliberate, different grain | `project/timeline.py` `GROUPS` ("Map") vs `project/status/build_status.py` `_TALLY_WORDS` ("added", "removed", "imported"); a new event type goes in both, or it shows as Other / other |
+| P5 | Event kind → word: Logs titles vs day tally | Deliberate, different grain | `project/timeline.py` `GROUPS` ("Map") vs `project/current_state/build_current_state.py` `_TALLY_WORDS` ("added", "removed", "imported"); a new event type goes in both, or it shows as Other / other |
 | P7 | Popover dismiss (close on outside click / Esc) | Five copies, all working | The node ⋯ menu (`panes/canvas/drawNodes.ts`), the confirmation (`confirmPopover.ts`), the saved-tree picker (`savedTrees/insertTree.ts`), + Add (`addMenu.ts`, copied from the picker) and the chat / menu (`panes/chat/commands/menu.ts`) each close themselves with their own code. One shared helper next to `placePopover.ts` would let a change (e.g. close on scroll) happen in one place |
 | P8 | Chat model call: local Ollama vs hosted OpenRouter | Deliberate, one per environment | `backend/model/client.py` `send_chat()` picks one by `TALK_PROVIDER`: `ollama.chat()` (default) or `openrouter.chat()` (public demo, [[05-decisions]] #70). Same model, temperature, and no-reasoning setting on both; a change to one (e.g. a new option) must be made in both |
 | P9 | Default theme: page script vs `theme.ts` | Deliberate, the script prevents a light flash | Every page in `app/ui/` (`index.html`, `login.html`, `settings/*.html`) sets `data-theme` in a small inline script before the CSS loads; `src/user/theme.ts` `getTheme()` decides the same default for the code. Dark unless the user chose light: a change to the default goes in both |

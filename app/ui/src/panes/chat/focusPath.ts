@@ -10,7 +10,7 @@ export function focusPathPlaceholder(label: string): string {
 }
 
 /** "changes on 27 Sep" for a YYYY-MM-DD day — the same wording the
- * backend tags the model's history with (build_status.day_name()). */
+ * backend tags the model's history with (build_current_state.day_name()). */
 export function changesDayName(day: string): string {
   const [y, m, d] = day.split("-").map(Number);
   if (!y || !m || !d || m > 12) return `changes on ${day}`;

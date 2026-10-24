@@ -1,6 +1,6 @@
 """
 Project persistence: current.json (SoT for map/chat) + events.jsonl
-(slim change tape for Status/Logs) under data/projects/{id}/.
+(slim change tape for Current state/Logs) under data/projects/{id}/.
 
 Identity grouping for display lives in create/resolver.py. A new
 project's id comes from backend/identity/ and is also its folder name.
@@ -44,7 +44,7 @@ def record_project_id(record: dict) -> str | None:
 # ============================================================
 #
 # Current is the source of truth for map/chat. Events are a slim change
-# tape for Status/Logs. Each save updates current and appends one event
+# tape for Current state/Logs. Each save updates current and appends one event
 # (no full map on the tape).
 
 
@@ -180,7 +180,7 @@ def load_project_events(project_id: str) -> list[dict]:
 
 
 def load_project_history(project_id: str) -> list[dict]:
-    """Compatibility alias: the events tape (Status/chat/timeline)."""
+    """Compatibility alias: the events tape (Current state/chat/timeline)."""
     return load_project_events(project_id)
 
 

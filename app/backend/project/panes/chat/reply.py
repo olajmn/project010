@@ -14,14 +14,14 @@ reload. The whole path and its rules: docs/chat.md.
 from backend.model.brief.budget import fit_to_budget
 from backend.model.brief.conversation import build_messages
 from backend.model.client import PROMPT_TOKENS, send_chat
+from backend.project.current_state.build_current_state import (
+    build_current_state,
+    changes_text,
+    current_state_text,
+)
 from backend.project.node import find_node, nodes_of
 from backend.project.panes.chat.commands import try_command
 from backend.project.panes.create.resolver import get_history_for_project
-from backend.project.status.build_status import (
-    build_status,
-    changes_text,
-    status_text,
-)
 from backend.storage.paths import now_utc
 from backend.storage.project_persistence import save_project
 
@@ -75,11 +75,11 @@ def reply(
         return out
 
     history = get_history_for_project(latest["project_id"])
-    status = "\n\n".join(
+    current_state = "\n\n".join(
         filter(
             None,
             [
-                status_text(build_status(history, current=latest)),
+                current_state_text(build_current_state(history, current=latest)),
                 changes_text(history),
             ],
         )
@@ -90,7 +90,7 @@ def reply(
         history,
         map_focus,
         focus_node_id,
-        status,
+        current_state,
         focus_day=focus_day,
         about_removed=gone and about_removed,
     )

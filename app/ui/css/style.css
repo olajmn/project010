@@ -24,7 +24,7 @@
 @import url("panes/canvas/savedTrees.css");
 @import url("panes/chat/conversation.css");
 @import url("panes/chat/agent-chat.css");
-@import url("panes/chat/status.css");
+@import url("panes/chat/currentState.css");
 @import url("panes/chat/chatToggle.css");
 @import url("shared.css");
 @import url("settings/chrome.css");

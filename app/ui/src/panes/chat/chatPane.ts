@@ -1,8 +1,8 @@
-// Fills the chat column for one project: Status panel and message thread.
+// Fills the chat column for one project: Current state panel and message thread.
 //
 // Selection state stays in index.ts. This pane only draws the column and
-// calls back when a Status node name or an About-frame should select a map
-// node, or a Status day should select that day's changes.
+// calls back when a Current state node name or an About-frame should select a map
+// node, or a Current state day should select that day's changes.
 //
 // Contents
 //  1. Types
@@ -12,14 +12,14 @@
 
 import type { ProjectView } from "../../dataShapes.js";
 import { createIsolateChat, type RemovedFocus } from "./showOnlyThis.js";
-import { createStatusPanel } from "./statusPanel/statusPanel.js";
+import { createCurrentStatePanel } from "./currentState/currentStatePanel.js";
 
 // 1. Types
 
 export type ChatPane = {
-  /** No project (or Create open): clear Status and show a placeholder. */
+  /** No project (or Create open): clear Current state and show a placeholder. */
   fillEmpty: (placeholder: string) => void;
-  /** One open project: Status + thread. */
+  /** One open project: Current state + thread. */
   fillProject: (opts: {
     project: ProjectView;
     onSelectNode: (nodeId: string, label: string) => void;
@@ -36,9 +36,9 @@ export type ChatPane = {
 };
 
 type ChatPaneOpts = {
-  statusPanel: HTMLElement;
-  statusResize: HTMLElement;
-  statusToggle: HTMLButtonElement;
+  currentStatePanel: HTMLElement;
+  currentStateResize: HTMLElement;
+  currentStateToggle: HTMLButtonElement;
   threadEl: HTMLDivElement;
   /** Re-render the shell when isolate filter changes. */
   onIsolateChange: () => void;
@@ -47,10 +47,10 @@ type ChatPaneOpts = {
 // 2. Public API
 
 export function installChatPane(opts: ChatPaneOpts): ChatPane {
-  const statusPanel = createStatusPanel(
-    opts.statusPanel,
-    opts.statusResize,
-    opts.statusToggle,
+  const currentStatePanel = createCurrentStatePanel(
+    opts.currentStatePanel,
+    opts.currentStateResize,
+    opts.currentStateToggle,
   );
 
   let resolveNodeIdLive: ((label: string) => string | null) | null = null;
@@ -79,7 +79,7 @@ export function installChatPane(opts: ChatPaneOpts): ChatPane {
       resolveNodeIdLive = null;
       labelForNodeIdLive = null;
       fillPlaceholder(placeholder);
-      statusPanel.fill(null, () => {});
+      currentStatePanel.fill(null, () => {});
     },
     fillProject: ({ project, onSelectNode, resolveNodeId, labelForNodeId, selectedDay, onSelectDay }) => {
       resolveNodeIdLive = resolveNodeId;
@@ -89,8 +89,8 @@ export function installChatPane(opts: ChatPaneOpts): ChatPane {
         (nodeId, label) => onSelectNode(nodeId, label),
         (day) => onSelectDay(day),
       );
-      statusPanel.fill(
-        project.status,
+      currentStatePanel.fill(
+        project.current_state,
         (label) => {
           const nodeId = resolveNodeId(label);
           if (!nodeId) return;

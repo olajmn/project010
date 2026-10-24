@@ -1,14 +1,14 @@
-/* Status panel above the chat — where the project stands now and what
- * has happened, as plain text. TS lives in src/panes/chat/statusPanel/.
+/* Current state panel above the chat — where the project stands now and
+ * what has happened, as plain text. TS lives in src/panes/chat/currentState/.
  *
  * Contents
- *  1. Status button (Accounts twin)
+ *  1. Current state button (Accounts twin)
  *  2. Panel
  *  3. Summary, history, node names
- *  4. Resize handle (status height)
+ *  4. Resize handle (panel height)
  */
 
-/* 1. Status button */
+/* 1. Current state button */
 
 .project-chat .chat-brand {
   display: block;
@@ -37,7 +37,7 @@
 
 /* 2. Panel */
 
-.project-chat .status-panel {
+.project-chat .current-state-panel {
   box-sizing: border-box;
   flex: 0 0 auto;
   min-height: 0;
@@ -52,27 +52,27 @@
 
 /* 3. Summary, history, node names */
 
-.status-panel .status-summary {
+.current-state-panel .current-state-summary {
   display: grid;
   grid-template-columns: max-content 1fr;
   gap: 0.15rem var(--space-3);
   margin: 0;
 }
 
-.status-panel .status-summary dt {
+.current-state-panel .current-state-summary dt {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   line-height: 1.7;
 }
 
-.status-panel .status-summary dd {
+.current-state-panel .current-state-summary dd {
   margin: 0;
   min-width: 0;
   word-break: break-word;
 }
 
-/* Subsection under Status chrome — quieter than the Status toggle, no rule. */
-.status-panel .status-heading {
+/* Subsection under Current state chrome — quieter than its toggle, no rule. */
+.current-state-panel .current-state-heading {
   margin: var(--space-3) 0 var(--space-1);
   padding: 0;
   border: none;
@@ -81,68 +81,68 @@
   color: var(--color-text-muted);
 }
 
-.status-panel .status-lines {
+.current-state-panel .current-state-lines {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.status-panel .status-lines li {
+.current-state-panel .current-state-lines li {
   display: grid;
   grid-template-columns: 2.75rem 1fr;
   gap: var(--space-2);
 }
 
 /* Day-change pulse: day label + "N changes" (no clock column). */
-.status-panel .status-lines.status-days li {
+.current-state-panel .current-state-lines.current-state-days li {
   grid-template-columns: 5.5rem 1fr;
 }
 
-.status-panel .status-day-label {
+.current-state-panel .current-state-day-label {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   line-height: 1.7;
   font-variant-numeric: tabular-nums;
 }
 
-.status-panel .status-lines.status-days li.is-quiet .status-text {
+.current-state-panel .current-state-lines.current-state-days li.is-quiet .current-state-text {
   color: var(--color-text-muted);
 }
 
 /* A day with changes: click to talk about that day; the selected one
    reads like a selected node (underlined, accent). */
-.status-panel .status-lines.status-days li.is-selectable {
+.current-state-panel .current-state-lines.current-state-days li.is-selectable {
   cursor: pointer;
 }
 
-.status-panel .status-lines.status-days li.is-selectable:hover .status-text {
+.current-state-panel .current-state-lines.current-state-days li.is-selectable:hover .current-state-text {
   color: var(--color-accent);
 }
 
-.status-panel .status-lines.status-days li.is-selected .status-day-label,
-.status-panel .status-lines.status-days li.is-selected .status-text {
+.current-state-panel .current-state-lines.current-state-days li.is-selected .current-state-day-label,
+.current-state-panel .current-state-lines.current-state-days li.is-selected .current-state-text {
   color: var(--color-accent);
   font-weight: 500;
 }
 
-.status-panel .status-lines.status-days li.is-selected .status-text {
+.current-state-panel .current-state-lines.current-state-days li.is-selected .current-state-text {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.status-panel .status-text {
+.current-state-panel .current-state-text {
   min-width: 0;
   word-break: break-word;
 }
 
-.status-panel .status-earlier {
+.current-state-panel .current-state-earlier {
   margin: var(--space-2) 0 0;
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
 /* A node name: reads as text, underlined on hover, selects it on the map. */
-.status-panel .status-node {
+.current-state-panel .current-state-node {
   font: inherit;
   color: inherit;
   background: none;
@@ -154,14 +154,14 @@
   cursor: pointer;
 }
 
-.status-panel .status-node:hover {
+.current-state-panel .current-state-node:hover {
   text-decoration-color: var(--color-accent);
   color: var(--color-accent);
 }
 
 /* 4. Resize handle */
 
-.project-chat .status-resize {
+.project-chat .current-state-resize {
   position: relative;
   flex: 0 0 auto;
   height: 0;
@@ -171,7 +171,7 @@
   user-select: none;
 }
 
-.project-chat .status-resize::before {
+.project-chat .current-state-resize::before {
   content: "";
   position: absolute;
   left: 0;
@@ -182,15 +182,15 @@
 
 /* Neutral like the column seams (css/shell/layout.css): lighter on
    hover, a bit more while dragging; blue is for selected / active. */
-.project-chat .status-resize:hover {
+.project-chat .current-state-resize:hover {
   border-top-color: rgba(var(--ink-rgb), 0.25);
 }
 
-body.is-resizing-status .status-resize {
+body.is-resizing-current-state .current-state-resize {
   border-top-color: rgba(var(--ink-rgb), 0.4);
 }
 
-body.is-resizing-status {
+body.is-resizing-current-state {
   cursor: ns-resize;
   user-select: none;
 }

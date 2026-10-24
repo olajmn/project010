@@ -1,4 +1,4 @@
-// Height drag on the status panel above the chat — same separator idiom as
+// Height drag on the Current state panel above the chat — same separator idiom as
 // the sidebar / chat column grips (`shell/columnWidths.ts`).
 //
 // Contents
@@ -51,13 +51,13 @@ export function applyStoredPanelHeight(
   panel.style.maxHeight = "";
   const capped = Math.min(maxPanelHeight(panel), h);
   if (opts?.clampToContent === false) {
-    // Empty panel (a project with no status yet): keep the pin so the
+    // Empty panel (a project with no current state yet): keep the pin so the
     // handle stays usable when switching projects.
     applyPanelHeight(panel, capped);
     return;
   }
   const content = panel.scrollHeight;
-  // May be shorter than the content (handle under Status) but not taller
+  // May be shorter than the content (handle under Current state) but not taller
   // than the content (no empty space under the last line).
   applyPanelHeight(panel, Math.min(capped, content));
 }
@@ -81,7 +81,7 @@ export function installPanelResize(
     startY = event.clientY;
     startH = panel.getBoundingClientRect().height;
     maxH = maxPanelHeight(panel);
-    document.body.classList.add("is-resizing-status");
+    document.body.classList.add("is-resizing-current-state");
   });
 
   handle.addEventListener("pointermove", (event) => {
@@ -100,7 +100,7 @@ export function installPanelResize(
     if (!dragging) return;
     dragging = false;
     handle.releasePointerCapture(event.pointerId);
-    document.body.classList.remove("is-resizing-status");
+    document.body.classList.remove("is-resizing-current-state");
     try {
       localStorage.setItem(
         HEIGHT_KEY,

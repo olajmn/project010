@@ -114,7 +114,7 @@ export function settingsError(message?: string): HTMLParagraphElement {
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /** "28 Sep 2026" — dates in Settings rows, the same shape as Current
- *  state (backend/project/status/build_status.py). Spelled out here
+ *  state (backend/project/current_state/build_current_state.py). Spelled out here
  *  rather than toLocaleDateString, which gives "Sept" in some browsers. */
 export function shortDate(iso: string | null | undefined): string {
   if (!iso) return "";

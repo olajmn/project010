@@ -1044,6 +1044,8 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Follow-up (same day, the chat's names):** "Talk" as a name for the chat is gone from the code: `model/brief/talk_prompt.py` is `chat_prompt.py`, the provider setting is `CHAT_PROVIDER` (in `app/fly.toml`), and the demo's chat limits are `CHAT_PER_SESSION`, `CHAT_PER_IP`, and `CHAT_PER_DAY` (`DEMO_CHAT_PER_DAY` to change the last). "Talk about this" and the model's instructions keep the ordinary verb.
 
+**Follow-up (same day, Current state):** The panel the page calls Current state is called that in code too: `project/status/` is `project/current_state/` (`build_current_state()`, `current_state_text()`), the project view's field is `current_state`, and the page's `panes/chat/statusPanel/` and `status.css` are `panes/chat/currentState/` and `currentState.css`, with `current-state-*` ids and classes. "status" stays where it means a node's state (open or done) or an HTTP status, and the stored setting `projects.statusOpen` keeps its name so the panel remembers whether it was open. This completes `TODO.md` 62 except step 5.
+
 ## See also
 
 - [[03-architecture]]

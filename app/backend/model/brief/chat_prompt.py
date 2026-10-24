@@ -28,7 +28,7 @@ BEHAVIOR = (
     "- Keep replies short: one to four sentences, unless the question "
     "clearly needs more.\n"
     "- Use the project background only when the question needs it. Do not "
-    "recite the structure, the status, or any counts unprompted.\n"
+    "recite the structure, the current state, or any counts unprompted.\n"
     "- Refer to parts by their names. Do not describe the project in terms "
     "of how it is displayed (map, nodes, tree, labels, levels).\n"
     "- Speak about the project itself, not about what you were given: never "

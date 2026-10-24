@@ -88,7 +88,9 @@ def test_create_project(api) -> None:
 
     assert view["name"] == "House" and kind_of(view["project_id"]) == "project"
     assert view["node"] is None  # an empty map has no tree yet
-    assert {"thread", "status", "completed", "cancelled", "account_id"} <= set(view)
+    assert {"thread", "current_state", "completed", "cancelled", "account_id"} <= set(
+        view
+    )
     # Empty text picks the next `New project N`.
     assert api.post("/api/projects", {"text": ""})[1]["name"] == "New project 1"
     assert [p["name"] for p in api.get("/api/projects")[1]] == [

@@ -156,7 +156,7 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
     const markSelected = (nodeId: string, note: string) => {
       const row = line.querySelector(`[data-node-id="${CSS.escape(nodeId)}"]`);
       const label = beadLabel(row) ?? nodeId;
-      // Picking a node lets a selected day go; redraw so the Status row
+      // Picking a node lets a selected day go; redraw so the Current state row
       // no longer shows as selected.
       const hadDay = opts.getSelectedDay() !== null;
       opts.setSelectedNode(nodeId, label);

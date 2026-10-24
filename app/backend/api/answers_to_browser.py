@@ -15,6 +15,7 @@ no product rules.
 #      - map_tree()
 
 from backend.project.changes.undo import undo_state
+from backend.project.current_state.build_current_state import build_current_state
 from backend.project.node import count_nodes, nodes_of
 from backend.project.panes.chat.screen.chat_thread import thread_for
 from backend.project.panes.create.resolver import (
@@ -22,7 +23,6 @@ from backend.project.panes.create.resolver import (
     get_history_for_project,
     get_latest_for_all_projects,
 )
-from backend.project.status.build_status import build_status
 from backend.storage.project_persistence import record_project_id
 
 # ============================================================
@@ -36,7 +36,7 @@ def project_view(
     toggle_map_ids: bool = False,
 ) -> dict:
     """One project as the browser gets it after any project action:
-    name, state, map tree, chat, and status (the panel above the chat).
+    name, state, map tree, chat, and current state (the panel above the chat).
 
     A chat reply just made is already the last message in `thread`
     (it is saved before the view is built). `select` (optional
@@ -68,7 +68,7 @@ def project_view(
         "undo": undo_state(history),
         "node": node,
         "thread": thread,
-        "status": build_status(history, current=record),
+        "current_state": build_current_state(history, current=record),
     }
     if select and select.get("id") and select.get("label"):
         view["select"] = {

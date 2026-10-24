@@ -1,11 +1,11 @@
 """
-A project's status: where it stands now (summary) and a day-by-day
+A project's current state: where it stands now (summary) and a day-by-day
 change pulse (history). Summary facts come from the current SoT;
 the pulse counts non-chat events per calendar day — no model, nothing
 saved — so it can never disagree with the tape.
 
-Shown in the UI as the **Current state** panel (`build_status()`) and
-given to the chat's model (`status_text()`, `changes_text()`,
+Shown in the UI as the **Current state** panel (`build_current_state()`) and
+given to the chat's model (`current_state_text()`, `changes_text()`,
 `changes_on_day_text()` when a day is selected). docs/05-decisions.md #36–37, #41.
 """
 
@@ -13,9 +13,9 @@ given to the chat's model (`status_text()`, `changes_text()`,
 #  1. Settings
 #      - HISTORY_DAYS / DAY_CHANGES
 #      - _CHAT_EVENTS / _NOT_CHANGES
-#  2. The status
-#      - build_status()
-#      - status_text()
+#  2. The current state
+#      - build_current_state()
+#      - current_state_text()
 #      - changes_text()
 #      - changes_on_day_text() / day_name()
 #  3. Summary facts / day pulse
@@ -40,7 +40,7 @@ HISTORY_DAYS = 25
 # not a target.
 DAY_CHANGES = 100
 
-# Chat lines are not "changes" in the Status pulse (map/work only).
+# Chat lines are not "changes" in the Current state pulse (map/work only).
 _CHAT_EVENTS = frozenset({"chat", "chat_added_nodes"})
 
 # Kept in the tape and the change lines, but not counted as a change:
@@ -49,11 +49,11 @@ _NOT_CHANGES = frozenset({"created"})
 
 
 # ============================================================
-# 2. The status
+# 2. The current state
 # ============================================================
 
 
-def build_status(
+def build_current_state(
     history: list[dict],
     now: datetime | None = None,
     current: dict | None = None,
@@ -78,12 +78,12 @@ def build_status(
     }
 
 
-def status_text(status: dict) -> str:
+def current_state_text(state: dict) -> str:
     """The summary rows as plain text, for the chat's model. The day
     pulse is left out: the model gets the changes themselves from
     changes_text(), and a count beside the list read as more
     changes."""
-    return "\n".join(f"{row['label']}: {row['text']}" for row in status["summary"])
+    return "\n".join(f"{row['label']}: {row['text']}" for row in state["summary"])
 
 
 def changes_text(history: list[dict], now: datetime | None = None) -> str:

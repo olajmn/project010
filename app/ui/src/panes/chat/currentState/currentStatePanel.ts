@@ -1,5 +1,5 @@
 // The Current state panel above the chat: where the project stands now
-// and what has happened (backend/project/status/). The chat's model gets
+// and what has happened (backend/project/current_state/). The chat's model gets
 // the same summary rows and the changes themselves, not the per-day
 // counts; a selected day gives it that day's changes.
 //
@@ -8,23 +8,23 @@
 //
 // Contents
 //  1. Types
-//      - StatusPanel
+//      - CurrentStatePanel
 //  2. Public API
-//      - createStatusPanel()
+//      - createCurrentStatePanel()
 
-import type { ProjectStatus } from "../../../dataShapes.js";
+import type { CurrentState } from "../../../dataShapes.js";
 import { applyStoredPanelHeight, installPanelResize } from "./resizePanel.js";
-import { drawStatus } from "./drawStatus.js";
+import { drawCurrentState } from "./drawCurrentState.js";
 
 const OPEN_KEY = "projects.statusOpen";
 
 // 1. Types
 
-export type StatusPanel = {
-  /** Show one project's status. `onNode` runs when a node name is
+export type CurrentStatePanel = {
+  /** Show one project's current state. `onNode` runs when a node name is
    * clicked, `onDay` when a day is picked (null lets it go). */
   fill: (
-    status: ProjectStatus | null,
+    state: CurrentState | null,
     onNode: (label: string) => void,
     selectedDay?: string | null,
     onDay?: (day: string | null) => void,
@@ -33,14 +33,14 @@ export type StatusPanel = {
 
 // 2. Public API
 
-export function createStatusPanel(
+export function createCurrentStatePanel(
   panel: HTMLElement,
   handle: HTMLElement,
   toggle: HTMLButtonElement,
-): StatusPanel {
+): CurrentStatePanel {
   installPanelResize(panel, handle);
 
-  let lastStatus: ProjectStatus | null = null;
+  let lastState: CurrentState | null = null;
   let lastOnNode: ((label: string) => void) | null = null;
   let lastSelectedDay: string | null = null;
   let lastOnDay: (day: string | null) => void = () => {};
@@ -56,22 +56,25 @@ export function createStatusPanel(
   function paint(): void {
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     toggle.classList.toggle("is-active", open);
+    // Redrawn on every pick of a day: keep the scroll where it was.
+    const scrolled = panel.scrollTop;
     panel.innerHTML = "";
     panel.hidden = !open;
     handle.hidden = !open;
     if (!open) return;
-    if (!lastStatus || lastStatus.summary.length === 0 || !lastOnNode) {
+    if (!lastState || lastState.summary.length === 0 || !lastOnNode) {
       // Keep the pinned height with nothing to show, so the handle stays usable.
       applyStoredPanelHeight(panel, { clampToContent: false });
       return;
     }
-    panel.appendChild(drawStatus(lastStatus, lastOnNode, lastSelectedDay, lastOnDay));
+    panel.appendChild(drawCurrentState(lastState, lastOnNode, lastSelectedDay, lastOnDay));
     applyStoredPanelHeight(panel);
+    panel.scrollTop = scrolled;
   }
 
   return {
-    fill: (status, onNode, selectedDay = null, onDay = () => {}) => {
-      lastStatus = status;
+    fill: (state, onNode, selectedDay = null, onDay = () => {}) => {
+      lastState = state;
       lastOnNode = onNode;
       lastSelectedDay = selectedDay;
       lastOnDay = onDay;

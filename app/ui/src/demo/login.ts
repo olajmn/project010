@@ -12,7 +12,7 @@ applyStoredTheme();
 // (so its Changes list shows). Owners of these keys:
 // user/activeAccount.ts (lastProjectId:),
 // panes/canvas/zoomAndPan/frameControls.ts (map…), and
-// panes/chat/statusPanel/ (projects.chartHeightPx, projects.statusOpen).
+// panes/chat/currentState/ (projects.chartHeightPx, projects.statusOpen).
 // Theme and column widths are kept.
 const SESSION_KEY_PREFIXES = [
   "lastProjectId:",

@@ -1,15 +1,15 @@
-"""Checks for build_status / status_text day-change pulse - no files, no
+"""Checks for build_current_state / current_state_text day-change pulse - no files, no
 model.
 """
 
 from datetime import UTC, datetime
 
-from backend.project.status.build_status import (
-    build_status,
+from backend.project.current_state.build_current_state import (
+    build_current_state,
     changes_on_day_text,
     changes_text,
+    current_state_text,
     day_name,
-    status_text,
 )
 
 
@@ -57,7 +57,7 @@ TAPE = [
 ]
 
 
-def test_build_status() -> None:
+def test_build_current_state() -> None:
     tree = [{"label": "Rooms", "children": [{"label": "Kitchen"}, {"label": "Bath"}]}]
     history = [
         line(None, "2026-09-24T09:00:00.000+00:00", "created"),
@@ -87,16 +87,16 @@ def test_build_status() -> None:
             name="Home",
         ),
     ]
-    status = build_status(history, now=NOW)
+    state = build_current_state(history, now=NOW)
 
     # Chat and "created" excluded; Sep 24: node_added = 1; Sep 25: 2 adds + rename = 3.
-    assert [(h["day"], h["changes"], h["text"]) for h in status["history"]] == [
+    assert [(h["day"], h["changes"], h["text"]) for h in state["history"]] == [
         ("Today", 3, "3 changes"),
         ("Yesterday", 1, "1 change"),
-    ], status["history"]
-    assert status["earlier"] == 0
+    ], state["history"]
+    assert state["earlier"] == 0
 
-    summary = {row["label"]: row["text"] for row in status["summary"]}
+    summary = {row["label"]: row["text"] for row in state["summary"]}
     assert summary["Project"] == "Home", summary
     assert summary["Created"] == "24 Sep 2026", summary
     assert summary["Map"] == "3 nodes, 2 levels"
@@ -106,17 +106,17 @@ def test_build_status() -> None:
     assert "Last change" in summary
     assert list(summary) == ["Project", "Created", "Last change", "Map"], list(summary)
 
-    text = status_text(status)
+    text = current_state_text(state)
     assert text.startswith("Project: Home\nCreated: 24 Sep 2026")
     assert "Last change:" in text
     assert "changes" not in text  # the day pulse is for the panel only
     # Each pulse row carries a fixed date to select it by.
-    assert all("date" in row for row in status["history"])
+    assert all("date" in row for row in state["history"])
 
 
 def test_quiet_days_count_as_zero() -> None:
     # Quiet days between first change and now are listed as 0.
-    gap = build_status(
+    gap = build_current_state(
         [
             line(None, "2026-09-20T10:00:00.000+00:00", "created"),
             line("Added node: A", "2026-09-20T10:05:00.000+00:00", "node_added"),
@@ -131,7 +131,7 @@ def test_quiet_days_count_as_zero() -> None:
 
 def test_old_timestamps_without_offset() -> None:
     # Older timestamps (local time, no offset) still count; chat excluded.
-    old = build_status(
+    old = build_current_state(
         [
             {
                 "project_id": 1,
@@ -164,7 +164,7 @@ def test_old_timestamps_without_offset() -> None:
 def test_created_only() -> None:
     # A project that was only created has had no changes yet, but its
     # first day still starts the pulse.
-    fresh = build_status(
+    fresh = build_current_state(
         [line(None, "2026-09-25T09:00:00.000+00:00", "created")], now=NOW
     )
     assert [(h["day"], h["changes"]) for h in fresh["history"]] == [("Today", 0)], (
@@ -175,7 +175,7 @@ def test_created_only() -> None:
 
 
 def test_empty_history() -> None:
-    assert build_status([]) == {"summary": [], "history": [], "earlier": 0}
+    assert build_current_state([]) == {"summary": [], "history": [], "earlier": 0}
 
 
 def test_changes_text() -> None:
