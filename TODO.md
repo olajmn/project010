@@ -11,7 +11,15 @@ next.
 
 ## Active
 
-Nothing chosen yet; pick the next item from the Queue.
+50. **Node ids → globally unique random ids** (Step, before data is
+    shared outside this app) — `p<N>` ids are unique per project only,
+    need a counter (`node_id_hi`), and show count and order. Target:
+    UUIDv7 or ULID, shown as a short prefix like git. The id is minted
+    in `_id_minter()` (`edit_map.py`); old `p` ids in `events.jsonl`
+    need a transition. Open: which side mints ids if another app shares
+    the data. Also open (was 49): a Settings overview of every node's
+    id, and a check for duplicate or dangling ids. Rules:
+    `app/backend/project/node/README.md`.
 
 ## Queue
 
@@ -39,15 +47,6 @@ Nothing chosen yet; pick the next item from the Queue.
 
 ### Map and nodes
 
-50. **Node ids → globally unique random ids** (Step, before data is
-    shared outside this app) — `p<N>` ids are unique per project only,
-    need a counter (`node_id_hi`), and show count and order. Target:
-    UUIDv7 or ULID, shown as a short prefix like git. The id is minted
-    in `_id_minter()` (`edit_map.py`); old `p` ids in `events.jsonl`
-    need a transition. Open: which side mints ids if another app shares
-    the data. Also open (was 49): a Settings overview of every node's
-    id, and a check for duplicate or dangling ids. Rules:
-    `app/backend/project/node/README.md`.
 54. **Undo for map edits (Ctrl+Z)** (Step) — nothing can be undone
     today. Likely shape: keep the last 10–20 versions of the tree;
     Undo saves the previous one back as a new change. To decide: which
