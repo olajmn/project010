@@ -11,27 +11,43 @@ next.
 
 ## Active
 
-77. **A project always has an account** (Step) — like
-    an address on a chain, something always holds a project: nothing
-    exists without an owner, and giving one up is a recorded change to
-    another holder, not an empty field. Today a project may have no
-    account (`account_id` null). Where that is allowed: creating a
-    project without one (`panes/create/lifecycle.py`), unlinking one
-    (`panes/create/project_account.py`, `POST /api/projects/{id}/user`
-    with null), and deleting an account, which detaches its projects
-    (`archive_account()` there; `detachArchivedOwners()` in
-    `ui/src/panes/create/projectsForAccount.ts`). The UI that handles
-    the gap goes with it: "Projects without an account" in
-    `settings/directory/directory.ts` and "Assign N unowned" in
-    `panes/create/accounts/` (`panel.ts`, `helpers.ts`). No saved project
-    lacks an account today. Chosen 2026-10-24: deleting an account moves
-    it to Archive *with* its projects, still held by it; restoring the
-    account brings them back, so nothing is lost by accident. Moving a
-    project to another account stays possible (the backend already
-    saves it as `owner_changed`); its control moves to the project's
-    details page ("Move…" by Account), replacing "Assign N unowned". Open:
-    deleting an archived account for good while it still holds projects
-    (likely refused, or only with an explicit "and its N projects").
+77. **Everything is held, and projects are nodes** (Step) — a small
+    rule with a wide reach: nothing exists without a holder, and a
+    project is the same kind of thing as a node. The pitch stays (a
+    workspace for the structure of projects); this adds a layer: an
+    account becomes a workspace where things can be copied, moved, and
+    put together freely, each keeping its own identity. Planned
+    2026-10-24, in stages, each usable on its own.
+    1. **Everything is always held.** Today a project may have no
+       account (`account_id` null). Where that is allowed: creating a
+       project without one (`panes/create/lifecycle.py`), unlinking one
+       (`panes/create/project_account.py`, `POST /api/projects/{id}/user`
+       with null), and deleting an account, which detaches its projects
+       (`archive_account()` there; `detachArchivedOwners()` in
+       `ui/src/panes/create/projectsForAccount.ts`). The UI that handles
+       the gap goes with it: "Projects without an account" in
+       `settings/directory/directory.ts` and "Assign N unowned" in
+       `panes/create/accounts/` (`panel.ts`, `helpers.ts`). No saved
+       project lacks an account today. Deleting an account moves it to
+       Archive *with* its projects, still held by it; restoring it brings
+       them back. Moving a project to another account stays (saved as
+       `owner_changed`), from its details page ("Move…" by Account).
+       Open: deleting an archived account for good while it still holds
+       projects (likely refused, or only with an explicit "and its N
+       projects"). Phrase the rule as "held", not "has an `account_id`",
+       so the later stages fit.
+    2. **A project is a root node.** Project and node become the same
+       kind of thing in code and data: a project is a node with no
+       parent, held by an account. A decision in `05-decisions.md`, and
+       a line in `docs/02-product.md`.
+    3. **Moving across.** A node, or a whole project, can move under a
+       node in another project, keeping its id and its history; copying
+       still makes new ids (as saved trees do). The history follows the
+       node rather than the project folder (the largest change), and a
+       move that would put a node inside itself is refused. Open: who
+       holds a project once it is inside another one.
+    4. **The workspace.** An account's things can be pasted, moved, and
+       put together freely across what are projects today.
 
 ## Queue
 
