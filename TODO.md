@@ -24,13 +24,22 @@ next.
        move (id, from, to), rename (id, old, new), import / folder /
        insert tree (every node brought in, parent). Written once, in
        `panes/canvas/edit_map.py` through one helper; kept by
-       `save_plan()` (`storage/project_persistence.py`).
-    2. **A starting point and replay.** History before step 1 is too
-       thin to replay, so each project gets one checkpoint line holding
-       its tree when records begin; from then on the tree is the
-       checkpoint plus every change after it. `current.json` stays as
-       the quick answer; `tools/project_check.py` checks that replaying
-       the log gives exactly `current.json`.
+       `save_plan()` (`storage/project_persistence.py`). Still to add:
+       each record's own id (a UUID, so an undo can name the change it
+       reverses, across projects too), and which account made it.
+    2. **A history that replays from the start.** History before step 1
+       is too thin to replay ("Imported 90 nodes" does not say which).
+       So the demo is rebuilt from an empty tree by a script that uses
+       the app's own edits (add, import, move, rename), spread over
+       working days from a start date per project up to today, with the
+       9 existing chat turns placed after their nodes exist; it can be
+       run again when the dates grow old. The same build becomes the
+       local data, a clean start (the old `app/data/` is archived, not
+       deleted); only a project kept from it gets one checkpoint line
+       holding its tree. From then on the tree is the start plus every
+       change; `current.json` stays as the quick answer, and
+       `tools/project_check.py` checks that replaying the log gives
+       exactly `current.json`.
     3. **Undo and redo.** Undo reads the last change and saves its
        opposite as a new change ("Undid: Removed step: Client"); nodes
        come back with their own ids, so their chat reconnects; redo is
@@ -98,6 +107,14 @@ next.
 
 ### Map and nodes
 
+74. **Project and account ids as identity** (Step) — like node ids
+    (#78), the global `project_id`, the per-account number
+    (`account_n`, shown as #1, #2), and account ids are counters that
+    show order and count. Make them UUIDs, shown short. Larger than node
+    ids: the project id is in API paths (`/api/projects/{id}/…`), folder
+    names (`data/projects/{id}/`), `DEMO_START_PROJECT_ID`, and the UI.
+    Best done with the clean start in 54 step 2, when little old data
+    is left to convert.
 72. **Node id follow-ups** (Step, when needed) — ids are random UUIDv4
     since 2026-10-24 (#78, `app/backend/project/node/README.md`). Open:
     a Settings overview of every node's id (was 49) — purpose not
