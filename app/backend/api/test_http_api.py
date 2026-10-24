@@ -103,6 +103,8 @@ def test_rename_project(api, project) -> None:
     assert status == 200 and view["name"] == "Home"
     assert api.post(f"/api/projects/{pid}/name", {"text": "  "})[0] == 400
     assert api.post("/api/projects/99/name", {"text": "X"}) == (404, "no such project")
+    # Saving again moves created_at; started_at stays when it was made.
+    assert view["started_at"] <= project["created_at"] <= view["created_at"]
 
 
 def test_bad_json_body(api) -> None:

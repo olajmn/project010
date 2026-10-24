@@ -45,7 +45,7 @@ The demo also caps the chat at 500 messages a day (`settings.py`). Chat messages
 - Locally, from `app/`: `DEMO_MODE=1 DEMO_PASSWORD=test DEMO_INSECURE_COOKIE=1 .venv/bin/python -m server`
 - Publish a change: commit, then `fly deploy` from `app/`. A deploy restarts the server and logs everyone out.
 - New password: change the `DEMO_PASSWORD` secret on Fly.io, then deploy.
-- New demo content: replace `app/demo_seed/` with a copy of the projects to show, then deploy.
+- New demo content or newer dates: edit `app/backend/seed/story.py` if needed, then from `app/` run `.venv/bin/python -m backend.seed.build demo_seed.new`, replace `demo_seed/` with it, and deploy.
 - Stop it (no cost): `fly scale count 0`; start again with `fly scale count 1`.
 
 ## See also

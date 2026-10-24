@@ -24,7 +24,7 @@ Arrows show who calls whom; every answer returns the same way.
 | **Storage** | `backend/storage/` | The only code that reads or writes `data/` (plain JSON), or a visitor's sandbox copy of it in the public demo |
 | **Model** | `backend/model/` | Talks to the language model (local Ollama; OpenRouter in the public demo), and packs what it is given |
 
-`app/server.py` only starts the server (localhost unless `HOST` is set). `backend/foundation/`
+`app/server.py` only starts the server (localhost unless `HOST` is set). `backend/seed/` builds the demo's data through the Project layer, run by hand ([[05-decisions]] #83). `backend/foundation/`
 (math, time) is not used by anything today.
 
 ## 2. Inside Project
@@ -32,6 +32,7 @@ Arrows show who calls whom; every answer returns the same way.
 | Folder | What it holds |
 |---|---|
 | `node/` | What a node is: identity, children, rules ([[05-decisions]] #52) |
+| `changes/` | Each map edit as a full record, and replaying a log into its tree ([[05-decisions]] #80, #83) |
 | `saved_trees/` | Saving a branch as structure and inserting it again ([[05-decisions]] #54) |
 | `panes/create/` | Creating, naming, archiving projects; which account owns one |
 | `panes/canvas/` | Changing the map: add, remove, paste, folder |

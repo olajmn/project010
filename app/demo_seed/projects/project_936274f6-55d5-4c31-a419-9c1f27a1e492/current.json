@@ -1,40 +1,39 @@
 {
-  "id": 90,
+  "id": 15,
   "user_id": 1,
-  "project_id": 57,
-  "account_id": 15,
-  "account_n": 2,
+  "project_id": "project_936274f6-55d5-4c31-a419-9c1f27a1e492",
+  "account_id": "account_53af3cc1-5100-4a64-ae62-aa3107edf98a",
   "name": "Training",
   "plan": {
     "progression": {
       "steps": [
         {
-          "id": "e843651c-e6e9-4179-a6e4-62f022f8e163",
+          "id": "node_99feda9d-79a2-44db-b7d1-faf6b57dc4ec",
           "label": "Plan",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "669dec8e-718a-4c31-80ee-802c72e182b5",
+              "id": "node_23df682c-62e3-4ffc-81af-6280858beb9f",
               "label": "Goals",
               "ordered": true,
               "resolved": false,
               "children": []
             },
             {
-              "id": "9f794064-0213-4151-a8a2-eb1c108bc3b4",
+              "id": "node_62ff859e-34bb-4b92-9567-91423e425259",
               "label": "Schedule",
               "ordered": true,
               "resolved": false,
               "children": [
                 {
-                  "id": "4720fe96-d5b0-47ee-a55b-2e7eba85c3a2",
+                  "id": "node_6f03338f-7f59-4468-8061-bbd4088b9ba1",
                   "label": "Monday",
                   "ordered": true,
                   "resolved": false,
                   "children": [
                     {
-                      "id": "a7d74c0d-02ce-42bb-b5f3-9871d329b831",
+                      "id": "node_b0e12226-936c-4932-8c7d-aa56abadbd66",
                       "label": "18.00-20.00",
                       "ordered": true,
                       "resolved": false,
@@ -43,13 +42,13 @@
                   ]
                 },
                 {
-                  "id": "2d22c34d-8363-4e91-a00f-f3409a0fe4ba",
+                  "id": "node_e9a4fded-f41e-48b3-a716-8c4d481a9fdf",
                   "label": "Wednesday",
                   "ordered": true,
                   "resolved": false,
                   "children": [
                     {
-                      "id": "a69618c0-fedc-4208-badc-71496b5680be",
+                      "id": "node_495e474b-b9c7-4dbc-8cbf-a928c5f815d2",
                       "label": "14:30-16.00",
                       "ordered": true,
                       "resolved": false,
@@ -58,13 +57,13 @@
                   ]
                 },
                 {
-                  "id": "73bb9c0e-7215-40da-9a62-76557fdcaba3",
+                  "id": "node_e4d61d93-5031-4340-97ef-947d03920e94",
                   "label": "Friday",
                   "ordered": true,
                   "resolved": false,
                   "children": [
                     {
-                      "id": "5e4f96c7-3b53-4909-8aca-480e917c18d6",
+                      "id": "node_2b0b6225-4327-4b53-8066-33a2dc819973",
                       "label": "14.00-15.00",
                       "ordered": true,
                       "resolved": false,
@@ -75,45 +74,45 @@
               ]
             },
             {
-              "id": "21227681-c6ad-4482-b8d0-53d9404cf7a9",
+              "id": "node_86911f54-8012-4251-824c-0a3f49f29f1f",
               "label": "Exercises",
               "ordered": true,
               "resolved": false,
               "children": [
                 {
-                  "id": "f8d3225f-0350-4661-b53e-9dc8264ea6e9",
+                  "id": "node_19edd9b3-66bc-445b-be07-03c69a62f6e1",
                   "label": "Strength",
                   "ordered": true,
                   "resolved": false,
                   "children": [
                     {
-                      "id": "d654f530-c87b-44f8-8b1c-e255dc3b43e2",
+                      "id": "node_0da78089-a134-4b51-b54b-900487d7cc5c",
                       "label": "Upper Body",
                       "ordered": true,
                       "resolved": false,
                       "children": [
                         {
-                          "id": "b3dc2392-661d-49a2-8dce-fec0d325f63f",
+                          "id": "node_42158e95-2552-4538-a84e-526adf6efe65",
                           "label": "Compound",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "248f07b5-4598-4b94-a268-25dd2eab09fb",
+                              "id": "node_bb05bae8-6027-4fc6-b968-2b893f7d6961",
                               "label": "Bench Press",
                               "ordered": true,
                               "resolved": false,
                               "children": []
                             },
                             {
-                              "id": "a60c9de6-8a95-4c03-8425-1a74110b399b",
+                              "id": "node_79bd65eb-5d67-407e-94aa-466f61932925",
                               "label": "Squat",
                               "ordered": true,
                               "resolved": false,
                               "children": []
                             },
                             {
-                              "id": "2e5338e9-03f2-41ad-bdd7-08c5634083f1",
+                              "id": "node_84f4c85d-65e4-4cdb-b26a-656a475db71c",
                               "label": "Pull-ups",
                               "ordered": true,
                               "resolved": false,
@@ -122,27 +121,27 @@
                           ]
                         },
                         {
-                          "id": "b6dc0b20-0105-4704-a558-e370e7800c37",
+                          "id": "node_c438cd89-a2f0-4fb3-80ed-8eed2798aff6",
                           "label": "Isolation",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "2eff7460-b94d-49c8-a182-cc1b8bebcfa0",
+                              "id": "node_a416a1eb-c8ac-44e0-a6bd-526de7e179e2",
                               "label": "Biceps Curl",
                               "ordered": true,
                               "resolved": false,
                               "children": []
                             },
                             {
-                              "id": "2096eb81-6990-4a72-aff3-05c72b8fd3d6",
+                              "id": "node_8ff75985-55d4-4ec9-87ca-ac064039b10d",
                               "label": "Triceps Extension",
                               "ordered": true,
                               "resolved": false,
                               "children": []
                             },
                             {
-                              "id": "e3401906-90cd-478a-9493-2d3d85d94cd8",
+                              "id": "node_cecec143-65ad-4a5a-9c6c-a169d2b3a1e0",
                               "label": "Lateral Raise",
                               "ordered": true,
                               "resolved": false,
@@ -153,26 +152,26 @@
                       ]
                     },
                     {
-                      "id": "ecca30a6-04ef-4c20-ac8f-27f541f4a04a",
+                      "id": "node_5032538f-c5ce-44f3-aa12-b3653038425b",
                       "label": "Lower Body",
                       "ordered": true,
                       "resolved": false,
                       "children": [
                         {
-                          "id": "f4a8685d-4c9d-4d21-8ae5-ed3f27370717",
+                          "id": "node_79f57053-ee44-4fd8-8dfe-0c5e99e0b7a3",
                           "label": "Excercises",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "b316dc8e-849f-48d7-97e3-9266b0019ab1",
+                              "id": "node_bbc45999-9715-4855-a043-3aed4b549d20",
                               "label": "Squat",
                               "ordered": true,
                               "resolved": false,
                               "children": []
                             },
                             {
-                              "id": "914e5d7b-a663-46be-801a-a4b75ad173cd",
+                              "id": "node_87e06e4c-df45-4046-ae00-0bf179438437",
                               "label": "Deadlift",
                               "ordered": true,
                               "resolved": false,
@@ -185,26 +184,26 @@
                   ]
                 },
                 {
-                  "id": "bbeab9be-cc47-49b2-aea1-e66f21d27fbf",
+                  "id": "node_0f507995-bf16-4620-8c71-0d805bf5bc64",
                   "label": "Condition",
                   "ordered": true,
                   "resolved": false,
                   "children": [
                     {
-                      "id": "e191c91a-8b68-41fa-84ee-e0cc11ac8496",
+                      "id": "node_617341df-8e47-4c3b-90a8-b974f9361925",
                       "label": "Exercises",
                       "ordered": true,
                       "resolved": false,
                       "children": [
                         {
-                          "id": "b163f3d9-975f-467a-a906-642335110546",
+                          "id": "node_69289bfb-4dcd-4467-89b6-92111000a5cd",
                           "label": "Intervalls",
                           "ordered": true,
                           "resolved": false,
                           "children": []
                         },
                         {
-                          "id": "36803a4d-f565-4d46-8aa2-167a5f09fd09",
+                          "id": "node_2a9f0756-bcb9-4566-8f38-be4e5ce5c5ba",
                           "label": "5 km run",
                           "ordered": true,
                           "resolved": false,
@@ -219,57 +218,57 @@
           ]
         },
         {
-          "id": "f4f88948-6fe1-4778-8918-92aae6db8491",
+          "id": "node_78d88f61-98d2-46b6-8223-945d0b2771ed",
           "label": "Log",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "69825137-758b-418a-89ce-f1719be0c904",
+              "id": "node_ef8be379-e4d4-4921-b8ea-bb45035545ab",
               "label": "2026",
               "ordered": true,
               "resolved": false,
               "children": [
                 {
-                  "id": "020a4c10-7913-48b6-96c0-441b24957b3b",
+                  "id": "node_9e203d84-121e-4fba-b1b4-7f23fa0d9e97",
                   "label": "September",
                   "ordered": true,
                   "resolved": false,
                   "children": [
                     {
-                      "id": "cc092f61-9bd2-4060-93b1-1f505fc195c1",
+                      "id": "node_86e6ef57-2f83-4dfe-a7ec-5f7025383561",
                       "label": "Week 1",
                       "ordered": true,
                       "resolved": false,
                       "children": [
                         {
-                          "id": "bd6092e7-c0d7-419f-b169-b7486f056b0b",
+                          "id": "node_9568d4af-03aa-4798-a089-1d820b2b7a88",
                           "label": "Monday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "397ae2c3-07b7-4fa0-a494-f0f72430a493",
+                              "id": "node_096cfd5d-3817-478a-9cb1-92506163484f",
                               "label": "Upper Body",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "9751748e-b2a5-4450-8f98-8a49cab3776e",
+                                  "id": "node_20f776b2-c527-4607-befc-d8c35440fd2f",
                                   "label": "Bench Press",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "a1504783-265a-4a24-ab86-896b1d69739c",
+                                  "id": "node_2da82826-426a-47a0-b867-5dba101fa17e",
                                   "label": "Pull-ups",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "97ac4e46-26c3-47f5-9185-2cc13a7f8e89",
+                                  "id": "node_8ebe535f-c511-4285-8df8-802d1dc9c2db",
                                   "label": "Shoulder Press",
                                   "ordered": true,
                                   "resolved": false,
@@ -280,26 +279,26 @@
                           ]
                         },
                         {
-                          "id": "57268519-92bb-4b5e-8953-81bdea80eafb",
+                          "id": "node_474bcfc2-6e36-4be2-a405-0259312c3c11",
                           "label": "Wednesday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "3ebfab10-8833-490e-a58c-a2891ca1dc78",
+                              "id": "node_af1a9c53-64cb-4a9e-999d-91dca104a827",
                               "label": "Lower Body",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "0c6cf23b-bfd7-468d-8f97-55f0bb9b08fc",
+                                  "id": "node_4fd8c99c-a51e-49b8-b51f-34193c4050b5",
                                   "label": "Squat",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "cf5da15c-c1ca-4c45-b9b8-edb3013ca0d1",
+                                  "id": "node_b6dec4a5-f682-467e-b0f4-3ada5c904049",
                                   "label": "Deadlift",
                                   "ordered": true,
                                   "resolved": false,
@@ -312,39 +311,39 @@
                       ]
                     },
                     {
-                      "id": "f771c96e-9240-411f-a3ef-28ee88a3eee6",
+                      "id": "node_7145aa97-84d5-4533-b821-02cf4a914746",
                       "label": "Week 2",
                       "ordered": true,
                       "resolved": false,
                       "children": [
                         {
-                          "id": "920d6fe8-acb2-4c1f-aa5b-2713e3f2e3f2",
+                          "id": "node_0781fc39-7f5a-47d3-a946-c4ea46293f8c",
                           "label": "Monday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "dff20d48-9cd5-4f97-96a4-85c2adb39fbd",
+                              "id": "node_5f93f187-213c-4aba-bbfa-0e356ae66218",
                               "label": "Upper Body",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "5607c832-32f1-43f1-a43e-77855dd634ea",
+                                  "id": "node_7acd73d9-f79e-48e5-9068-19f3a1ea0c9a",
                                   "label": "Bench Press",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "02a1e3fc-e14e-4f20-bfd3-554f330f6d91",
+                                  "id": "node_92ad6f06-4454-48b4-8d19-a7160efccf58",
                                   "label": "Pull-ups",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "efe4f55a-3310-4e85-9df5-a5f1127fa3b0",
+                                  "id": "node_af5528c4-2f22-46fa-b438-a1c973511941",
                                   "label": "Biceps Curl",
                                   "ordered": true,
                                   "resolved": false,
@@ -355,26 +354,26 @@
                           ]
                         },
                         {
-                          "id": "d7b1c51b-36ae-4a94-b959-fd4c4acc23f6",
+                          "id": "node_25ff1c4b-f111-4a11-9831-ba474b62b5b2",
                           "label": "Wednesday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "1ee9be82-0414-4efe-8baf-5e79156c9e94",
+                              "id": "node_f594b4d1-4149-4aa9-afda-ca94452e1929",
                               "label": "Lower Body",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "11017c7f-ed59-4998-a787-84e4b4054506",
+                                  "id": "node_73cc4665-0959-412f-afdf-f977cbbaf49b",
                                   "label": "Squat",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "86ee827e-a2bb-4b6e-9cf1-b719a9f76723",
+                                  "id": "node_83f927ea-2238-4f31-9877-cedb4c4b020f",
                                   "label": "Leg Press",
                                   "ordered": true,
                                   "resolved": false,
@@ -385,19 +384,19 @@
                           ]
                         },
                         {
-                          "id": "8079b133-2cee-4168-9644-93e6e0dc37bd",
+                          "id": "node_3099a04d-28ae-4fc4-9df5-8ec23f1cfbf4",
                           "label": "Friday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "0c919111-193d-4b27-996c-a84efac7d07f",
+                              "id": "node_c1d64421-f6d1-4ecc-9329-800c1df2ad34",
                               "label": "Conditioning",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "16c7a684-3540-4e2f-981b-21983bc5167f",
+                                  "id": "node_bab57e19-ae4d-45b2-999a-23938672e638",
                                   "label": "5 km Run",
                                   "ordered": true,
                                   "resolved": false,
@@ -410,39 +409,39 @@
                       ]
                     },
                     {
-                      "id": "6cf0952f-a6ac-4d6e-aaad-13de56649670",
+                      "id": "node_6fbdd2e7-7a8f-4084-8b62-8ce32611b166",
                       "label": "Week 3",
                       "ordered": true,
                       "resolved": false,
                       "children": [
                         {
-                          "id": "ea362794-4501-48b2-83cb-6078bf48a556",
+                          "id": "node_644377ac-ab65-4fe2-8801-fc12da46f679",
                           "label": "Tuesday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "c3612f4d-8fa6-43b1-9688-4c96ff5a5416",
+                              "id": "node_27421d38-b04d-4a4c-8044-421d96cd3a9d",
                               "label": "Upper Body",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "24874be8-0e85-4789-9296-164a3b527e45",
+                                  "id": "node_95ea69c8-4a10-4c92-b594-1cee2735c83e",
                                   "label": "Bench Press",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "e764e411-9b55-476f-b902-5d2dd413be53",
+                                  "id": "node_78377539-b4db-46ef-89de-f230ccfe2f09",
                                   "label": "Shoulder Press",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "40fe8b64-1f08-4773-b21c-f2d40b0aeb25",
+                                  "id": "node_ff4416e7-00e8-471b-b98d-2aaccf90e053",
                                   "label": "Triceps Extension",
                                   "ordered": true,
                                   "resolved": false,
@@ -453,26 +452,26 @@
                           ]
                         },
                         {
-                          "id": "00474c04-4bd7-449d-a009-ccb97bd4f9a3",
+                          "id": "node_e76d9800-95e8-493e-9708-944290074091",
                           "label": "Friday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "4a7b1435-a1b0-41c9-9733-1c2b23395ea5",
+                              "id": "node_1b9462b7-8a4b-4836-9a6b-2fb1cbe4a7dc",
                               "label": "Lower Body",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "822d4490-51d3-49ff-b706-ad4c5983d926",
+                                  "id": "node_ecda526d-1a7b-42e9-a8a9-8b3b0fb7a1d9",
                                   "label": "Squat",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "22603357-dace-4234-b59d-60508fd47634",
+                                  "id": "node_a9b97337-b1b8-473b-8549-296120113ad4",
                                   "label": "Deadlift",
                                   "ordered": true,
                                   "resolved": false,
@@ -485,39 +484,39 @@
                       ]
                     },
                     {
-                      "id": "7363c5b2-df4a-4f60-b57f-d450fe9ec52a",
+                      "id": "node_9c19f826-59f2-4296-8a59-7df6c98f091f",
                       "label": "Week 4",
                       "ordered": true,
                       "resolved": false,
                       "children": [
                         {
-                          "id": "9d036cbb-7d49-4884-9906-e1c9bdd058e0",
+                          "id": "node_2d074e4a-c6c1-4f5b-ab3d-5dfa41f730ae",
                           "label": "Monday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "520bacb3-50a2-4559-a928-38f10f3e5dc4",
+                              "id": "node_5c8a156f-fe3a-459b-9100-2295fd9e591a",
                               "label": "Upper Body",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "7823a51e-b30b-47c0-b417-02292814654f",
+                                  "id": "node_8ec0c6fd-f74a-4b0b-848f-47b107f67eb5",
                                   "label": "Bench Press",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "c611c7ad-618b-4fb3-8b9d-22480a81e3af",
+                                  "id": "node_aa15f7b0-2088-4235-b700-9ae23626a7de",
                                   "label": "Pull-ups",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "c5d1e629-e382-442d-a60f-1682c18eab58",
+                                  "id": "node_45fa59cd-519e-4c87-9cc2-a67424edda73",
                                   "label": "Lateral Raise",
                                   "ordered": true,
                                   "resolved": false,
@@ -528,33 +527,33 @@
                           ]
                         },
                         {
-                          "id": "a8b0df6c-b7d2-4da5-8125-2e32509adb12",
+                          "id": "node_b7b24237-129f-441d-99cf-448383bee285",
                           "label": "Wednesday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "9cb77a91-f097-493b-b019-a8aab77c65d8",
+                              "id": "node_df877ffc-75bc-4e1b-b2c8-79fc22afef75",
                               "label": "Lower Body",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "006c9755-9069-42d3-bcfb-3d64900512b8",
+                                  "id": "node_7b29a6a7-172f-4cba-a635-1ba20380573d",
                                   "label": "Squat",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "2a023abc-2aef-40c6-a37b-b4f28c3d14f0",
+                                  "id": "node_fa49a6f7-2116-42cb-bf2a-94d8e4de3412",
                                   "label": "Deadlift",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "e384bf92-18ae-4476-a30d-35b7bb403625",
+                                  "id": "node_8b5f8f83-f57d-4eb7-8b8e-a4c42a30ef2a",
                                   "label": "Leg Press",
                                   "ordered": true,
                                   "resolved": false,
@@ -565,26 +564,26 @@
                           ]
                         },
                         {
-                          "id": "449e5dd8-0851-4853-92ad-853c3e76422f",
+                          "id": "node_d4382791-1a67-41bf-bf1b-7ae89d45676f",
                           "label": "Friday",
                           "ordered": true,
                           "resolved": false,
                           "children": [
                             {
-                              "id": "33abadf5-a7c5-4746-8b9a-4e682178a470",
+                              "id": "node_662ab915-64b5-4075-8743-1cdd9e06f7fc",
                               "label": "Conditioning",
                               "ordered": true,
                               "resolved": false,
                               "children": [
                                 {
-                                  "id": "bd8291b3-2f33-4178-86b4-bf117505bde2",
+                                  "id": "node_59db0aba-6291-4dec-b4f5-ad8bbb8eece0",
                                   "label": "Intervals",
                                   "ordered": true,
                                   "resolved": false,
                                   "children": []
                                 },
                                 {
-                                  "id": "60ff5709-c9af-4138-ab46-991eef33403d",
+                                  "id": "node_c73f1020-45e8-453c-b37a-8bb774637afe",
                                   "label": "5 km Run",
                                   "ordered": true,
                                   "resolved": false,
@@ -599,34 +598,34 @@
                   ]
                 },
                 {
-                  "id": "034cbb70-98ad-42f4-b57b-778287166fe2",
+                  "id": "node_eddb70db-e457-48f3-8d13-e43046ff22e2",
                   "label": "October",
                   "ordered": true,
                   "resolved": false,
                   "children": [
                     {
-                      "id": "e2710704-bf5a-4f54-b71c-6cdfce84fdd4",
+                      "id": "node_92f4c962-0f5f-4009-9a3b-5c717bc432de",
                       "label": "Week 1",
                       "ordered": true,
                       "resolved": false,
                       "children": []
                     },
                     {
-                      "id": "d1c15857-977f-4841-a9ad-e6cd08686533",
+                      "id": "node_1889007a-8ce7-4103-8f9a-cfb815c6d5e0",
                       "label": "Week 2",
                       "ordered": true,
                       "resolved": false,
                       "children": []
                     },
                     {
-                      "id": "4f8a8d5b-1f12-4791-b23b-aa489ae1ee36",
+                      "id": "node_7d5cc914-ae37-4554-b50d-50364cc264f3",
                       "label": "Week 3",
                       "ordered": true,
                       "resolved": false,
                       "children": []
                     },
                     {
-                      "id": "359c1c3c-0522-41ba-897f-a77a76198d08",
+                      "id": "node_3376d5b6-89eb-4b4a-9ff1-d0cc8753f374",
                       "label": "Week 4",
                       "ordered": true,
                       "resolved": false,
@@ -641,13 +640,9 @@
       ]
     }
   },
+  "feedback": "Imported 5 nodes under 2026",
   "completed": false,
   "cancelled": false,
-  "created_at": "2026-10-16T13:40:00.000+00:00",
-  "event": "chat",
-  "sent_at": "2026-10-16T13:39:48.000+00:00",
-  "map_focus": "18.00-20.00",
-  "focus_step_id": "a7d74c0d-02ce-42bb-b5f3-9871d329b831",
-  "message": "What's this?",
-  "reply": "This part is a time slot scheduled for Monday at 18:00 to 20:00 under the Plan section of the project. It does not specify what activities are planned for that time yet."
+  "created_at": "2026-10-19T08:40:25.000+00:00",
+  "event": "pasted"
 }

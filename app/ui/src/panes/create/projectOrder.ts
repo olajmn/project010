@@ -13,7 +13,7 @@ import { shortId } from "../../ids.js";
 
 // 1. Order
 
-/** Active user's projects, oldest-first (by created_at, an ISO time). */
+/** Active user's projects, oldest-first (by started_at, an ISO time). */
 export function projectsChronologicalForUser(
   projects: ProjectView[],
   userId: string | null,
@@ -22,7 +22,7 @@ export function projectsChronologicalForUser(
   return projects
     .filter((p) => p.account_id === userId)
     .slice()
-    .sort((a, b) => (a.created_at ?? "").localeCompare(b.created_at ?? ""));
+    .sort((a, b) => (a.started_at ?? "").localeCompare(b.started_at ?? ""));
 }
 
 /** Newest on top for sidebar display. */

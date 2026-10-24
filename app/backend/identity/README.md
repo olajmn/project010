@@ -28,4 +28,4 @@ Projects are listed by `created_at`, not by id.
 
 ## Older ids
 
-Node ids were `p1`, `p2`, … until 2026-10-24, then a bare UUID without a kind. Both are still read wherever they remain; `short_id()` and `kind_of()` handle them. They go when the data is rebuilt (`TODO.md` 54, step 2). Projects and accounts had counters (`project_id` 1, 2, …, and a per-account `account_n` shown as #1, #2) until 2026-10-24. Decisions: `docs/05-decisions.md` #78, #81, #82.
+Node ids were `p1`, `p2`, … until 2026-10-24, then briefly a bare UUID without a kind; the data was rebuilt with kinds the same day (`TODO.md` 54). `short_id()` and `kind_of()` still accept an id without a kind. Projects and accounts had counters (`project_id` 1, 2, …, and a per-account `account_n` shown as #1, #2) until 2026-10-24. Decisions: `docs/05-decisions.md` #78, #81, #82.

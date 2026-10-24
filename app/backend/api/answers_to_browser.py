@@ -59,6 +59,10 @@ def project_view(
         "cancelled": bool(record.get("cancelled")),
         "account_id": record.get("account_id"),
         "created_at": record.get("created_at"),
+        # When it was made: its first log line (created_at is its latest).
+        "started_at": history[0].get("created_at")
+        if history
+        else record.get("created_at"),
         "node": node,
         "thread": thread,
         "status": build_status(history, current=record),

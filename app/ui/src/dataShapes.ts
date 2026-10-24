@@ -68,6 +68,8 @@ export interface ProjectView {
   account_id: string | null;
   /** Latest history record timestamp for this project. */
   created_at?: string | null;
+  /** When the project was made (its first history record). */
+  started_at?: string | null;
   node: MapNode | null;
   thread: ChatMessage[];
   status: ProjectStatus;

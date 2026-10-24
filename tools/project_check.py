@@ -5,7 +5,8 @@ docs/04-current-state.md's prose at face value. Reports observable
 facts: git status, files newer than docs/04-current-state.md, app/'s
 actual backend/ tree, whether the core modules still import,
 code-level hygiene (Ruff, mypy, stale backend/ path mentions, modules
-with no inbound import), and this same tools/'s docs_check.py/
+with no inbound import), whether each project's log replays to its
+tree, and this same tools/'s docs_check.py/
 docs_lint.py findings.
 
 Interprets nothing about content or correctness - every finding is
@@ -19,8 +20,8 @@ Run from the project root, but against app/'s own venv (this is the
 only project this script's backend/import checks target):
     app/.venv/bin/python3 -m tools.project_check
 
-Exit code 0 if docs_check.py, docs_lint.py, Ruff, mypy, and the import
-smoke test all pass; 1 if any of them found something. Every other
+Exit code 0 if docs_check.py, docs_lint.py, Ruff, mypy, the import
+smoke test, and the replay check all pass; 1 if any of them found something. Every other
 section is pure information and never affects the exit code.
 """
 
@@ -42,6 +43,7 @@ section is pure information and never affects the exit code.
 #      - CODE_PATH_RE / STALE_PATH_SCAN_TARGETS
 #      - _is_history() / stale_code_path_mentions()
 #      - modules_with_no_inbound_import()
+#      - REPLAY_DATA / replay_check()
 #
 #  3. Entry Point
 #      - main()
@@ -276,6 +278,23 @@ def modules_with_no_inbound_import() -> list[str]:
     return sorted(orphans)
 
 
+# Data folders whose project logs must replay to their trees.
+REPLAY_DATA = ["data", "demo_seed"]
+
+
+def replay_check() -> list[str]:
+    """Projects whose log does not rebuild their current.json
+    (backend/project/changes/replay.py), per data folder that exists."""
+    problems = []
+    for folder in REPLAY_DATA:
+        if not (APP_ROOT / folder / "projects").is_dir():
+            continue
+        code, output = _run([str(PYTHON), "-m", "backend.project.changes.replay", folder])
+        if code != 0:
+            problems += [f"{folder}/projects/{line.strip()}" for line in output.splitlines()]
+    return problems
+
+
 # 3. Entry Point
 
 
@@ -362,6 +381,16 @@ def main() -> int:
         print("  not this script's.)")
     else:
         print("  none")
+
+    print()
+    print("=== project logs replay to their trees ===")
+    unreplayed = replay_check()
+    if unreplayed:
+        for line in unreplayed:
+            print(f"  {line}")
+        exit_code = 1
+    else:
+        print("  every project in " + ", ".join(REPLAY_DATA))
 
     print()
     print("=== docs_check.py ===")

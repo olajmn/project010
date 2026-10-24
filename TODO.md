@@ -27,19 +27,11 @@ next.
        `save_plan()` (`storage/project_persistence.py`). Each record
        has its own `change_…` id (#81); the account that made it is the
        line's `account_id`.
-    2. **A history that replays from the start.** History before step 1
-       is too thin to replay ("Imported 90 nodes" does not say which).
-       So the demo is rebuilt from an empty tree by a script that uses
-       the app's own edits (add, import, move, rename), spread over
-       working days from a start date per project up to today, with the
-       9 existing chat turns placed after their nodes exist; it can be
-       run again when the dates grow old. The same build becomes the
-       local data, a clean start (the old `app/data/` is archived, not
-       deleted); only a project kept from it gets one checkpoint line
-       holding its tree. From then on the tree is the start plus every
-       change; `current.json` stays as the quick answer, and
-       `tools/project_check.py` checks that replaying the log gives
-       exactly `current.json`.
+    2. **A history that replays from the start** — done 2026-10-24
+       (#83). The demo is built from empty by `backend/seed/build.py`
+       through the app's own edits, and is also the local data; the old
+       `app/data/` is archived. `tools/project_check.py` checks that
+       each log replays to `current.json` (`project/changes/replay.py`).
     3. **Undo and redo.** Undo reads the last change and saves its
        opposite as a new change ("Undid: Removed step: Client"); nodes
        come back with their own ids, so their chat reconnects; redo is

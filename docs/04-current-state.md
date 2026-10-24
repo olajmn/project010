@@ -36,8 +36,8 @@ default, and then nothing changes. On:
   8 KB) answer 413; the chat is limited per session, per IP, and per day
   (429); at most 50 sessions at once.
 - Each login gets its own sandbox: a copy of `app/demo_seed/` (the
-  account John Doe with "Project #1001" and "Getting in shape", copied
-  from local data on 2026-10-14) in its own folder under `DEMO_SANDBOX_DIR`
+  account John Doe with Building Project, Training, and Character A,
+  built by `backend/seed/build.py`, below) in its own folder under `DEMO_SANDBOX_DIR`
   (default: the system temp directory), never `app/data/`. Storage reads
   and writes there for that session's requests
   (`backend/storage/sandboxes.py`); the folder is deleted when the
@@ -92,17 +92,21 @@ Everything lives in `app/data/` as plain JSON:
   random UUIDv4 (`node_3f9c…`, `change_8b4e…`, `project_…`,
   `account_…`), shown as 8 characters; unique beyond a project and
   never reused ([[05-decisions]] #78, #81, #82;
-  `backend/identity/README.md`). Projects are listed by `created_at`.
-- `app/data/` and `app/demo_seed/` still hold the older ids (numbered
-  project folders and accounts, bare node UUIDs) until they are rebuilt
-  (`TODO.md` 54, step 2); the code on branch `ids-and-rebuild` expects
-  the new ones, so it is not deployed before then.
-- Saved-tree ids are never reused.
-- Every file is in the current format (converted once, 2026-09-27;
-  chat turns split into `message` and `reply` once, and node ids
-  `p<N>` replaced by UUIDs once, both 2026-10-24):
-  there is no code for reading older formats. The `.bak` files in
-  `data/` are leftovers from earlier conversions; nothing reads them.
+  `backend/identity/README.md`). Projects are listed by when they were
+  made (`started_at`, the first log line; `created_at` is the latest).
+- Saved-tree ids (`t1`, `t2`, …) are a counter, never reused.
+- `app/demo_seed/` is built by `backend/seed/build.py` from a written
+  history (`backend/seed/story.py`): each project grows from empty
+  through the app's own edits, on working days from its start date
+  (Building Project 3 Aug, Training 14 Sep, Character A 5 Oct) to the
+  last Friday, with its chat turns where they belong. Run from `app/`:
+  `python -m backend.seed.build <new folder>`; dates shift by whole
+  weeks to the day it runs, ids are new each time ([[05-decisions]] #83).
+- `app/data/` is a copy of that build since 2026-10-24; the data before
+  it is archived outside the repository. Every log line of a map edit
+  has its `change` record, and replaying a project's log from empty
+  gives exactly its `current.json` (`project/changes/replay.py`;
+  checked by `tools/project_check.py` for `data/` and `demo_seed/`).
 
 ## 4. The model
 

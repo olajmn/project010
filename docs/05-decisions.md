@@ -988,6 +988,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes, but only with a conversion of saved data.
 
+## 83. 2026-10-24 — The demo is built from a written history, and is also the local data
+
+**Decision:** `app/demo_seed/` is no longer a copy of local data. `backend/seed/build.py` builds it from `backend/seed/story.py`, a day-by-day history of the three demo projects, by calling the app's own functions (create, paste, add, rename, move, remove, save tree, and the chat's save) with a clock set to each step's time; dates shift by whole weeks to the day it runs. Every map edit therefore has its change record (#80), and each project's log replays from empty to its `current.json`: `project/changes/replay.py` does this, and `tools/project_check.py` runs it on `data/` and `demo_seed/`. The final trees and saved trees are the same as before; the 9 chat turns keep their text and sit after the nodes they are about. `app/data/` was archived outside the repository and replaced by a copy of the build. Projects are listed by `started_at`, their first log line, since `created_at` is a project's latest save.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** converting the old data (its early lines say "Imported 90 nodes" but not which, so it cannot replay); a checkpoint line holding each old tree, with records after it (keeps old data, but its history starts in the middle); writing the data files directly (would not be the shape the app itself saves).
+
+**Why this choice:** For the log to be the account of what happened (#80), it has to hold everything from the start. Building through the app's own edits makes the demo's history the same shape as one made by hand, and the replay check keeps it that way.
+
+**Reversible?** The archive of the old `app/data/` can be put back, but it holds the older ids (#82).
+
 ## See also
 
 - [[03-architecture]]
