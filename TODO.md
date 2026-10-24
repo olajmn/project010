@@ -35,7 +35,14 @@ next.
        Open: deleting an archived account for good while it still holds
        projects (likely refused, or only with an explicit "and its N
        projects"). Phrase the rule as "held", not "has an `account_id`",
-       so the later stages fit.
+       so the later stages fit. **The account's own log:** what the
+       account has and has had, not what happens inside its projects
+       (those are the project's log): a project made, archived, brought
+       back, deleted for good, sent to another account, received from
+       one. Kept on the account, append-only and never rewritten, so a
+       deleted project and a sent one stay in it; a transfer saves both
+       its from and to account. The account's details page shows this
+       log instead of today's merge of its projects' logs.
     2. **A project is a root node.** Project and node become the same
        kind of thing in code and data: a project is a node with no
        parent, held by an account. A decision in `05-decisions.md`, and
