@@ -1,13 +1,11 @@
 """Project node — the one unit of the family tree (parent/child).
 
 Not the visual map. Above panes/: canvas draws nodes; chat talks about
-nodes; this package defines what one node is (`node.py`), how its id
-is made and shown (`identity.py`, the only place node ids are minted),
-and the tree-as-text walk (`tree_as_text.py`). Map UI stays in
-panes/canvas/.
+nodes; this package defines what one node is (`node.py`) and the
+tree-as-text walk (`tree_as_text.py`). Node ids are made in
+backend/identity/, with every other id. Map UI stays in panes/canvas/.
 """
 
-from backend.project.node.identity import new_node_id, short_id
 from backend.project.node.node import (
     Step,
     from_nested_labels,
@@ -25,8 +23,6 @@ from backend.project.node.tree_as_text import (
 )
 
 __all__ = [
-    "new_node_id",
-    "short_id",
     "Step",
     "from_nested_labels",
     "sibling_label_clash",

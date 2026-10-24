@@ -13,19 +13,19 @@ keeping its id and everything under it (no LLM).
 rename_map_node() — give a Step a new label, keeping its id, so chat
 turns about it stay attached (docs/05-decisions.md #52, #71).
 
-New nodes get their ids from project/node/identity.py.
+New nodes get their ids from backend/identity/.
 
 Does not touch the Steps-page scratch tree.
 """
 
 import copy
 
+from backend.identity import new_node_id
 from backend.project.changes import records
 from backend.project.node import (
     Step,
     find_path,
     from_nested_labels,
-    new_node_id,
     sibling_label_clash,
     unique_sibling_label,
 )

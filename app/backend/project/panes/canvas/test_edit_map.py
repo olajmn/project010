@@ -151,21 +151,30 @@ def test_new_nodes_get_random_ids_and_no_counter(saved) -> None:
 
     edit_map.add_map_node(tree(), "Roof")
     added = saved["plan"]["progression"]["steps"][-1]
-    assert uuid.UUID(added["id"]).version == 4
+    assert uuid.UUID(added["id"].removeprefix("node_")).version == 4
     assert "node_id_hi" not in saved["plan"]
     forest = [{"label": "A", "children": [{"label": "B", "children": []}]}]
     edit_map.import_map_outline(tree(), forest=forest)
     top = saved["plan"]["progression"]["steps"][-1]
-    assert uuid.UUID(top["id"]).version == 4
-    assert uuid.UUID(top["children"][0]["id"]).version == 4
+    assert uuid.UUID(top["id"].removeprefix("node_")).version == 4
+    assert uuid.UUID(top["children"][0]["id"].removeprefix("node_")).version == 4
 
 
 # Change records: what each edit did, saved with it (project/changes/).
 
 
+def _record(saved: dict) -> dict:
+    """The saved change record without its own id, after checking it."""
+    from backend.identity import kind_of
+
+    record = dict(saved["change"])
+    assert kind_of(record.pop("id")) == "change"
+    return record
+
+
 def test_add_records_the_node_and_its_place(saved) -> None:
     edit_map.add_map_node(tree(), "Roof", parent_id="p1")
-    change = saved["change"]
+    change = _record(saved)
     added = saved["plan"]["progression"]["steps"][0]["children"][-1]
     assert change == {"op": "add", "parent": "p1", "index": 1, "nodes": [added]}
 
@@ -173,7 +182,7 @@ def test_add_records_the_node_and_its_place(saved) -> None:
 def test_import_records_every_node_brought_in(saved) -> None:
     forest = [{"label": "A", "children": [{"label": "B", "children": []}]}]
     edit_map.import_map_outline(tree(), forest=forest)
-    change = saved["change"]
+    change = _record(saved)
     top = saved["plan"]["progression"]["steps"][-1]
     assert change == {"op": "add", "parent": None, "index": 1, "nodes": [top]}
     assert change["nodes"][0]["children"][0]["label"] == "B"
@@ -181,7 +190,7 @@ def test_import_records_every_node_brought_in(saved) -> None:
 
 def test_remove_records_the_whole_branch(saved) -> None:
     edit_map.remove_map_node(tree(), "p2")
-    assert saved["change"] == {
+    assert _record(saved) == {
         "op": "remove",
         "parent": "p1",
         "index": 0,
@@ -195,15 +204,20 @@ def test_remove_records_the_whole_branch(saved) -> None:
 
 def test_move_and_rename_record_ids_and_values(saved) -> None:
     edit_map.move_map_node(row(), "p2", "up")
-    assert saved["change"] == {
+    assert _record(saved) == {
         "op": "move",
-        "id": "p2",
+        "node_id": "p2",
         "parent": None,
         "from": 1,
         "to": 0,
     }
     edit_map.rename_map_node(row(), "p3", "First")
-    assert saved["change"] == {"op": "rename", "id": "p3", "from": "B1", "to": "First"}
+    assert _record(saved) == {
+        "op": "rename",
+        "node_id": "p3",
+        "from": "B1",
+        "to": "First",
+    }
 
 
 def test_a_record_does_not_change_with_the_tree(saved) -> None:

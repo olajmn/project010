@@ -51,26 +51,9 @@ short ids and labels (display only — `ui/src/panes/canvas/idView.ts`).
 
 ## How an id is made
 
-Every node id is minted by `new_node_id()` in `identity.py`, and nowhere
-else; `panes/canvas/edit_map.py` and everything that adds nodes ask it.
-An id is a random UUIDv4 in its standard form
-(`3f9c2a71-8b4e-4d10-a6f2-91c0e7b45d38`), shown to people as its first
-8 characters (`short_id()`, and `ui/src/panes/canvas/nodeId.ts` on the
-map), the way git shows a commit. `docs/05-decisions.md` #78.
-
-What an id promises:
-
-- **It identifies one node and nothing else.** It says nothing about
-  when the node was made, in what order, or how many came before it.
-- **It is unique beyond its project and this app.** Projects, devices,
-  or other systems can hold the same nodes side by side without ids
-  colliding; no counter has to be kept in step.
-- **It is never reused.** A removed node's id is retired, not freed: it
-  keeps meaning that one node wherever it is still named — its changes,
-  its chat turns, the source of a saved tree.
-- **It is separate from what the node holds.** The label, place, and
-  children can all change; the id does not. A copy (an inserted saved
-  tree) is a new node with a new id.
+Node ids, like every id in the app, are made in `backend/identity/`
+(`new_node_id()`); what an id is, its kinds, and what it promises:
+`backend/identity/README.md`.
 
 ## Rules
 - **Sibling labels stay unique**, as an addressing and readability rule,

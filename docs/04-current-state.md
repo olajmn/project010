@@ -88,10 +88,11 @@ Everything lives in `app/data/` as plain JSON:
 | `accounts.json` | Accounts; a deleted one leaves a tombstone so its id is never reused |
 | `saved_trees.json` | Saved trees per account, with `id_hi` |
 
-- Node ids are random UUIDv4, minted only in
-  `backend/project/node/identity.py` and shown as their first 8
-  characters; they are unique beyond a project and never reused
-  ([[05-decisions]] #78, `project/node/README.md`).
+- Ids are made only in `backend/identity/` (`ids.py`): a kind and a
+  random UUIDv4 (`node_3f9c…`, `change_8b4e…`), shown as 8 characters;
+  unique beyond a project and never reused ([[05-decisions]] #78, #81;
+  `backend/identity/README.md`). Nodes made before ids had a kind keep
+  a bare UUID until the data is rebuilt (`TODO.md` 54).
 - Other ids that are never reused: saved-tree ids, account ids,
   per-account project numbers. Global `project_id` is
   `max + 1`, so deleting the newest project frees its id.

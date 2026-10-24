@@ -24,9 +24,9 @@ next.
        move (id, from, to), rename (id, old, new), import / folder /
        insert tree (every node brought in, parent). Written once, in
        `panes/canvas/edit_map.py` through one helper; kept by
-       `save_plan()` (`storage/project_persistence.py`). Still to add:
-       each record's own id (a UUID, so an undo can name the change it
-       reverses, across projects too), and which account made it.
+       `save_plan()` (`storage/project_persistence.py`). Each record
+       has its own `change_…` id (#81); the account that made it is the
+       line's `account_id`.
     2. **A history that replays from the start.** History before step 1
        is too thin to replay ("Imported 90 nodes" does not say which).
        So the demo is rebuilt from an empty tree by a script that uses

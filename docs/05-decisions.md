@@ -964,6 +964,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; records are an added field, and nothing reads them yet.
 
+## 81. 2026-10-24 — All ids are made in backend/identity/, as a kind and a UUID
+
+**Decision:** Every id the app makes comes from `backend/identity/ids.py` and nowhere else, as its kind and a random UUIDv4: `node_…` for map nodes, `change_…` for change records; projects and accounts follow (`TODO.md` 74). `kind_of()` reads an id's kind and `short_id()` gives the 8 characters people see. Node id minting moves here from `project/node/identity.py`. Each change record (#80) now carries its own `change_…` id; in `move` and `rename` records the node is named by `node_id`, so a record's `id` is always its own. `backend/identity/README.md` lists every kind, where it is made, kept, and read, and what an id promises.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** bare UUIDs (#78; an id alone does not say what it belongs to); minting each kind beside the code that uses it (the rule "ids are opaque and made in one place" would be spread over several folders).
+
+**Why this choice:** Ids are a simulated layer of addresses: the app treats them as opaque strings and works the same whatever they look like, so their making belongs in one place apart from the rest of the system. A kind in front of each id shows on sight what it belongs to, in data files, logs, and debugging. Undo needs to name the change it reverses, hence a change id.
+
+**Reversible?** Yes; ids are read as opaque strings, and older ids without a kind are still read.
+
 ## See also
 
 - [[03-architecture]]

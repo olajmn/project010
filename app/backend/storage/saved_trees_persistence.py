@@ -6,7 +6,7 @@ records, no history: {id, name, account_id, saved_at, source, tree}.
 
 Tree ids (`t1`, `t2`, …) are never reused: the file keeps an `id_hi`
 high-water mark, so a deleted tree's id stays retired. (Node ids are a
-different kind: random, from project/node/identity.py.)
+different kind: random, from backend/identity/.)
 """
 
 # Contents
