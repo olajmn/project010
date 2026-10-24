@@ -23,7 +23,6 @@ Run from app/, into a folder that does not exist yet:
 #
 #  3. Helpers
 #      - _use_clock()
-#      - _outline()
 #      - _node_id()
 #
 #  4. Entry point
@@ -49,12 +48,13 @@ from backend.project.panes.canvas.edit_map import (
     remove_map_node,
     rename_map_node,
 )
+from backend.project.panes.chat.reply import save_chat_turn
 from backend.project.panes.create.lifecycle import create_project
 from backend.project.saved_trees.saved_trees import save_tree_from_node
 from backend.seed import story
 from backend.storage import paths, sandboxes
 from backend.storage.accounts_persistence import save_account
-from backend.storage.project_persistence import load_current, save_plan
+from backend.storage.project_persistence import load_current
 
 # ============================================================
 # 1. Time
@@ -156,7 +156,8 @@ def _do(action: dict, latest: dict, clock: Clock) -> None:
     do = action["do"]
     if do == "paste":
         parent = _node_id(latest, action["under"]) if action["under"] else None
-        import_map_outline(latest, parent_id=parent, forest=_outline(action["outline"]))
+        # Read as plain indented lines, as Paste does with unwrap off.
+        import_map_outline(latest, action["outline"], parent, unwrap=False)
     elif do == "add":
         parent = _node_id(latest, action["under"]) if action["under"] else None
         add_map_node(latest, action["label"], parent)
@@ -178,18 +179,14 @@ def _do(action: dict, latest: dict, clock: Clock) -> None:
         )
         # The message is sent a moment before the reply is saved.
         sent = clock.at(clock.moment - timedelta(seconds=12))
-        save_plan(
-            latest["name"],
-            latest.get("plan") or {},
-            project_id=latest["project_id"],
-            account_id=latest.get("account_id"),
-            event="chat",
-            sent_at=sent,
+        save_chat_turn(
+            latest,
+            action["message"],
+            reply,
+            sent,
             map_focus=about.split("/")[-1] if about else None,
             focus_step_id=node_id,
             focus_day=clock.day(focus_day).isoformat() if focus_day else None,
-            message=action["message"],
-            reply=reply,
         )
     else:
         raise ValueError(f"unknown story step: {do}")
@@ -215,22 +212,6 @@ def _use_clock(clock: Clock) -> Callable[[], None]:
             module.now_utc = real  # type: ignore[attr-defined]
 
     return restore
-
-
-def _outline(text: str) -> list[dict]:
-    """Indented lines (two spaces a level) as a {"label", "children"}
-    forest, the shape Paste imports."""
-    forest: list[dict] = []
-    stack: list[list[dict]] = [forest]
-    for line in text.splitlines():
-        if not line.strip():
-            continue
-        depth = (len(line) - len(line.lstrip(" "))) // 2
-        node: dict = {"label": line.strip(), "children": []}
-        del stack[depth + 1 :]
-        stack[depth].append(node)
-        stack.append(node["children"])
-    return forest
 
 
 def _node_id(latest: dict, path: str) -> str:

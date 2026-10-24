@@ -56,7 +56,7 @@ def reply(
         stamp_label = commanded.select_label or map_focus
         stamp_id = commanded.select_id or focus_step_id
         base = commanded.record if commanded.record is not None else latest
-        record = _save_talk(
+        record = save_chat_turn(
             base,
             note,
             text,
@@ -95,7 +95,7 @@ def reply(
         about_removed=gone and about_removed,
     )
     text = send_chat(fit_to_budget(messages, PROMPT_TOKENS)).strip()
-    record = _save_talk(
+    record = save_chat_turn(
         latest,
         note,
         text,
@@ -107,7 +107,7 @@ def reply(
     return {"record": record}
 
 
-def _save_talk(
+def save_chat_turn(
     latest: dict,
     note: str,
     text: str,
@@ -118,7 +118,7 @@ def _save_talk(
 ) -> dict:
     """Keep the map as it is; store the turn's message and reply in their
     own fields, which screen/chat_thread.py and model/brief/conversation.py
-    read."""
+    read. The one way a chat turn is saved (also by backend/seed/)."""
     return save_plan(
         latest.get("name") or "",
         latest.get("plan") or {},

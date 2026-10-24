@@ -12,7 +12,7 @@ from backend.project.saved_trees import (
 )
 
 
-def _project(project_id: int, account: int | None, steps: list) -> dict:
+def _project(project_id: str, account: str | None, steps: list) -> dict:
     return {
         "name": "P",
         "project_id": project_id,
@@ -22,23 +22,23 @@ def _project(project_id: int, account: int | None, steps: list) -> dict:
 
 
 RECIPE = {
-    "id": "p1",
+    "id": "node_1",
     "label": "Pasta Bolognese",
     "resolved": True,
     "ordered": False,
     "children": [
         {
-            "id": "p2",
+            "id": "node_2",
             "label": "Ingredients",
             "path": "/tmp/x",
             "children": [
-                {"id": "p3", "label": "Pasta", "children": []},
+                {"id": "node_3", "label": "Pasta", "children": []},
             ],
         },
-        {"id": "p4", "label": "Method", "children": []},
+        {"id": "node_4", "label": "Method", "children": []},
     ],
 }
-SOURCE = _project(1, 7, [RECIPE])
+SOURCE = _project("project_1", "account_7", [RECIPE])
 
 
 @pytest.fixture(autouse=True)
@@ -55,13 +55,13 @@ def library(tmp_path, monkeypatch):
 
 @pytest.fixture
 def saved() -> dict:
-    return save_tree_from_node(SOURCE, "p1")
+    return save_tree_from_node(SOURCE, "node_1")
 
 
 def test_saved_as_structure(saved) -> None:
     # No id, resolved, or path anywhere.
     assert saved["id"] == "t1" and saved["name"] == "Pasta Bolognese"
-    assert saved["source"] == {"project_id": 1, "step_id": "p1"}
+    assert saved["source"] == {"project_id": "project_1", "step_id": "node_1"}
     tree = saved["tree"]
     assert tree["ordered"] is False
     flat = repr(tree)
@@ -70,46 +70,46 @@ def test_saved_as_structure(saved) -> None:
 
 def test_library_is_per_account(saved) -> None:
     assert [t["id"] for t in saved_trees_for(SOURCE)] == ["t1"]
-    assert saved_trees_for(_project(2, 8, [])) == []
+    assert saved_trees_for(_project("project_2", "account_8", [])) == []
 
 
 def test_insert_under_a_node(saved) -> None:
     # Under a node that already has the same label: fresh ids, numbered
     # top label, `ordered` kept.
     target = _project(
-        3,
-        7,
+        "project_3",
+        "account_7",
         [
             {
-                "id": "p5",
+                "id": "node_5",
                 "label": "Recipes",
                 "children": [
-                    {"id": "p6", "label": "Pasta Bolognese", "children": []},
+                    {"id": "node_6", "label": "Pasta Bolognese", "children": []},
                 ],
             }
         ],
     )
-    record = insert_saved_tree(target, "t1", "p5")
+    record = insert_saved_tree(target, "t1", "node_5")
     recipes = record["plan"]["progression"]["steps"][0]["children"]
     inserted = recipes[-1]
     assert inserted["label"] == "Pasta Bolognese (2)"
     assert inserted["ordered"] is False and inserted["resolved"] is False
     ids = [inserted["id"], *(c["id"] for c in inserted["children"])]
-    assert "p1" not in ids and "p2" not in ids and len(set(ids)) == len(ids)
+    assert "node_1" not in ids and "node_2" not in ids and len(set(ids)) == len(ids)
     assert [c["label"] for c in inserted["children"]] == ["Ingredients", "Method"]
 
 
 def test_insert_at_top_level(saved) -> None:
-    top = insert_saved_tree(_project(3, 7, []), "t1", None)
+    top = insert_saved_tree(_project("project_3", "account_7", []), "t1", None)
     assert top["plan"]["progression"]["steps"][-1]["label"] == "Pasta Bolognese"
 
 
 def test_other_accounts_tree_cannot_be_inserted(saved) -> None:
     with pytest.raises(ValueError):
-        insert_saved_tree(_project(4, 8, []), "t1", None)
+        insert_saved_tree(_project("project_4", "account_8", []), "t1", None)
 
 
 def test_delete_retires_the_id(saved) -> None:
     remove_saved_tree("t1")
     assert saved_trees_for(SOURCE) == []
-    assert save_tree_from_node(SOURCE, "p1")["id"] == "t2"
+    assert save_tree_from_node(SOURCE, "node_1")["id"] == "t2"

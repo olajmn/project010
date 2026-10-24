@@ -4,7 +4,7 @@ Every id the app makes, made in one place (`ids.py`) and kept apart from the res
 
 ## What an id is
 
-An id is its kind and a random UUIDv4: `node_3f9c2a71-8b4e-4d10-a6f2-91c0e7b45d38`. The kind says what the id belongs to; the UUID makes it unique. People see 8 characters after the kind (`3f9c2a71`), the way git shows a commit (`short_id()`; on the map, `ui/src/panes/canvas/nodeId.ts`).
+An id is its kind and a random UUIDv4: `node_3f9c2a71-8b4e-4d10-a6f2-91c0e7b45d38`. The kind says what the id belongs to; the UUID makes it unique. People see 8 characters after the kind (`3f9c2a71`), the way git shows a commit (`short_id()`; in the UI, `ui/src/ids.ts`).
 
 The rest of the app treats an id as an opaque string. Nothing reads meaning from it, compares ids by size, or counts them; it only needs ids to be unique. That is why ids are made here and nowhere else: what an id looks like is decided in one file, and the system works the same whatever that is.
 

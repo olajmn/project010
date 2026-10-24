@@ -34,10 +34,15 @@ next.
        each log replays to `current.json` (`project/changes/replay.py`).
     3. **Undo and redo.** Undo reads the last change and saves its
        opposite as a new change ("Undid: Removed step: Client"); nodes
-       come back with their own ids, so their chat reconnects; redo is
-       an undo of an undo. Nothing in the history is erased. Works
-       after a reload and has no step limit, since the records are the
-       log. Route `POST /api/projects/{id}/undo` in `api/app.py`.
+       come back with their own ids, so their chat reconnects. Each
+       undo goes one change further back,
+       and redo puts undone changes back in order until a new edit is
+       made. Nothing in the history is erased. Undo reaches only the
+       changes made since the project was opened in this page (a
+       reload or switching projects starts again); older changes stay
+       in the log, and reversing them is a separate, deliberate action
+       (see Ideas: a details window). Routes
+       `POST /api/projects/{id}/undo` and `/redo` in `api/app.py`.
     4. **The UI.** A back-arrow icon (drawn, not a character) on the
        map's toolbar, grey when there is nothing to undo; Ctrl+Z while
        the map has focus (text fields keep their own undo); a short
