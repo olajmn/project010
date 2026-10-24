@@ -84,9 +84,9 @@ def test_unknown_post_route(api) -> None:
 def test_create_project(api) -> None:
     status, view = api.post("/api/projects", {"text": "  House  "})
     assert status == 200
-    from backend.identity import kind_of
+    import uuid
 
-    assert view["name"] == "House" and kind_of(view["project_id"]) == "project"
+    assert view["name"] == "House" and uuid.UUID(view["project_id"]).version == 4
     assert view["node"] is None  # an empty map has no tree yet
     assert {"thread", "current_state", "completed", "cancelled", "account_id"} <= set(
         view

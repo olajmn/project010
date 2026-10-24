@@ -4,7 +4,6 @@ accounts. What an id promises: README.md here.
 """
 
 from backend.identity.ids import (
-    kind_of,
     new_account_id,
     new_change_id,
     new_node_id,
@@ -13,7 +12,6 @@ from backend.identity.ids import (
 )
 
 __all__ = [
-    "kind_of",
     "new_account_id",
     "new_change_id",
     "new_node_id",

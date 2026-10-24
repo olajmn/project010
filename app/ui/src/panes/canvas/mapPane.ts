@@ -5,13 +5,11 @@
 // Contents
 //  1. Types
 //  2. Helpers
-//      - isNodeTree()
 //      - nodeIdForLabel()
 //      - countUnder()
 //  3. Public API
 //      - installMapPane()
 
-import { isNodeId } from "./nodeId.js";
 import { undoButtons } from "./undo.js";
 import { addNode, removeNode, renameProject } from "../../api.js";
 import { getActiveUserId, setLastProjectId } from "../../user/activeAccount.js";
@@ -65,12 +63,6 @@ type MapPaneOpts = {
 };
 
 // 2. Helpers
-
-export function isNodeTree(
-  node: { children: { id: string }[] },
-): boolean {
-  return node.children.some((child) => isNodeId(child.id));
-}
 
 /** A map row's node label — from data-label, not the box text, which
  *  shows the id instead while `/id` is on. */
@@ -150,7 +142,8 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
     body.className = "project-body";
 
     const middle = project.node?.children ?? [];
-    const canSelect = project.node ? isNodeTree(project.node) : false;
+    // Every row under the project's own is a node (the map has none when empty).
+    const canSelect = project.node !== null;
     let line: HTMLDivElement;
 
     const markSelected = (nodeId: string, note: string) => {

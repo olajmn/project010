@@ -8,9 +8,10 @@ Every test runs against its own temporary directory, never the real
 data/: the `data_dir` fixture points the path constants there.
 """
 
+import uuid
+
 import pytest
 
-from backend.identity import kind_of
 from backend.storage import accounts_persistence as ap
 from backend.storage import paths as storage_paths
 from backend.storage import project_persistence as pp
@@ -45,7 +46,7 @@ def test_save_project_writes_current_and_events() -> None:
     assert plain_record["name"] == "Make a song"
     assert "goal" not in plain_record
     pid = plain_record["project_id"]
-    assert kind_of(pid) == "project"
+    assert uuid.UUID(pid).version == 4
     assert pp.current_path(pid).exists()
     assert pp.events_path(pid).exists()
     assert pp.current_path(pid).parent.name == pid  # the id is the folder
@@ -57,7 +58,7 @@ def test_save_project_writes_current_and_events() -> None:
 def test_accounts_save_rename_and_ids() -> None:
     user = ap.save_account("Improve physical health and quality of life")
     assert user["text"] == "Improve physical health and quality of life"
-    assert kind_of(user["id"]) == "account"
+    assert uuid.UUID(user["id"]).version == 4
     assert ap.get_account(user["id"]) == user
     assert ap.get_account("account_none") is None
     renamed = ap.rename_account(user["id"], "Health")

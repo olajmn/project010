@@ -1046,6 +1046,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Follow-up (same day, Current state):** The panel the page calls Current state is called that in code too: `project/status/` is `project/current_state/` (`build_current_state()`, `current_state_text()`), the project view's field is `current_state`, and the page's `panes/chat/statusPanel/` and `status.css` are `panes/chat/currentState/` and `currentState.css`, with `current-state-*` ids and classes. "status" stays where it means a node's state (open or done) or an HTTP status, and the stored setting `projects.statusOpen` keeps its name so the panel remembers whether it was open. This completes `TODO.md` 62 except step 5.
 
+## 87. 2026-10-24 — Ids are bare UUIDs; what an id belongs to is known from where it is kept
+
+**Decision:** An id is a random UUIDv4 with nothing in front (`3f9c2a71-8b4e-…`), replacing #81's kind prefixes (`node_…`, `change_…`, `project_…`, `account_…`). What an id belongs to is known from where it is kept (a node's id in `nodes`, an account's in `accounts.json`, a project's as its folder), and a view that shows an id names its kind from where it was opened (`TODO.md` 75). `backend/identity/` still makes every id, and its functions say what they make (`new_node_id()`, `new_change_id()`, `new_project_id()`, `new_account_id()`); `kind_of()` is gone and `short_id()` is the first 8 characters. The map no longer checks a prefix to tell its project row from nodes: every row under the project's own is a node, so `ui/src/panes/canvas/nodeId.ts` and the checks that used it were removed. The saved data was converted once (1,980 ids in `app/data/` and `app/demo_seed/`, project folders renamed), backed up first; every log still replays, and a fresh build of the demo matches. Last step of `TODO.md` 62.
+
+**Date:** 2026-10-24
+
+**Alternatives considered:** keeping the prefixes (#81; easier to read in raw files, but the id would say something about itself).
+
+**Why this choice:** An id should identify one thing and say nothing else (#78), and here that includes its kind: the kind belongs to where the id is kept and to the code that made it, not to the id. The code already knew the kind from context everywhere but two places, and those turned out not to need it.
+
+**Reversible?** Only by converting back; the data with prefixes is outside the repository.
+
 ## See also
 
 - [[03-architecture]]

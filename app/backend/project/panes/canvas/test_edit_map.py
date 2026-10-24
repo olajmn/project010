@@ -143,13 +143,13 @@ def test_new_nodes_get_random_ids_and_no_counter(saved) -> None:
 
     edit_map.add_map_node(tree(), "Roof")
     added = saved["nodes"][-1]
-    assert uuid.UUID(added["id"].removeprefix("node_")).version == 4
+    assert uuid.UUID(added["id"]).version == 4
     assert "node_id_hi" not in saved
     forest = [{"label": "A", "children": [{"label": "B", "children": []}]}]
     edit_map.import_map_outline(tree(), forest=forest)
     top = saved["nodes"][-1]
-    assert uuid.UUID(top["id"].removeprefix("node_")).version == 4
-    assert uuid.UUID(top["children"][0]["id"].removeprefix("node_")).version == 4
+    assert uuid.UUID(top["id"]).version == 4
+    assert uuid.UUID(top["children"][0]["id"]).version == 4
 
 
 # Change records: what each edit did, saved with it (project/changes/).
@@ -157,10 +157,10 @@ def test_new_nodes_get_random_ids_and_no_counter(saved) -> None:
 
 def _record(saved: dict) -> dict:
     """The saved change record without its own id, after checking it."""
-    from backend.identity import kind_of
+    import uuid
 
     record = dict(saved["change"])
-    assert kind_of(record.pop("id")) == "change"
+    assert uuid.UUID(record.pop("id")).version == 4
     return record
 
 

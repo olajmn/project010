@@ -4,13 +4,13 @@ Every id the app makes, made in one place (`ids.py`) and kept apart from the res
 
 ## What an id is
 
-An id is its kind and a random UUIDv4: `node_3f9c2a71-8b4e-4d10-a6f2-91c0e7b45d38`. The kind says what the id belongs to; the UUID makes it unique. People see 8 characters after the kind (`3f9c2a71`), the way git shows a commit (`short_id()`; in the UI, `ui/src/ids.ts`).
+An id is a random UUIDv4 and nothing else: `3f9c2a71-8b4e-4d10-a6f2-91c0e7b45d38`. It does not say what it belongs to; that is known from where it is kept (a node's id in `nodes`, an account's in `accounts.json`), and the code that makes it says what it makes (`new_node_id()`, `new_project_id()`, …). People see its first 8 characters (`3f9c2a71`), the way git shows a commit (`short_id()`; in the UI, `ui/src/ids.ts`); a view that shows an id names its kind from where it was opened.
 
 The rest of the app treats an id as an opaque string. Nothing reads meaning from it, compares ids by size, or counts them; it only needs ids to be unique. That is why ids are made here and nowhere else: what an id looks like is decided in one file, and the system works the same whatever that is.
 
-## The kinds
+## What ids are made for
 
-| Kind | Made by | Where it is kept | Who reads it |
+| For | Made by | Where it is kept | Who reads it |
 |---|---|---|---|
 | `node` | `new_node_id()`, called by `project/panes/canvas/edit_map.py` for every new node | each node's `id` in `current.json`; `focus_node_id` on log lines; `source.node_id` of saved trees | the map, the chat, saved trees |
 | `change` | `new_change_id()`, called by `project/changes/records.py` | `change.id` on a map edit's line in `events.jsonl` | undo (`TODO.md` 54) |
@@ -28,4 +28,4 @@ Projects are listed by `created_at`, not by id.
 
 ## Older ids
 
-Node ids were `p1`, `p2`, … until 2026-10-24, then briefly a bare UUID without a kind; the data was rebuilt with kinds the same day (`TODO.md` 54). `short_id()` and `kind_of()` still accept an id without a kind. Projects and accounts had counters (`project_id` 1, 2, …, and a per-account `account_n` shown as #1, #2) until 2026-10-24. Decisions: `docs/05-decisions.md` #78, #81, #82.
+Node ids were `p1`, `p2`, … until 2026-10-24. The same day ids briefly carried their kind in front (`node_…`, `project_…`), and the saved data was then converted to bare UUIDs (`TODO.md` 62). Projects and accounts had counters (`project_id` 1, 2, …, and a per-account `account_n` shown as #1, #2) until 2026-10-24. Decisions: `docs/05-decisions.md` #78, #81, #82, #87.

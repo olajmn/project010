@@ -5,7 +5,6 @@
  */
 
 import { shortId } from "../../ids.js";
-import { isNodeId } from "./nodeId.js";
 import type { MapNode } from "../../dataShapes.js";
 import { indentRem, NEST_INSET_REM } from "./spacing.js";
 import { installMapLines } from "./lines/addLines.js";
@@ -180,7 +179,6 @@ function fillBeadUnit(
   const unit = document.createElement("div");
   unit.className = "progress-bead-unit";
 
-  const canEdit = isNodeId(node.id);
   // `/id` shows the id in the box; the label stays in data-label, which
   // is what everything reading a node's name uses (mapPane beadLabel()).
   const shown = mapShowsIds() ? shortId(node.id) : node.label;
@@ -202,11 +200,11 @@ function fillBeadUnit(
     unit.appendChild(label);
   }
 
-  if (onAddNode && canEdit) {
+  if (onAddNode) {
     attachAddControl(unit, onAddNode, node.id, { showButton: false });
   }
 
-  if (canEdit && onMenuAction) {
+  if (onMenuAction) {
     attachNodeMenu(unit, node.id, onMenuAction, layout);
   }
 

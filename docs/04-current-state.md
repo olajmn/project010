@@ -89,10 +89,10 @@ Everything lives in `app/data/` as plain JSON:
 | `accounts.json` | Accounts; a deleted one leaves a tombstone so its id is never reused |
 | `saved_trees.json` | Saved trees per account, with `id_hi` |
 
-- Ids are made only in `backend/identity/` (`ids.py`): a kind and a
-  random UUIDv4 (`node_3f9c…`, `change_8b4e…`, `project_…`,
-  `account_…`), shown as 8 characters; unique beyond a project and
-  never reused ([[05-decisions]] #78, #81, #82;
+- Ids are made only in `backend/identity/` (`ids.py`): a bare random
+  UUIDv4 (`3f9c2a71-…`), with nothing in front; what an id belongs to
+  is known from where it is kept. Shown as 8 characters; unique beyond
+  a project and never reused ([[05-decisions]] #78, #81, #82, #87;
   `backend/identity/README.md`). Projects are listed by when they were
   made (`started_at`, the first log line; `created_at` is the latest).
 - Saved-tree ids (`t1`, `t2`, …) are a counter, never reused.

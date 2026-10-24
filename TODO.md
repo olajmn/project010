@@ -11,62 +11,8 @@ next.
 
 ## Active
 
-62. **Old names left in code** (Step) — names from the planner era and
-    from before "the chat" and "Current state" still name today's
-    things, and confuse reading the code ("step" is a node). Rename only:
-    no behavior changes, no new files beyond one renamed module, and no
-    code that reads both old and new names (data is converted once).
-    Planned 2026-10-24. One commit per step; after each, pytest, the UI
-    type check, and `tools/project_check.py` (its replay check catches
-    data that no longer matches).
-    1. **Backend names** — done 2026-10-24, with step 2 (#86).
-       (`app/backend/`, not `foundation/`): `Step` →
-       `Node`, `steps_of()` → `nodes_of()` (still the one place that
-       knows where nodes sit on a record), `find_step()` → `find_node()`,
-       `step` / `step_id` / `new_steps` → `node` / `node_id` /
-       `new_nodes`, `save_plan()` → `save_project()` with `nodes`
-       instead of a `plan` dict. Tests follow.
-    2. **Saved data** — done 2026-10-24 (#86); the page's
-       `focus_node_id` field changed with it. `current.json`
-       `plan.progression.steps` → `nodes` (an empty map is `[]`, not
-       `progression: null`); `focus_step_id` → `focus_node_id` on log
-       lines; saved trees' `source.step_id` → `source.node_id`. One
-       conversion script outside the repository for `app/data/` and
-       `app/demo_seed/`, backed up first; `backend/seed/` writes the new
-       names. Change records already say `nodes` / `node_id`.
-    3. **UI names** — done 2026-10-24 (#86 follow-up), with
-       `data-step-id` → `data-node-id`. (`app/ui/src/`): `stepId` → `nodeId`, `onAddStep` /
-       `onRemoveStep` / `onStepClick` → `…Node…`, `labelForStepId`,
-       `resolveStepId(Live)`, `stepIdForLabel`, `stepLayout`,
-       `isProgressionTree`, `AddStepHandler` / `RemoveStepHandler`, and
-       `focus_step_id` in `dataShapes.ts`, `api.ts`, and
-       `api/request_bodies.py` (the same field on both sides).
-    4. **Talk and Status**, in two parts. a. **Talk** — done 2026-10-24
-       (#86 follow-up): `talk_prompt.py` → `chat_prompt.py`,
-       `TALK_PROVIDER` → `CHAT_PROVIDER` (also `app/fly.toml`; live after
-       the next deploy), the demo's `TALK_PER_*` → `CHAT_PER_*`. The
-       English verb stays where it is the words ("Talk about this", the
-       model's instructions). b. **Status** — done 2026-10-24 (#86 follow-up): "Status" is
-       "Current state": `project/current_state/`, `build_current_state()`,
-       `current_state_text()`, the view's `current_state` field, and the
-       page's `panes/chat/currentState/` and `currentState.css`.
-    5. **Ids without a kind in front**, with step 2's conversion: an id
-       is a bare UUIDv4, and what it belongs to is known from where it
-       is kept (a node in `nodes`, an account in `accounts.json`, a
-       project as its folder), not read from the id. `backend/identity/`
-       still makes every id (`new_node_id()`, … say what they make);
-       `kind_of()` goes, and the map tells its project row from nodes
-       some other way than `isNodeId()`'s prefix check. A new decision
-       replaces #81's prefixes.
-    Not renamed: `backend/foundation/` (parked Time code, where a step
-    is a step in time; P2) and `docs/05-decisions.md` (history). Done
-    when a whole-word search for `step`, `steps`, `Step`, `stepId`,
-    `progression`, `TALK_`, and `talk_` in `app/backend/` (outside
-    `foundation/`) and `app/ui/src/` finds nothing, and "status" is left
-    only where it means a node's state or an HTTP status. Docs: a decision in
-    `05-decisions.md`, the data rows in `04-current-state.md` § 3,
-    `docs/chat.md`, `docs/ui.md`, the two code-folder READMEs
-    (`project/node/`, `identity/`).
+None chosen; the next one is 75 (a details window). Old names (62)
+were renamed and ids lost their kind in front on 2026-10-24 (#86, #87).
 
 ## Queue
 
