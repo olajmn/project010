@@ -31,6 +31,7 @@ def reply(
     map_focus: str | None = None,
     focus_step_id: str | None = None,
     focus_day: str | None = None,
+    about_removed: bool = False,
 ) -> dict:
     """{"record", "select"?, "toggle_map_ids"?} - the saved project
     record the screen is rebuilt from (its thread ends with the reply),
@@ -41,8 +42,10 @@ def reply(
     sent_at = now_utc()
 
     # The screen may still hold a node that was removed; a selection that
-    # is not in the tree is no selection.
-    if focus_step_id and find_step(steps_of(latest), focus_step_id) is None:
+    # is not in the tree is no selection, unless the message was sent from
+    # that removed node's own conversation (`about_removed`).
+    gone = bool(focus_step_id and find_step(steps_of(latest), focus_step_id) is None)
+    if gone and not (about_removed and map_focus):
         map_focus = focus_step_id = None
 
     commanded = try_command(latest, note, focus_step_id=focus_step_id)
@@ -88,6 +91,7 @@ def reply(
         focus_step_id,
         status,
         focus_day=focus_day,
+        about_removed=gone and about_removed,
     )
     text = send_chat(messages).strip()
     record = _save_talk(

@@ -100,6 +100,7 @@ installSendMessage({
   getSelectedNodeId: () => selection.selectedNodeId,
   getSelectedNodeLabel: () => selection.selectedNodeLabel,
   getSelectedDay: () => selection.selectedDay,
+  getRemovedFocus: () => chatPane.removedFocus(),
   onUpdated: (updated) => replaceProject(updated),
 });
 

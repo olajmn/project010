@@ -313,13 +313,18 @@ export async function sendChatMessage(
   focusLabel?: string | null,
   focusStepId?: string | null,
   focusDay?: string | null,
+  aboutRemoved?: boolean,
 ): Promise<ProjectView> {
   const body: {
     text: string;
     focus_label?: string;
     focus_step_id?: string;
     focus_day?: string;
+    about_removed?: boolean;
   } = { text };
+  if (aboutRemoved) {
+    body.about_removed = true;
+  }
   if (focusLabel) {
     body.focus_label = focusLabel;
   }

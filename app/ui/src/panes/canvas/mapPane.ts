@@ -363,6 +363,10 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
     } else {
       opts.chatInput.placeholder = DEFAULT_CHAT_PLACEHOLDER;
     }
+    const removed = opts.chatPane.removedFocus();
+    if (removed) {
+      opts.chatInput.placeholder = `Talk about “${removed.label}” (removed)…`;
+    }
   };
 
   return {

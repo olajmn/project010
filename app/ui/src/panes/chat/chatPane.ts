@@ -30,6 +30,8 @@ export type ChatPane = {
     onSelectDay: (day: string | null) => void;
   }) => void;
   clearIsolate: () => void;
+  /** The removed node whose conversation is shown alone, if any. */
+  removedFocus: () => { stepId: string; label: string } | null;
   readonly threadEl: HTMLDivElement;
 };
 
@@ -72,6 +74,7 @@ export function installChatPane(opts: ChatPaneOpts): ChatPane {
   return {
     threadEl: opts.threadEl,
     clearIsolate: () => isolateChat.clear(),
+    removedFocus: () => isolateChat.removedFocus(),
     fillEmpty: (placeholder) => {
       resolveStepIdLive = null;
       labelForStepIdLive = null;

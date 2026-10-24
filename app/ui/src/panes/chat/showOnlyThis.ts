@@ -23,6 +23,9 @@ import type { ChatMessage } from "../../dataShapes.js";
 export type IsolateChat = {
   /** Drop isolation (full thread again). */
   clear: () => void;
+  /** The removed node whose conversation is shown alone, if any: a
+   * message sent now is about it. */
+  removedFocus: () => { stepId: string; label: string } | null;
   /** Render thread into `threadEl`, applying isolation if set. */
   fill: (
     messages: ChatMessage[],
@@ -43,7 +46,12 @@ export type IsolateChatOptions = {
 
 // 2. Helpers
 
-type Frame = { key: string; name: string; day: string | null; removed?: boolean };
+type Frame = {
+  key: string;
+  name: string;
+  day: string | null;
+  removed?: { stepId: string; label: string };
+};
 
 /** What a message's About-frame is: its node (by id when saved, else by
  * label), or its day of changes. `key` groups messages; `name` is shown:
@@ -56,7 +64,8 @@ function frameOf(
   const stepId = message.focus_step_id?.trim();
   if (stepId) {
     if (message.removed) {
-      return { key: `id:${stepId}`, name: `${focus || stepId} (removed)`, day: null, removed: true };
+      const label = focus || stepId;
+      return { key: `id:${stepId}`, name: `${label} (removed)`, day: null, removed: { stepId, label } };
     }
     const name = labelForStepId?.(stepId) || focus || stepId;
     return { key: `id:${stepId}`, name, day: null };
@@ -186,6 +195,7 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
       isolatedFocus = null;
       preIsolationScrollTop = null;
     },
+    removedFocus: () => isolatedFocus?.removed ?? null,
     fill,
   };
 }

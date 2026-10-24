@@ -53,10 +53,14 @@ class InsertTree(BaseModel):
 
 
 class ChatMessage(BaseModel):
+    """`about_removed`: sent from a removed node's own conversation, so
+    that node stays the subject."""
+
     text: str | None = None
     focus_label: str | None = None
     focus_step_id: str | None = None
     focus_day: str | None = None
+    about_removed: bool = False
 
 
 class RenameAccount(BaseModel):

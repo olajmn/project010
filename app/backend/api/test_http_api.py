@@ -319,3 +319,25 @@ def test_chat_about_a_removed_part_is_saved_without_it(
     asked = view["thread"][-2]
     assert asked["text"] == "and this?"
     assert "focus" not in asked and "focus_step_id" not in asked
+
+
+def test_chat_about_a_removed_part_on_purpose(api, project, monkeypatch) -> None:
+    # Sent from the removed part's own conversation, it stays in that frame.
+    monkeypatch.setattr(reply_module, "send_chat", lambda messages: "Fine.")
+    pid = project["project_id"]
+    status, view = api.post(
+        f"/api/projects/{pid}/chat",
+        {
+            "text": "can we still talk about this?",
+            "focus_label": "Ghost",
+            "focus_step_id": "p99",
+            "about_removed": True,
+        },
+    )
+    assert status == 200
+    asked = view["thread"][-2]
+    assert (asked["focus"], asked["focus_step_id"], asked["removed"]) == (
+        "Ghost",
+        "p99",
+        True,
+    )

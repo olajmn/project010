@@ -235,3 +235,16 @@ def test_selected_part_that_no_longer_exists_is_no_selection() -> None:
     assert "Nothing is selected" in messages[0]["content"]
     assert "Kitchen" not in messages[0]["content"]
     assert messages[-1]["content"] == "and now?"
+
+
+def test_asking_about_a_removed_part_on_purpose() -> None:
+    # From that part's own conversation: it stays the subject, marked gone.
+    messages = build_messages(
+        HOUSE, "can we still talk about this?", [], "Kitchen", "p9", about_removed=True
+    )
+    assert messages[-1]["content"] == (
+        "[about: Kitchen (since removed)] can we still talk about this?"
+    )
+    system = messages[0]["content"]
+    assert 'asking about "Kitchen", a part that was removed' in system
+    assert "Nothing is selected" not in system

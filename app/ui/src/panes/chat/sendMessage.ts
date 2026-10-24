@@ -17,6 +17,8 @@ type SendMessageOpts = {
   getSelectedNodeId: () => string | null;
   getSelectedNodeLabel: () => string | null;
   getSelectedDay: () => string | null;
+  /** A removed node whose conversation is shown alone: the message is about it. */
+  getRemovedFocus: () => { stepId: string; label: string } | null;
   onUpdated: (updated: ProjectView) => void;
 };
 
@@ -51,7 +53,17 @@ export function installSendMessage(opts: SendMessageOpts): void {
       // remove afterward (visible, reversible), never a silently
       // discarded one they never see.
       let updated: ProjectView;
-      if (selectedNodeId && text.includes("\n")) {
+      const removed = opts.getRemovedFocus();
+      if (removed) {
+        updated = await sendChatMessage(
+          project.project_id,
+          text,
+          removed.label,
+          removed.stepId,
+          null,
+          true,
+        );
+      } else if (selectedNodeId && text.includes("\n")) {
         try {
           updated = await pasteText(
             project.project_id,

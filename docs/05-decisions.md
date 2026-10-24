@@ -912,6 +912,8 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; nothing saved changes shape.
 
+**Follow-up (same day):** A removed part can still be talked about on purpose. A message sent while its conversation is shown alone ("Show only this") carries `about_removed`; the turn is saved with the part's retired id, stays in its frame, and the model is told the user is asking about a part that was removed. Without that flag, a selection that is not in the tree still counts as none. Ids are never reused (#52), so a retired id keeps meaning that one part.
+
 ## See also
 
 - [[03-architecture]]

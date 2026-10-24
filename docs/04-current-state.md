@@ -117,7 +117,9 @@ Everything lives in `app/data/` as plain JSON:
   (`Rooms / Planning`), with its earlier name after a rename, or
   "(since removed)" when it is gone ([[05-decisions]] #76). A selected
   part that is no longer in the tree counts as nothing selected; the chat
-  on screen shows such a frame as "(removed)", not clickable.
+  on screen shows such a frame as "(removed)", not clickable. A message
+  sent from that frame's own conversation ("Show only this") is about
+  the removed part, and the model is told it is gone.
 - The model sees labels only — not node ids, file contents, or anything
   outside the project.
 

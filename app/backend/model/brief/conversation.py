@@ -29,6 +29,7 @@ def build_messages(
     focus_step_id: str | None = None,
     status: str | None = None,
     focus_day: str | None = None,
+    about_removed: bool = False,
 ) -> list[dict]:
     """[{role, content}] for model.client.send_chat(). `status` is the
     project's status text (status/build_status.status_text()).
@@ -36,15 +37,22 @@ def build_messages(
     changes are read from `history`.
 
     Only `focus_step_id` decides the selected part, and only when the
-    part is in the tree now; `map_focus` is the label the screen showed
-    and is not read here."""
+    part is in the tree now. `about_removed` is the one exception: the
+    message was sent from a removed part's own conversation, so that
+    part, named by `map_focus`, stays the subject, marked as removed."""
     steps = steps_of(latest)
     selected_day = changes_on_day_text(history, focus_day) if focus_day else None
-    system = _system_text(latest, focus_step_id, status, selected_day)
+    gone = (map_focus or "").strip() if about_removed else ""
+    if gone and focus_step_id and find_path(steps, focus_step_id) is not None:
+        gone = ""  # it is in the tree after all
+    system = _system_text(latest, focus_step_id, status, selected_day, gone)
     messages = [{"role": "system", "content": system}]
     messages.extend(past_turns(history, steps))
-    # No saved label to fall back on: a selected part not in the tree is none.
-    part = _part_name(None, focus_step_id, steps)
+    if gone:
+        part: str | None = f"{gone}{_REMOVED}"
+    else:
+        # No saved label to fall back on: a selected part not in the tree is none.
+        part = _part_name(None, focus_step_id, steps)
     messages.append(
         {"role": "user", "content": _with_focus(note, part or _day_tag(focus_day))}
     )
@@ -85,6 +93,7 @@ def _system_text(
     focus_step_id: str | None,
     status: str | None = None,
     selected_day: str | None = None,
+    removed_part: str = "",
 ) -> str:
     slots = [
         ("ROLE", ROLE),
@@ -94,7 +103,7 @@ def _system_text(
         ("EXAMPLES", EXAMPLES),
         (
             "PROJECT BACKGROUND",
-            _background(latest, focus_step_id, status, selected_day),
+            _background(latest, focus_step_id, status, selected_day, removed_part),
         ),
     ]
     return "\n\n".join(f"{title}\n{text}" for title, text in slots if text)
@@ -105,9 +114,10 @@ def _background(
     focus_step_id: str | None,
     status: str | None,
     selected_day: str | None = None,
+    removed_part: str = "",
 ) -> str:
     """The project as reference for this Send: name, status, map, and
-    the selected node or day of changes."""
+    the selected node, removed part, or day of changes."""
     name = (latest.get("name") or "").strip() or "untitled"
     parts = [
         "Reference for this conversation; look things up here when the "
@@ -134,6 +144,12 @@ def _background(
         parts.append(
             "The user has selected this part (shown with what it sits under "
             "and what it contains):\n" + selected
+        )
+    elif removed_part:
+        parts.append(
+            f'The user is asking about "{removed_part}", a part that was removed '
+            "from the project. It is not in the structure above; earlier turns "
+            'about it are tagged "(since removed)". Talk about it as removed.'
         )
     elif selected_day:
         parts.append(selected_day)
