@@ -94,6 +94,19 @@ next.
     (stays web and TypeScript), or Flutter as a new project on the same
     API. Either way the frontend is rewritten.
 
+### Settings
+
+75. **A details window per project and account** (Step, **next after 62**) — a Details button opens
+    what is about the system rather than for people: its kind and id,
+    made and changed dates, and the project's log (now under Settings →
+    Logs). The rows in Directory and Archive would then show names only.
+    The kind is shown from where the details were opened (a project row
+    says "project"), not read from the id (62 step 5). Open: how it
+    scales: projects and accounts are few and can each have a Details
+    window in Settings; nodes can be many, so a node's details likely
+    belong on the node itself (its ⋯ menu on the map) rather than in a
+    list of every node (cf. 72).
+
 ### Map and nodes
 
 72. **Node id follow-ups** (Step, when needed) — ids are random UUIDv4
@@ -186,16 +199,6 @@ choice.
   (`text_to_tree.py`); box diagrams need another path (was 25).
 - **Export / share a structure** — a branch or project as a file others
   can open.
-- **A details window per project and account** — a Details button opens
-  what is about the system rather than for people: its kind and id,
-  made and changed dates, and the project's log (now under Settings →
-  Logs). The rows in Directory and Archive would then show names only.
-  The kind is shown from where the details were opened (a project row
-  says "project"), not read from the id (62 step 5). Open: how it
-  scales: projects and accounts are few and can each have a Details
-  window in Settings; nodes can be many, so a node's details likely
-  belong on the node itself (its ⋯ menu on the map) rather than in a
-  list of every node (cf. 72).
 - **Sync across devices** with end-to-end encryption, the local copy
   staying the real one (`docs/03-architecture.md` § 5).
 - **Other front ends on the same data** — the node data is portable.
