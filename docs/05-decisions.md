@@ -1086,6 +1086,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Follow-up (same day):** Send… is on every project row in Settings → Directory too, so a project moves between live accounts without archiving one; both tabs use one action (`settings/sendTo.ts`).
 
+## 90. 2026-10-25 — An account keeps its own log of what it has had
+
+**Decision:** Each account has its own append-only log, `data/accounts/{id}/events.jsonl` (`storage/account_log_persistence.py`): one line when a project it holds is made, archived, restored, or deleted for good, and a line on both accounts when a project is sent (`project_sent`, `project_received`, each naming both). A line keeps ids only (`project_id`, `from_account`, `to_account`) and the project's name as it was; account names are made when shown, by `userLabel()` in the UI. The lines are written by `panes/create/account_log.py`, called from `lifecycle.py` and `project_account.py`; what happens inside a project stays in the project's log. `GET /api/accounts/{id}/log` reads it, and an account's details page shows it instead of the merged logs of the projects it holds now, so a deleted or sent project stays in it. The log starts empty: nothing is built up from the projects' logs. `demo_seed/` was rebuilt (`backend/seed/build.py`), so the demo account's log has its three projects from the start; `data/` was left as it was. Deleting an account for good erases its log. The JSON-lines reading is shared with the projects' logs (`storage/jsonl.py`). `TODO.md` 77, stage 1, part B.
+
+**Date:** 2026-10-25
+
+**Alternatives considered:** keeping the account page's merge of its current projects' logs (a deleted or sent project disappears from it); building the log up from the projects' logs (a deleted project's log is already gone, so it would have gaps, and it would describe what the account never recorded); keeping the log after the account is deleted, as a chain would (the log is the user's data, and this app is not a chain); account names saved in the lines (a rename would leave old names, and the name would be made in a second place).
+
+**Why this choice:** An account answers for the things it holds (#89), so what it has held is its own record, not something put together from projects that may be gone. Ids only and one line per event keep it a plain table if the files become a database (`TODO.md` 67).
+
+**Reversible?** Yes; the log is a separate file per account, and nothing else reads it.
+
 ## See also
 
 - [[03-architecture]]

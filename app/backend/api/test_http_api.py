@@ -385,6 +385,23 @@ def test_an_account_holding_projects_cannot_be_deleted(api, account, project) ->
     assert api.post(f"/api/accounts/{account}/delete")[0] == 200
 
 
+def test_an_account_log(api, account, project, data_dir) -> None:
+    pid = project["project_id"]
+    _, other = api.post("/api/accounts", {"text": "Other"})
+    api.post(f"/api/projects/{pid}/user", {"account_id": other["id"]})
+    status, log = api.get(f"/api/accounts/{account}/log")
+    assert status == 200
+    assert [(e["kind"], e["project"]) for e in log] == [
+        ("Created", "House"),
+        ("Sent", "House"),
+    ]
+    assert log[-1]["account"] == other["id"]
+    assert api.get("/api/accounts/account_none/log") == (404, "no such account")
+    # Deleting the account for good erases its log with it.
+    assert api.post(f"/api/accounts/{account}/delete")[0] == 200
+    assert not (data_dir / "accounts" / account).exists()
+
+
 def test_chat_about_a_removed_part_is_saved_without_it(
     api, project, monkeypatch
 ) -> None:

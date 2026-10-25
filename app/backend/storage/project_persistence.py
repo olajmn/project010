@@ -23,6 +23,7 @@ from pathlib import Path
 
 from backend.identity import new_project_id
 from backend.storage import sandboxes
+from backend.storage.jsonl import append_jsonl, read_jsonl
 from backend.storage.paths import DATA_DIR, DEFAULT_USER_ID, now_utc
 
 PROJECTS_DIR = DATA_DIR / "projects"
@@ -46,32 +47,6 @@ def record_project_id(record: dict) -> str | None:
 # Current is the source of truth for map/chat. Events are a slim change
 # tape for Current state/Logs. Each save updates current and appends one event
 # (no full map on the tape).
-
-
-def _read_jsonl(path: Path) -> list[dict]:
-    """Every non-blank line as one JSON object, oldest first."""
-    records: list[dict] = []
-    try:
-        with open(path, encoding="utf-8") as f:
-            for line_no, line in enumerate(f, start=1):
-                text = line.strip()
-                if not text:
-                    continue
-                try:
-                    records.append(json.loads(text))
-                except json.JSONDecodeError as e:
-                    raise RuntimeError(
-                        f"{path} line {line_no} is corrupted and can't be "
-                        f"read as JSON ({e}). Restore from a backup or fix "
-                        "that line by hand before continuing."
-                    ) from e
-    except json.JSONDecodeError as e:
-        raise RuntimeError(
-            f"{path} is corrupted and can't be read as JSON ({e}). "
-            "It may have been interrupted mid-write. Restore it from a "
-            "backup or fix it by hand before continuing."
-        ) from e
-    return records
 
 
 def _projects_dir() -> Path:
@@ -137,13 +112,6 @@ def _read_json(path: Path) -> dict:
     return data
 
 
-def _append_event(project_id: str, event: dict) -> None:
-    path = events_path(project_id)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(event, ensure_ascii=False) + "\n")
-
-
 def _iter_current_paths() -> list[tuple[str, Path]]:
     """(project_id, current.json path) for every on-disk project folder."""
     projects_dir = _projects_dir()
@@ -172,10 +140,7 @@ def load_current(project_id: str) -> dict | None:
 
 def load_project_events(project_id: str) -> list[dict]:
     """Slim change tape for one project, oldest first."""
-    path = events_path(project_id)
-    if not path.exists():
-        return []
-    return _read_jsonl(path)
+    return read_jsonl(events_path(project_id))
 
 
 def load_project_history(project_id: str) -> list[dict]:
@@ -255,7 +220,7 @@ def save_project(
     line = _slim_event(record)
     if change is not None:
         line["change"] = change
-    _append_event(pid, line)
+    append_jsonl(events_path(pid), line)
     return record
 
 

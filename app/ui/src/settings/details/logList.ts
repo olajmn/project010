@@ -32,7 +32,7 @@ function timeOf(when: Date): string {
 // 2. logDaySections()
 
 /** One section per day, in the order the entries come. `showProject`
- *  adds the project name (All activity); a single project's timeline
+ *  adds the project name (an account's log); a single project's timeline
  *  leaves it out. */
 export function logDaySections(entries: LogEntry[], showProject: boolean): HTMLElement[] {
   const days: { label: string; rows: HTMLElement[] }[] = [];

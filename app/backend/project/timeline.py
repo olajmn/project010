@@ -49,6 +49,7 @@ GROUPS = {
     "renamed": "Renamed",
     "owner_changed": "Owner",
     "archived": "Archived",
+    "restored": "Restored",
 }
 
 _TEXT_MAX = 160
@@ -84,7 +85,7 @@ def to_event(record: dict, project_name: str) -> dict:
     feedback = (record.get("feedback") or "").strip()
     if name == "chat":
         text = (record.get("message") or "").strip()
-    elif name in ("created", "archived"):
+    elif name in ("created", "archived", "restored"):
         text = ""
     else:
         text = feedback

@@ -1,5 +1,6 @@
 // What is about the system rather than for people, for one project or
-// one account: its kind, full id, and dates, and a project's whole log.
+// one account: its kind, full id, and dates, and its log (a project's
+// saved changes, or what an account has and has had).
 // The kind comes from what the page was opened for, not from the id
 // (docs/05-decisions.md #87).
 
@@ -13,9 +14,16 @@
 //      - projectDetails()
 //  3. An account
 //      - accountDetails()
+//      - withAccountNames()
 
-import { fetchAccounts, fetchArchivedProjects, fetchProjects } from "../../api.js";
-import type { AccountView, ProjectView } from "../../dataShapes.js";
+import {
+  fetchAccountLog,
+  fetchAccounts,
+  fetchArchivedProjects,
+  fetchProjectTimeline,
+  fetchProjects,
+} from "../../api.js";
+import type { AccountView, LogEntry, ProjectView } from "../../dataShapes.js";
 import { projectsChronologicalForUser } from "../../panes/create/projectOrder.js";
 import { userLabel } from "../../user/activeAccount.js";
 import { logSection } from "./log.js";
@@ -52,7 +60,7 @@ export async function mountDetails(host: HTMLElement, query: URLSearchParams): P
     } else if (accountId) {
       const account = accounts.find((a) => a.id === accountId);
       host.replaceChildren(
-        ...(account ? accountDetails(account, projects, from) : [settingsHint("No such account.")]),
+        ...(account ? accountDetails(account, projects, accounts, from) : [settingsHint("No such account.")]),
       );
     } else {
       host.replaceChildren(settingsHint("Nothing chosen."));
@@ -105,13 +113,18 @@ function projectDetails(project: ProjectView, accounts: AccountView[], from: str
   }
   return [
     settingsSection(project.name, settingsGroup(rows)),
-    settingsSection("Log", logSection([project.project_id])),
+    settingsSection("Log", logSection(() => fetchProjectTimeline(project.project_id), false)),
   ];
 }
 
 // 3. An account
 
-function accountDetails(account: AccountView, projects: ProjectView[], from: string | null): HTMLElement[] {
+function accountDetails(
+  account: AccountView,
+  projects: ProjectView[],
+  accounts: AccountView[],
+  from: string | null,
+): HTMLElement[] {
   const rows = [
     settingsRow("Kind", "account"),
     settingsRow("Id", account.id),
@@ -124,7 +137,21 @@ function accountDetails(account: AccountView, projects: ProjectView[], from: str
         own.map((p) => settingsRow(p.name, shortDate(p.started_at ?? p.created_at), [detailsAction("project", p.project_id, from)])),
       )
     : settingsHint("No projects.");
-  const out = [settingsSection(userLabel(account), settingsGroup(rows)), settingsSection("Projects", list)];
-  if (own.length) out.push(settingsSection("Log", logSection(own.map((p) => p.project_id))));
-  return out;
+  const log = async () => withAccountNames(await fetchAccountLog(account.id), accounts);
+  return [
+    settingsSection(userLabel(account), settingsGroup(rows)),
+    settingsSection("Projects", list),
+    settingsSection("Log", logSection(log, true)),
+  ];
+}
+
+/** A transfer's text names the other account ("to John Doe"); one
+ *  deleted since shows its short id. */
+function withAccountNames(entries: LogEntry[], accounts: AccountView[]): LogEntry[] {
+  return entries.map((entry) => {
+    if (!entry.account) return entry;
+    const other = accounts.find((a) => a.id === entry.account) ?? { id: entry.account };
+    const word = entry.event === "project_sent" ? "to" : "from";
+    return { ...entry, text: `${word} ${userLabel(other)}` };
+  });
 }

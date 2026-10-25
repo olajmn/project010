@@ -71,7 +71,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Slash commands | `panes/chat/commands/` | `panes/chat/commands/` |
 | The chat thread and its About frames (node by id, or day); rename notes | `panes/chat/screen/chat_thread.py` | `panes/chat/showOnlyThis.ts`, `currentState/` |
 | Current state panel | `project/current_state/` | `panes/chat/currentState/` |
-| A project's or account's details page and its log | `project/timeline.py` | `settings/details/` |
+| A project's or account's details page and its log (a project's saved changes; an account's own log, empty until something happens after 2026-10-25) | `project/timeline.py`, `panes/create/account_log.py` | `settings/details/` |
 | Archive (restore / delete; an archived account's projects listed under it, to send or delete; an account that holds projects is not deleted) | `panes/create/lifecycle.py`, `panes/create/project_account.py`, `storage/accounts_persistence.py` | `settings/archive/` |
 | Every HTTP route | `api/app.py` (FastAPI) | `api.ts` |
 | Demo mode: login, sessions, limits | `api/demo/` | `demo/`, `ui/login.html` |
@@ -87,6 +87,7 @@ Everything lives in `app/data/` as plain JSON:
 | `projects/{id}/current.json` | The project now: name, account, and `nodes` (the top-level nodes, each with its children) |
 | `projects/{id}/events.jsonl` | One slim line per saved change: event, feedback (a chat turn: `message` and `reply` instead), times, focus; a map edit since 2026-10-24 also its full `change` record (`project/changes/records.py`) — the source for chat history, status, and logs |
 | `accounts.json` | Accounts; a deleted one leaves a tombstone so its id is never reused |
+| `accounts/{id}/events.jsonl` | An account's own log: one line when a project it holds is made, archived, restored, or deleted, and on both accounts when one is sent (`storage/account_log_persistence.py`); erased with the account |
 | `saved_trees.json` | Saved trees per account, with `id_hi` |
 
 - Ids are made only in `backend/identity/` (`ids.py`): a bare random

@@ -24,18 +24,9 @@ next.
     already fit; stages 1 and 2 barely touch today's change records,
     replay, and undo. Planned 2026-10-24, in stages, each usable on its
     own.
-    1. **Everything is always held.** Part A is done (a project always
-       has an account; archived means laid away; [[05-decisions]] #89).
-       **Part B, the account's own log:** what the account has and has had, not what
-       happens inside its projects (those are the project's log): a
-       project made, archived, brought back, deleted for good, sent to
-       another account, received from one. Kept on the account,
-       append-only and never rewritten, so a deleted project and a sent
-       one stay in it; a transfer saves both its from and to account.
-       The account's details page shows this log instead of today's
-       merge of its projects' logs. Open: whether the log is built up
-       from the projects' logs for what happened before it (a deleted
-       project's log is gone either way), or starts empty.
+    1. **Everything is always held.** Done: a project always has an
+       account, archived means laid away ([[05-decisions]] #89), and
+       an account keeps its own log of what it has had (#90).
     2. **A project is a root node.** Project and node become the same
        kind of thing in code and data: a project is a node with no
        parent, held by an account. A decision in `05-decisions.md`, and
@@ -70,7 +61,8 @@ next.
     being enough, and what replaces them.
     1. **Today:** JSON files under `app/data/`: per project a
        `current.json` (the project now) and an `events.jsonl` that only
-       grows. Only `backend/storage/` reads or writes them
+       grows, and per account an `events.jsonl` of what it has had
+       (TODO 77, part B). Only `backend/storage/` reads or writes them
        ([[03-architecture]] § 3), and "no database until a real need
        shows up" (§ 5).
     2. **What makes it needed:** several writers on one project at once

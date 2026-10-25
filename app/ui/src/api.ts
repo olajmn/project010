@@ -18,8 +18,8 @@
 //      - archiveAccount(), restoreAccount(), deleteAccount()
 //  5. Model (Settings → General)
 //      - fetchModel()
-//  6. A project's log (Settings → Details)
-//      - fetchProjectTimeline()
+//  6. Logs (Settings → Details)
+//      - fetchProjectTimeline(), fetchAccountLog()
 //  7. Saved trees
 //      - saveTree(), fetchSavedTrees(), insertSavedTree(), deleteSavedTree()
 //  8. Demo session
@@ -434,13 +434,22 @@ export async function fetchModel(): Promise<ModelView> {
   return (await res.json()) as ModelView;
 }
 
-// 6. A project's log (Settings → Details)
+// 6. Logs (Settings → Details)
 
 /** One project's full history, oldest first (ungrouped). */
 export async function fetchProjectTimeline(
   projectId: string,
 ): Promise<LogEntry[]> {
   const res = await fetch(`/api/projects/${projectId}/timeline`);
+  if (!res.ok) {
+    throw new Error(await httpErrorMessage(res));
+  }
+  return (await res.json()) as LogEntry[];
+}
+
+/** What one account has and has had, oldest first. */
+export async function fetchAccountLog(accountId: string): Promise<LogEntry[]> {
+  const res = await fetch(`/api/accounts/${accountId}/log`);
   if (!res.ok) {
     throw new Error(await httpErrorMessage(res));
   }

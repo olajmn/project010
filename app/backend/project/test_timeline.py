@@ -48,3 +48,9 @@ def test_to_event() -> None:
         {"project_id": "project_4", "feedback": "Added node: " + "x" * 300}, "House"
     )
     assert long["text"].endswith("…") and len(long["text"]) == 161
+    # Bringing a project back has a kind of its own, not "Other".
+    restored = to_event(
+        {"project_id": "project_4", "feedback": "Restored", "event": "restored"},
+        "House",
+    )
+    assert (restored["kind"], restored["text"]) == ("Restored", "")

@@ -1,25 +1,25 @@
 {
   "id": 14,
   "user_id": 1,
-  "project_id": "e12cbc15-30a0-4d30-b659-58aba33818d5",
-  "account_id": "53af3cc1-5100-4a64-ae62-aa3107edf98a",
+  "project_id": "ed5b4a00-184a-42a0-bea7-75a3865124ba",
+  "account_id": "c570fe64-4d1e-4539-af6e-58e0f71d5c63",
   "name": "Character A",
   "nodes": [
     {
-      "id": "6c2a03b7-db3f-4383-b5c8-0bcdfdec708e",
+      "id": "0f0e2401-8ac8-467c-a9aa-813d38d1c0f8",
       "label": "STORY",
       "ordered": true,
       "resolved": false,
       "children": [
         {
-          "id": "af202a21-592c-4dce-b087-e5d0ffe30f1b",
+          "id": "9b476073-63c8-48e3-a343-27972e2f4384",
           "label": "Genre: Mystery novel",
           "ordered": true,
           "resolved": false,
           "children": []
         },
         {
-          "id": "44028f43-bde2-43a3-9fec-1f033567b3cc",
+          "id": "70570654-7bb7-4bb2-a779-4af738f8a409",
           "label": "Role: Protagonist",
           "ordered": true,
           "resolved": false,
@@ -28,34 +28,34 @@
       ]
     },
     {
-      "id": "bc4de4cc-2f06-42ed-ac0c-421fd696de4b",
+      "id": "c708718b-6d23-40cd-8139-03c1347ce308",
       "label": "IDENTITY",
       "ordered": true,
       "resolved": false,
       "children": [
         {
-          "id": "0ea2b1e5-a1a3-4f69-9f9f-52bf2ee35e2e",
+          "id": "8805a569-47a0-4e57-9e93-b49a10028bc7",
           "label": "Character ID: C-001",
           "ordered": true,
           "resolved": false,
           "children": []
         },
         {
-          "id": "fe709b62-a71f-49db-b135-6ba92e76163b",
+          "id": "e10b59ae-7031-447a-afa5-a86869a7b7d8",
           "label": "Age: 26",
           "ordered": true,
           "resolved": false,
           "children": []
         },
         {
-          "id": "c28579a9-cb5e-4163-8545-f3023d0aa6a0",
+          "id": "8e907d64-dd12-4db3-84cf-fb1fdd3b5ab0",
           "label": "Place of Birth: Kyoto, Japan",
           "ordered": true,
           "resolved": false,
           "children": []
         },
         {
-          "id": "6b563180-289e-4e8f-aac3-8ec37b332fd1",
+          "id": "ae9464dd-0d2c-4a7a-888f-dd6ba1db82f4",
           "label": "Occupation: Investigator",
           "ordered": true,
           "resolved": false,
@@ -64,26 +64,26 @@
       ]
     },
     {
-      "id": "8c023aec-8595-422f-8571-5619ba7465a8",
+      "id": "a1b55491-d360-4911-b4ec-0c188595072e",
       "label": "BACKGROUND",
       "ordered": true,
       "resolved": false,
       "children": [
         {
-          "id": "36c75a31-f551-4141-b2a5-bc6eab83b5c0",
+          "id": "c486c3be-ce20-476f-bce8-94e07598d678",
           "label": "Family Background",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "ea287733-e68f-4990-ba12-c61bdf4fb6d6",
+              "id": "0d76ad14-ef47-482c-95f2-0d26e8cdcda8",
               "label": "Parent A",
               "ordered": true,
               "resolved": false,
               "children": []
             },
             {
-              "id": "19b33e50-de0f-44e4-8597-361ab90e0613",
+              "id": "111005c0-a859-4feb-8973-284e08e116d4",
               "label": "Parent B",
               "ordered": true,
               "resolved": false,
@@ -92,13 +92,13 @@
           ]
         },
         {
-          "id": "43a1c3be-18f1-4118-b658-c095506717a0",
+          "id": "1a4a82f1-10a1-434e-944b-3a483241d8ba",
           "label": "Education",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "3c8ece62-fa37-436d-b916-c495557840dd",
+              "id": "21091b2e-74fb-4027-9752-ec7d56a64009",
               "label": "Investigative Sciences",
               "ordered": true,
               "resolved": false,
@@ -107,13 +107,13 @@
           ]
         },
         {
-          "id": "296f39af-ad8d-456d-9dad-9827e7be24c8",
+          "id": "8d8c95bb-b142-467a-a495-e7089516137c",
           "label": "Formative Experience",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "0ab8553f-6a6c-47dd-8b05-f24c899331f1",
+              "id": "2b323c31-4c07-4d45-bf34-2cb2cdb6f9cd",
               "label": "A sibling disappeared during childhood",
               "ordered": true,
               "resolved": false,
@@ -124,26 +124,26 @@
       ]
     },
     {
-      "id": "8a8c3833-3e46-41ac-b044-03e0d3e654a1",
+      "id": "a82e9af3-2ed3-4d79-bc9e-fbb6cb8e94a6",
       "label": "PERSONALITY",
       "ordered": true,
       "resolved": false,
       "children": [
         {
-          "id": "691ee755-3b7e-41f0-9e06-cb0abbbcb325",
+          "id": "c5919d36-17f8-40b9-ad49-c12ecd72b52f",
           "label": "Strengths",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "770d64bc-ac36-48e1-8737-73fe499f9b4f",
+              "id": "c3fe4287-a757-400e-98ba-eee5a19c894d",
               "label": "Observant",
               "ordered": true,
               "resolved": false,
               "children": []
             },
             {
-              "id": "b3c91e81-3e08-40cf-be22-1e17f1e84f66",
+              "id": "5f019bca-8a93-47bd-811f-19308a6b2365",
               "label": "Persistent",
               "ordered": true,
               "resolved": false,
@@ -152,20 +152,20 @@
           ]
         },
         {
-          "id": "fae8aca8-b699-4d68-a4e8-59096ae9fa23",
+          "id": "75fe9b04-2084-48e1-93cc-d9a12eeb8ace",
           "label": "Weaknesses",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "377975d5-d37b-4d26-851e-de316307928b",
+              "id": "cf0b0c0a-5ba1-4c2a-a7a0-d039faa9e54f",
               "label": "Distrustful",
               "ordered": true,
               "resolved": false,
               "children": []
             },
             {
-              "id": "814dd0b2-ecfb-4fb3-a89c-a4e634c550b3",
+              "id": "e79d4fa7-66e8-4f21-aaa4-f5dbca79c8ea",
               "label": "Obsessive",
               "ordered": true,
               "resolved": false,
@@ -174,13 +174,13 @@
           ]
         },
         {
-          "id": "4fc552ab-cf2c-4152-b0ac-e9f9647cd494",
+          "id": "095d4f46-eb74-4467-ae2b-d467c20a94ae",
           "label": "Motivation",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "6faccfae-8b35-4db9-91b7-c106ecdead14",
+              "id": "cc61aa4c-e42a-4c92-b3bf-12ad72418198",
               "label": "Discover the truth",
               "ordered": true,
               "resolved": false,
@@ -189,13 +189,13 @@
           ]
         },
         {
-          "id": "c65fd256-1f6a-472a-a9f1-f28029be024f",
+          "id": "ccaa72b2-0603-45a3-8e11-63f92a1d08b3",
           "label": "Internal Conflict",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "610d8e42-ac5b-4c83-b0e7-81c6cb6778a8",
+              "id": "a6fed56c-b746-4f70-bf54-d4e769cd571b",
               "label": "Truth versus personal loyalty",
               "ordered": true,
               "resolved": false,
@@ -206,26 +206,26 @@
       ]
     },
     {
-      "id": "2e7b5171-6417-4256-a196-22191e00043b",
+      "id": "8beb2e14-130f-409b-9124-cd41934f1f8d",
       "label": "RELATIONSHIPS",
       "ordered": true,
       "resolved": false,
       "children": [
         {
-          "id": "e83ea4ed-271e-4373-b4b1-da611233a01b",
+          "id": "d971baf0-2662-4adb-b6d4-a940391ae190",
           "label": "Person B",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "a308834b-69ec-4888-86d9-7cb88ce48d96",
+              "id": "c5dcbe5b-2671-4623-b4cc-b6c1203aa3d6",
               "label": "Relationship: Former Mentor",
               "ordered": true,
               "resolved": false,
               "children": []
             },
             {
-              "id": "85cf91a0-589f-478d-94cd-2b729fcae4ab",
+              "id": "688dcbcf-3cdd-491e-9a58-d059e15be9ad",
               "label": "Status: Estranged",
               "ordered": true,
               "resolved": false,
@@ -234,20 +234,20 @@
           ]
         },
         {
-          "id": "517babba-0830-42a8-82d9-3929702a20d6",
+          "id": "71e44815-527c-4b10-9452-092b79a09731",
           "label": "Person C",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "846deb7c-eca9-411e-9e64-dc9837c9652b",
+              "id": "c5ffe2f0-f2a0-4d2c-80fe-441d8d897b60",
               "label": "Relationship: Colleague",
               "ordered": true,
               "resolved": false,
               "children": []
             },
             {
-              "id": "128dd58b-f368-42f6-a894-6716349f8701",
+              "id": "ef117f3e-ef0e-4170-8116-d4735327f247",
               "label": "Status: Trusted",
               "ordered": true,
               "resolved": false,
@@ -258,19 +258,19 @@
       ]
     },
     {
-      "id": "dbda688d-13fc-40ae-a9b2-5a372fc0a27d",
+      "id": "e54f545c-740f-4cfd-a612-c23ecec34df9",
       "label": "LIFE EVENTS",
       "ordered": true,
       "resolved": false,
       "children": [
         {
-          "id": "8a0b101f-b38b-4860-9a64-9e011b38d288",
+          "id": "615ddebd-148a-42a5-aaba-bc161a1cbdc6",
           "label": "Age 10 — Sibling Disappears",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "834fd05b-cee1-432c-afca-7c5ea668497d",
+              "id": "ba2bf9c3-34d9-452d-8fb2-28e20700dfe9",
               "label": "Shapes Character's Motivation",
               "ordered": true,
               "resolved": false,
@@ -279,13 +279,13 @@
           ]
         },
         {
-          "id": "1d8adcc4-fd78-47b8-89d7-7d846786526a",
+          "id": "9019e5c6-3d3c-4e54-bf05-d72d3daa3133",
           "label": "Age 19 — Leaves Home",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "3a907143-8a16-4c7d-bd3d-d2ab869df302",
+              "id": "a2ff5a70-818e-4568-b66c-2ff4883d4cd8",
               "label": "Begins Independent Life",
               "ordered": true,
               "resolved": false,
@@ -294,13 +294,13 @@
           ]
         },
         {
-          "id": "583b31ab-ee5c-4950-b04a-434540c7be57",
+          "id": "b1aa2333-d9d8-4256-b354-58b590d75c8b",
           "label": "Age 24 — Case Goes Unresolved",
           "ordered": true,
           "resolved": false,
           "children": [
             {
-              "id": "732006cb-0be1-4b38-905e-ae2294f7eda8",
+              "id": "4763824b-2017-47e7-bac7-464fb50881a6",
               "label": "Loses Trust in the Institution",
               "ordered": true,
               "resolved": false,
@@ -311,34 +311,34 @@
       ]
     },
     {
-      "id": "13dc3728-0724-4229-a78a-0319c7db7d4b",
+      "id": "493a06a7-d800-4ea1-b0bf-14a471460baa",
       "label": "CURRENT STATE",
       "ordered": true,
       "resolved": false,
       "children": [
         {
-          "id": "85f8c4dd-3522-4c0d-b5a5-b8e68639ab4f",
+          "id": "cfd8e368-f6eb-4260-a535-13c8d537e4ad",
           "label": "Location: Berlin, Germany",
           "ordered": true,
           "resolved": false,
           "children": []
         },
         {
-          "id": "e3a7148e-0015-4998-b33f-bf519198bea5",
+          "id": "b814dd3b-1d08-4330-b246-a5424197e391",
           "label": "Active Goal: Investigate a Missing Person",
           "ordered": true,
           "resolved": false,
           "children": []
         },
         {
-          "id": "bbbe47cd-f3f3-4de2-b96a-815ef2e24421",
+          "id": "e8362cd5-1de2-4129-815b-132db7697e97",
           "label": "Main Obstacle: Conflicting Evidence",
           "ordered": true,
           "resolved": false,
           "children": []
         },
         {
-          "id": "b2c7f19e-5b7d-4876-a0c3-a66710be3421",
+          "id": "92f87cd1-b686-458a-a894-b399cfcc5811",
           "label": "Current Conflict: Mentor May Be Involved",
           "ordered": true,
           "resolved": false,
@@ -348,7 +348,6 @@
     }
   ],
   "feedback": "Imported 2 nodes under LIFE EVENTS",
-  "completed": false,
   "cancelled": false,
   "created_at": "2026-10-20T10:33:07.000+00:00",
   "event": "pasted"

@@ -168,6 +168,9 @@ _TALLY_WORDS = {
     "redone": "redone",
     "suggested": "suggested",
     "renamed": "renamed",
+    "archived": "archived",
+    "restored": "restored",
+    "owner_changed": "sent",
 }
 
 

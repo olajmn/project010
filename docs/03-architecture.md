@@ -34,7 +34,7 @@ Arrows show who calls whom; every answer returns the same way.
 | `node/` | What a node is: identity, children, rules ([[05-decisions]] #52) |
 | `changes/` | Each map edit as a full record, replaying a log into its tree, and which change undo and redo act on ([[05-decisions]] #80, #83, #84) |
 | `saved_trees/` | Saving a branch as structure and inserting it again ([[05-decisions]] #54) |
-| `panes/create/` | Creating, naming, archiving projects; which account owns one |
+| `panes/create/` | Creating, naming, archiving projects; which account holds one, and the account's own log |
 | `panes/canvas/` | Changing the map: add, remove, paste, folder |
 | `panes/chat/` | A chat turn, slash commands, and the thread as shown |
 | `status/` | The Current state summary (shown to the user and the model) |

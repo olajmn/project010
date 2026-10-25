@@ -5,7 +5,8 @@ backend/identity/.
 Project current + events live in project_persistence.py. Shared roots
 (DATA_DIR, now_utc, …) live in paths.py.
 
-An account is a plain {id, text, created_at} record — no history.
+An account is a plain {id, text, created_at} record — no history of
+its own here; what it has had is its log (account_log_persistence.py).
 Every project is held by one, via account_id. Archiving mutates the
 account record in place; its projects stay held by it.
 

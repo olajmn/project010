@@ -6,6 +6,7 @@ Identity writes, not reasoning. Judgment does not own this.
 """
 
 from backend.project.node import nodes_of
+from backend.project.panes.create.account_log import record_transfer
 from backend.project.panes.create.resolver import (
     get_latest_for_all_projects,
     get_latest_for_project,
@@ -49,7 +50,7 @@ def set_project_user(project_id: str, account_id: str | None) -> dict | None:
     if account is None:
         return None
 
-    return save_project(
+    record = save_project(
         latest["name"],
         nodes_of(latest),
         feedback=f"Moved to account: {account['text']}",
@@ -58,6 +59,9 @@ def set_project_user(project_id: str, account_id: str | None) -> dict | None:
         cancelled=bool(latest.get("cancelled")),
         event="owner_changed",
     )
+    if latest.get("account_id"):
+        record_transfer(record, latest["account_id"], account_id)
+    return record
 
 
 def holds_projects(account_id: str) -> bool:

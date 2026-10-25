@@ -19,6 +19,7 @@ project_account.set_project_user().
 import re
 
 from backend.project.node import nodes_of
+from backend.project.panes.create.account_log import record_project_event
 from backend.project.panes.create.resolver import (
     get_latest_for_all_projects,
     get_latest_for_project,
@@ -51,12 +52,14 @@ def create_project(typed_text: str, account_id: str) -> dict | None:
     if account is None or account.get("archived"):
         return None
     name = typed_text.strip() or next_default_name(account_id)
-    return save_project(
+    record = save_project(
         name,
         [],
         account_id=account_id,
         event="created",
     )
+    record_project_event("project_created", record)
+    return record
 
 
 # Bare "New project" and legacy "New project #4" count too.
@@ -108,7 +111,7 @@ def cancel_project(project_id: str) -> dict | None:
     if latest.get("cancelled"):
         return latest
 
-    return save_project(
+    record = save_project(
         latest["name"],
         nodes_of(latest),
         feedback="Cancelled",
@@ -117,14 +120,15 @@ def cancel_project(project_id: str) -> dict | None:
         cancelled=True,
         event="archived",
     )
+    record_project_event("project_archived", record)
+    return record
 
 
 def restore_project(project_id: str) -> dict | None:
-    """Clear cancelled so the project is active again.
+    """Clear cancelled so the project is active again, with the account
+    that held it all along.
 
-    No-op if already live. Returns None if missing. If its account was
-    deleted in the meantime, the project comes back unassigned rather
-    than tied to an account that no longer exists.
+    No-op if already live. Returns None if missing.
     """
     latest = get_latest_for_project(project_id)
     if latest is None:
@@ -132,21 +136,25 @@ def restore_project(project_id: str) -> dict | None:
     if not latest.get("cancelled"):
         return latest
 
-    owner = latest.get("account_id")
-    if owner is not None and get_account(owner) is None:
-        owner = None
-
-    return save_project(
+    record = save_project(
         latest["name"],
         nodes_of(latest),
         feedback="Restored",
         project_id=latest["project_id"],
-        account_id=owner,
+        account_id=latest.get("account_id"),
         cancelled=False,
         event="restored",
     )
+    record_project_event("project_restored", record)
+    return record
 
 
 def delete_project(project_id: str) -> bool:
-    """Permanently erase the project store. True if something was removed."""
-    return erase_project_store(project_id)
+    """Permanently erase the project store. True if something was removed.
+    The account that held it keeps a line saying so (account_log.py)."""
+    latest = get_latest_for_project(project_id)
+    if not erase_project_store(project_id):
+        return False
+    if latest is not None:
+        record_project_event("project_deleted", latest)
+    return True

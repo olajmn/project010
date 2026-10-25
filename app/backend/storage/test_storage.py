@@ -183,3 +183,19 @@ def test_a_change_record_goes_to_the_log_not_the_current_state() -> None:
     ]
     assert pp.load_project_events(pid)[-1]["change"] == change
     assert "change" not in pp.load_current(pid)
+
+
+def test_an_account_log_is_appended_read_and_erased(data_dir) -> None:
+    from backend.storage import account_log_persistence as alp
+
+    assert alp.load_account_events("a1") == []
+    alp.append_account_event("a1", {"event": "project_created", "project": "P"})
+    alp.append_account_event("a1", {"event": "project_archived", "project": "P"})
+    assert [e["event"] for e in alp.load_account_events("a1")] == [
+        "project_created",
+        "project_archived",
+    ]
+    assert alp.account_log_path("a1") == data_dir / "accounts/a1/events.jsonl"
+    alp.delete_account_log("a1")
+    assert alp.load_account_events("a1") == []
+    assert not (data_dir / "accounts" / "a1").exists()

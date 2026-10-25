@@ -8,7 +8,7 @@
 //  3. Simulated users
 //  4. Paste
 //  5. Model boundary (Settings → General)
-//  6. Activity log (Settings → Logs)
+//  6. Logs (Settings → Details)
 //  7. Saved trees
 //  8. Demo session
 
@@ -112,20 +112,26 @@ export interface ModelView {
   temperature: number;
 }
 
-// 6. Activity log (Settings → Logs)
+// 6. Logs (Settings → Details)
 
-/** One saved change, from backend/project/timeline.py (via
- * /api/projects/<id>/timeline). `event` is what happened ("node_added",
- * "renamed", …); `kind` is its group, shown before the change in a
- * details page's log; `focus` is the map node a chat was about. */
+/** One line of a details page's log: a project's saved change
+ * (backend/project/timeline.py, /api/projects/<id>/timeline), or a line
+ * of an account's own log (panes/create/account_log.py,
+ * /api/accounts/<id>/log). `event` is what happened ("node_added",
+ * "project_sent", …); `kind` is its group, shown before it; `focus` is
+ * the map node a chat was about; `account` is the other account in a
+ * transfer. */
 export interface LogEntry {
   at: string | null;
   project_id: string | null;
   project: string;
   event: string;
-  kind: "Created" | "Chat" | "Map" | "Renamed" | "Owner" | "Archived" | "Other";
+  kind:
+    | "Created" | "Chat" | "Map" | "Renamed" | "Owner" | "Archived" | "Restored"
+    | "Deleted" | "Sent" | "Received" | "Other";
   text: string;
   focus?: string;
+  account?: string;
 }
 
 // 7. Saved trees

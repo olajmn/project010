@@ -76,6 +76,7 @@ from backend.project.panes.canvas.edit_map import (
 from backend.project.panes.canvas.text_to_tree import parse_outline
 from backend.project.panes.canvas.undo import redo_map_change, undo_map_change
 from backend.project.panes.chat.reply import reply
+from backend.project.panes.create.account_log import account_log
 from backend.project.panes.create.lifecycle import (
     cancel_project,
     create_project,
@@ -95,9 +96,11 @@ from backend.project.saved_trees import (
     saved_trees_for,
 )
 from backend.project.timeline import project_timeline
+from backend.storage.account_log_persistence import delete_account_log
 from backend.storage.accounts_persistence import (
     archive_account,
     delete_account,
+    get_account,
     load_accounts,
     rename_account,
     restore_account,
@@ -475,6 +478,13 @@ def post_create_account(
     return account_view(save_account(_text(body)))
 
 
+@app.get("/api/accounts/{account_id}/log")
+def get_account_log(account_id: str) -> list:
+    if get_account(account_id) is None:
+        raise fail(404, "no such account")
+    return account_log(account_id)
+
+
 @app.post("/api/accounts/{account_id}/rename")
 def post_rename_account(
     account_id: str, body: Annotated[RenameAccount, Body(default_factory=RenameAccount)]
@@ -498,7 +508,9 @@ def post_restore_account(account_id: str) -> dict:
 def post_delete_account(account_id: str) -> dict:
     if holds_projects(account_id):
         raise fail(409, "the account still holds projects")
-    return _account_or_404(delete_account(account_id))
+    deleted = _account_or_404(delete_account(account_id))
+    delete_account_log(account_id)  # the log is the user's data too
+    return deleted
 
 
 # ============================================================
