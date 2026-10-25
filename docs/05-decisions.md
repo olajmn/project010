@@ -1084,6 +1084,8 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; saved data keeps its shape. No saved project lacked an account when this was made.
 
+**Follow-up (same day):** Send… is on every project row in Settings → Directory too, so a project moves between live accounts without archiving one; both tabs use one action (`settings/sendTo.ts`).
+
 ## See also
 
 - [[03-architecture]]

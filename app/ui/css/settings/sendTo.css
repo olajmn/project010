@@ -1,5 +1,5 @@
-/* "Send to" box in Settings → Archive.
- * Mirrors src/settings/archive/sendTo.ts. The box and its choices are
+/* "Send to" box in Settings (Directory, Archive).
+ * Mirrors src/settings/sendTo.ts. The box and its choices are
  * .progress-menu / .confirm-popover (css/panes/canvas/map.css). */
 
 /* The title is not a choice, so it is grey. */

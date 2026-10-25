@@ -15,7 +15,6 @@ import {
   fetchProjects,
   restoreAccount,
   restoreProject,
-  setProjectUser,
 } from "../../api.js";
 import { askToConfirm } from "../../panes/canvas/confirmPopover.js";
 import { setButtonBusy } from "../../shell/busyButton.js";
@@ -33,7 +32,7 @@ import {
   projectState,
   shortDate,
 } from "../rows.js";
-import { askWhereToSend } from "./sendTo.js";
+import { sendAction } from "../sendTo.js";
 
 // 1. Rows
 
@@ -98,16 +97,9 @@ function accountRows(account: AccountView, held: ProjectView[], page: Page): HTM
 /** A project under an archived account: send it to another account, or
  *  delete it for good. Sending keeps whether it is archived. */
 function heldProjectRow(project: ProjectView, page: Page): HTMLElement {
-  const others = page.accounts.filter((a) => a.id !== project.account_id);
+  const send = sendAction(project, page.accounts, page.repaint, page.showError);
   return settingsListRow(project.name, projectDetails(project), [
-    ...(others.length > 0
-      ? [
-        settingsAction("Send…", async (btn) => {
-          const to = await askWhereToSend(btn.getBoundingClientRect(), others);
-          if (to) await busy(btn, page, () => setProjectUser(project.project_id, to.id));
-        }),
-      ]
-      : []),
+    ...(send ? [send] : []),
     deleteAction(`“${project.name}”`, page, () => deleteProject(project.project_id)),
     detailsAction("project", project.project_id, "archive"),
   ]);

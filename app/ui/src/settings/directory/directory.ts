@@ -1,6 +1,7 @@
 // Directory — Settings → Directory: accounts with their projects;
-// create, rename, and delete (to the archive) accounts. One row per
-// account and per project (../rows.ts).
+// create, rename, and delete (to the archive) accounts, and send a
+// project to another account. One row per account and per project
+// (../rows.ts).
 
 // Contents
 //  1. Helpers
@@ -26,6 +27,7 @@ import {
 } from "../../user/activeAccount.js";
 import type { AccountView, ProjectView } from "../../dataShapes.js";
 import { detailsAction } from "../details/details.js";
+import { sendAction } from "../sendTo.js";
 import {
   settingsAction,
   settingsError,
@@ -77,11 +79,18 @@ function newAccountSection(onCreate: (name: string) => Promise<void>): HTMLEleme
   return settingsSection("New account", settingsGroup([settingsRow("Name", input, [create])]));
 }
 
-function childProjectRow(project: ProjectView): HTMLElement {
+/** A project under its account: Send… and Details. */
+function childProjectRow(
+  project: ProjectView,
+  accounts: AccountView[],
+  repaint: () => Promise<void>,
+  showError: (message: string) => void,
+): HTMLElement {
+  const send = sendAction(project, accounts, repaint, showError);
   const row = settingsListRow(
     project.name,
     madeAndChanged(project.started_at, project.created_at),
-    [detailsAction("project", project.project_id, "directory")],
+    [...(send ? [send] : []), detailsAction("project", project.project_id, "directory")],
   );
   row.classList.add("is-child");
   return row;
@@ -92,6 +101,7 @@ function childProjectRow(project: ProjectView): HTMLElement {
 function accountRows(
   user: AccountView,
   projects: ProjectView[],
+  accounts: AccountView[],
   activeId: string | null,
   repaint: () => Promise<void>,
   showError: (message: string) => void,
@@ -159,7 +169,7 @@ function accountRows(
     input.select();
   };
 
-  return [row, ...projects.map(childProjectRow)];
+  return [row, ...projects.map((p) => childProjectRow(p, accounts, repaint, showError))];
 }
 
 // 3. mountDirectory()
@@ -189,6 +199,7 @@ export async function mountDirectory(host: HTMLElement): Promise<void> {
             accountRows(
               user,
               projectsChronologicalForUser(projects, user.id),
+              users,
               activeId,
               paint,
               showError,

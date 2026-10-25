@@ -61,7 +61,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Feature | Backend | UI |
 |---|---|---|
 | Create, rename, archive, restore projects | `project/panes/create/` (`lifecycle.py`, `rename.py`) | `ui/src/panes/create/` |
-| Accounts and which one holds a project (always one; archiving an account keeps its projects with it) | `storage/accounts_persistence.py`, `panes/create/project_account.py` | `panes/create/accounts/`, `settings/directory/` |
+| Accounts and which one holds a project (always one; archiving an account keeps its projects with it; Send… on a project row moves it to another) | `storage/accounts_persistence.py`, `panes/create/project_account.py` | `panes/create/accounts/`, `settings/directory/`, `settings/sendTo.ts` |
 | What a node is; ids; sibling names | `project/node/` (see its `README.md`) | — |
 | Add, remove, move, rename, paste, folder | `panes/canvas/edit_map.py`, `text_to_tree.py`, `add_folder/` | `panes/canvas/` |
 | Undo and redo of map edits (arrows in the map's top bar, Ctrl+Z / Ctrl+Shift+Z) | `panes/canvas/undo.py`, `project/changes/undo.py` | `panes/canvas/undo.ts` |
