@@ -43,18 +43,14 @@ async function busy(button: HTMLButtonElement, work: () => Promise<void>): Promi
   }
 }
 
-/** Restore (when allowed) and Delete; delete asks first, it cannot be
- *  undone. */
+/** Restore and Delete; delete asks first, it cannot be undone. */
 function actions(
   what: string,
-  onRestore: (() => Promise<void>) | null,
+  onRestore: () => Promise<void>,
   onDelete: () => Promise<void>,
 ): HTMLButtonElement[] {
-  const out: HTMLButtonElement[] = [];
-  if (onRestore) {
-    out.push(settingsAction("Restore", (btn) => void busy(btn, onRestore)));
-  }
-  out.push(
+  return [
+    settingsAction("Restore", (btn) => void busy(btn, onRestore)),
     settingsAction(
       "Delete",
       async (btn) => {
@@ -67,8 +63,7 @@ function actions(
       },
       true,
     ),
-  );
-  return out;
+  ];
 }
 
 function accountRow(account: AccountView, repaint: () => Promise<void>): HTMLElement {
@@ -92,16 +87,13 @@ function closedProjectRow(project: ProjectView, repaint: () => Promise<void>): H
   const details = [projectState(project), madeAndChanged(project.started_at, project.created_at)]
     .filter(Boolean)
     .join(" · ");
-  const canRestore = project.cancelled && !project.completed;
   return settingsListRow(project.name, details, [
     ...actions(
       `“${project.name}”`,
-      canRestore
-        ? async () => {
-            await restoreProject(project.project_id);
-            await repaint();
-          }
-        : null,
+      async () => {
+        await restoreProject(project.project_id);
+        await repaint();
+      },
       async () => {
         await deleteProject(project.project_id);
         await repaint();

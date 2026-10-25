@@ -136,9 +136,8 @@ export function madeAndChanged(
   return `made ${made} · changed ${last}`;
 }
 
-/** "Archived", "Completed", or "Open": a project's state in Settings. */
-export function projectState(project: { cancelled: boolean; completed: boolean }): string {
+/** "Archived" or "Open": a project's state in Settings. */
+export function projectState(project: { cancelled: boolean }): string {
   if (project.cancelled) return "Archived";
-  if (project.completed) return "Completed";
   return "Open";
 }

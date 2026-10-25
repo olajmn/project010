@@ -56,7 +56,6 @@ def project_view(
     view = {
         "project_id": pid,
         "name": record["name"],
-        "completed": bool(record.get("completed")),
         "cancelled": bool(record.get("cancelled")),
         "account_id": record.get("account_id"),
         "created_at": record.get("created_at"),
@@ -81,17 +80,17 @@ def project_view(
 
 
 def active_projects() -> list[dict]:
-    """Every project that's neither completed nor cancelled, newest first."""
+    """Every project that isn't cancelled, newest first."""
     latest = get_latest_for_all_projects()
-    active = [r for r in latest if not r.get("completed") and not r.get("cancelled")]
+    active = [r for r in latest if not r.get("cancelled")]
     active.sort(key=created_at_key, reverse=True)
     return active
 
 
 def archived_projects() -> list[dict]:
-    """Cancelled or completed projects, newest first (Settings → Archive)."""
+    """Cancelled projects, newest first (Settings → Archive)."""
     latest = get_latest_for_all_projects()
-    closed = [r for r in latest if r.get("completed") or r.get("cancelled")]
+    closed = [r for r in latest if r.get("cancelled")]
     closed.sort(key=created_at_key, reverse=True)
     return closed
 
@@ -136,7 +135,7 @@ def map_tree(record: dict) -> dict | None:
     return {
         "id": record["project_id"],
         "label": record.get("name", ""),
-        "status": "done" if record.get("completed") else "open",
+        "status": "open",
         "children": children,
     }
 

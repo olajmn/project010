@@ -237,7 +237,7 @@ def post_rename_project(
 def post_cancel_project(project_id: str) -> dict:
     record = cancel_project(project_id)
     if record is None:
-        raise fail(404, "no such project, or already completed")
+        raise fail(404, "no such project")
     return project_view(record)
 
 
@@ -245,7 +245,7 @@ def post_cancel_project(project_id: str) -> dict:
 def post_restore_project(project_id: str) -> dict:
     record = restore_project(project_id)
     if record is None:
-        raise fail(404, "no such project, or completed")
+        raise fail(404, "no such project")
     return project_view(record)
 
 

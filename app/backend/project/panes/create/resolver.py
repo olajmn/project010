@@ -8,7 +8,7 @@ and answers, by project_id:
 - What is the current SoT record for this project?
 - What is the current record for every project that exists?
 
-Whether a project counts as "active" or "completed", and how projects
+Whether a project counts as active or archived, and how projects
 get grouped or sorted for display, is board-building logic, not project
 identity.
 

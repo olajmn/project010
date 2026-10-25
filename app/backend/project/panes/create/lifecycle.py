@@ -4,9 +4,8 @@ A project's lifecycle: mint one, abandon one, restore or erase.
 Identity and current state stay in resolver.py - this module only
 writes. Mint is create_project() — a name and an empty canvas, no
 engine. Renaming the label is rename.py. Cancelling never does.
-Vision is accepted here as an optional link at birth, but
-linking/unlinking later stays on project_account.set_project_user()
-until Vision's own shape is decided.
+The account is given at birth; changing it later is
+project_account.set_project_user().
 """
 
 # Contents
@@ -70,7 +69,7 @@ def next_default_name(account_id: str | None) -> str:
     for record in get_latest_for_all_projects():
         if record.get("account_id") != account_id:
             continue
-        if record.get("completed") or record.get("cancelled"):
+        if record.get("cancelled"):
             continue
         match = _DEFAULT_NAME_RE.match((record.get("name") or "").strip())
         if match:
@@ -85,19 +84,14 @@ def next_default_name(account_id: str | None) -> str:
 
 def cancel_project(project_id: str) -> dict | None:
     """
-    Mark a project as cancelled (abandoned) - a distinct terminal status
-    from `completed`, not a UI-level relabeling of it and not a third
-    planning decision. Preserves `nodes` and `account_id` from the
-    latest record exactly as they were, so the project's own data/history
-    is never lost, only marked as no longer being pursued (still
-    visible in full in the project's timeline, same as any other project).
+    Mark a project as cancelled (archived). Preserves `nodes` and
+    `account_id` from the latest record exactly as they were, so the
+    project's own data/history is never lost, only marked as no longer
+    being pursued (still visible in full in the project's timeline, same
+    as any other project).
 
-    Returns the newly saved record, or None if the change is
-    rejected - never partially applied:
-    - `project_id` doesn't resolve to any project.
-    - the project is already completed - a finished project doesn't also
-      become abandoned; one terminal status wins, and completion,
-      already decided, isn't overwritten by a later Cancel click.
+    Returns the newly saved record, or None if `project_id` doesn't
+    resolve to any project.
 
     Requesting cancellation on an already-cancelled project is a genuine
     no-op - returns `latest` unchanged rather than appending an
@@ -105,8 +99,6 @@ def cancel_project(project_id: str) -> dict | None:
     """
     latest = get_latest_for_project(project_id)
     if latest is None:
-        return None
-    if latest.get("completed"):
         return None
     if latest.get("cancelled"):
         return latest
@@ -125,15 +117,12 @@ def cancel_project(project_id: str) -> dict | None:
 def restore_project(project_id: str) -> dict | None:
     """Clear cancelled so the project is active again.
 
-    No-op if already live. Returns None if missing or completed
-    (completed is not restored this way). If its account was deleted in
-    the meantime, the project comes back unassigned rather than tied to
-    an account that no longer exists.
+    No-op if already live. Returns None if missing. If its account was
+    deleted in the meantime, the project comes back unassigned rather
+    than tied to an account that no longer exists.
     """
     latest = get_latest_for_project(project_id)
     if latest is None:
-        return None
-    if latest.get("completed"):
         return None
     if not latest.get("cancelled"):
         return latest
@@ -149,7 +138,6 @@ def restore_project(project_id: str) -> dict | None:
         project_id=latest["project_id"],
         account_id=owner,
         cancelled=False,
-        completed=False,
         event="restored",
     )
 

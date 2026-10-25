@@ -42,10 +42,9 @@ def set_project_user(project_id: str, account_id: str | None) -> dict | None:
     cancelled project (see cancel_project()) is also a no-op here — never
     a save_project() call that could silently revive it.
 
-    Preserves `nodes` and `completed` from the latest record exactly as
-    they were -
-    this changes which account the project belongs to, nothing about the
-    map itself.
+    Preserves `nodes` from the latest record exactly as they were - this
+    changes which account the project belongs to, nothing about the map
+    itself.
     """
     latest = get_latest_for_project(project_id)
     if latest is None:
@@ -71,7 +70,6 @@ def set_project_user(project_id: str, account_id: str | None) -> dict | None:
         nodes_of(latest),
         feedback=feedback_text,
         project_id=latest["project_id"],
-        completed=latest.get("completed", False),
         account_id=account_id,
         event="owner_changed",
     )
@@ -84,11 +82,10 @@ def archive_account(account_id: str) -> dict | None:
     account is no longer an active seat, so an active project
     shouldn't keep showing a current tie to it. Account and project have
     independent lifecycles: this never changes a project's nodes or
-    completed/cancelled status - only which account (if
-    any) it currently points to.
+    cancelled status - only which account (if any) it currently points to.
 
-    Completed/cancelled projects keep their account_id unchanged - already
-    a closed, historical record, not a claim that the account is still
+    Cancelled projects keep their account_id unchanged - already a
+    closed, historical record, not a claim that the account is still
     active, so there's nothing to detach.
 
     Detaching reuses set_project_user(project_id, None) per project rather
@@ -105,11 +102,7 @@ def archive_account(account_id: str) -> dict | None:
         return None
 
     for latest in get_latest_for_all_projects():
-        if (
-            latest.get("account_id") == account_id
-            and not latest.get("completed")
-            and not latest.get("cancelled")
-        ):
+        if latest.get("account_id") == account_id and not latest.get("cancelled"):
             set_project_user(latest["project_id"], None)
 
     return account

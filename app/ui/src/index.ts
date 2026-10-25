@@ -231,7 +231,7 @@ function replaceProject(updated: ProjectView): void {
   projects = projects.map((p) =>
     p.project_id === updated.project_id ? updated : p,
   );
-  if (updated.completed || updated.cancelled) {
+  if (updated.cancelled) {
     projects = projects.filter((p) => p.project_id !== updated.project_id);
     ensureSel();
   } else {
@@ -278,11 +278,7 @@ async function load(startProjectId: string | null = null): Promise<void> {
   }
   renderAll();
   accountsPanel.restoreIfRemembered();
-  if (
-    getActiveUserId() === null
-    || params.get("tab") === "users"
-    || params.get("tab") === "vision"
-  ) {
+  if (getActiveUserId() === null) {
     accountsPanel.open();
   }
 }

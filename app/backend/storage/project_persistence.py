@@ -112,7 +112,6 @@ def _slim_event(record: dict) -> dict:
         "reply",
         "name",
         "account_id",
-        "completed",
         "cancelled",
         "archived_at",
     ):
@@ -188,7 +187,6 @@ def save_project(
     name: str,
     nodes: list[dict],
     feedback: str | None = None,
-    completed: bool = False,
     cancelled: bool = False,
     project_id: str | None = None,
     account_id: str | None = None,
@@ -231,7 +229,6 @@ def save_project(
         "name": name,
         "nodes": nodes,
         "feedback": feedback,
-        "completed": completed,
         "cancelled": cancelled,
         "created_at": now_utc(),
     }

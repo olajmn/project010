@@ -63,7 +63,6 @@ export interface CurrentState {
 export interface ProjectView {
   project_id: string;
   name: string;
-  completed: boolean;
   cancelled: boolean;
   account_id: string | null;
   /** Latest history record timestamp for this project. */

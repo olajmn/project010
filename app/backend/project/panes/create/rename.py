@@ -26,7 +26,6 @@ def rename_project(project_id: str, name: str) -> dict | None:
         label,
         nodes_of(latest),
         feedback=f"Renamed: {old} → {label}",
-        completed=latest.get("completed", False),
         project_id=latest["project_id"],
         account_id=latest.get("account_id"),
         event="renamed",
