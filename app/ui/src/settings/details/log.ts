@@ -20,7 +20,7 @@ const OPENS_ON = "Last 7 days";
 export function logSection(load: () => Promise<LogEntry[]>, showProject: boolean): HTMLElement {
   const box = document.createElement("div");
   const picker = document.createElement("select");
-  picker.className = "settings-log-range";
+  picker.className = "settings-picker";
   picker.setAttribute("aria-label", "Time range");
   for (const range of RANGES) {
     picker.add(new Option(range.label, range.label, false, range.label === OPENS_ON));

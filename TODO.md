@@ -195,6 +195,11 @@ choice.
   over the calm backdrop, and the blur under the top strip competed with
   its controls. Worth another try only with a livelier backdrop; the
   sketch `glass-sketch.html` (git-excluded, repo root) has the knobs.
+- **One log across all accounts** — what happened everywhere, newest
+  first ("John Doe · Sent · …", "account … · Archived"), as history
+  only, apart from Archive (which lists things to act on). #88 removed
+  the last such feed (All activity) so each log is read through the
+  account or project it belongs to; bringing one back reopens that.
 - **Calmer row actions in Settings** — the rows' actions do not line
   up (each row right-aligns its own), and the red Delete sits mid-row.
   Either Rename and Delete move to an account's details page, leaving

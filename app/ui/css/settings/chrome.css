@@ -3,7 +3,7 @@
  * Contents
  *  1. Page shell
  *  2. Content stack
- *  3. Log range on a details page
+ *  3. Pickers (a details page's log range, Archive's order)
  */
 
 /* 1. Page shell — the same floating block as the app (css/shell/layout.css),
@@ -109,14 +109,15 @@ body.settings-body main > nav a[aria-current="page"] {
 }
 
 /* General: short label → value rows read calmer in a narrow column; the
-   list pages (Archive, Directory, Logs) keep the wider one. */
+   list pages (Archive, Directory, details) keep the wider one. */
 .settings-stack--narrow > * {
   max-width: 40rem;
 }
 
-/* 3. Log range on a details page (Today … All) */
+/* 3. Pickers: a details page's log range (Today … All), Archive's order
+   (Newest first / Oldest first). */
 
-.settings-log-range {
+.settings-picker {
   font-size: var(--font-size-sm);
   color: var(--color-text);
   background: var(--fill-control);
@@ -130,10 +131,24 @@ body.settings-body main > nav a[aria-current="page"] {
 /* A select keeps focus after its list closes, so the browser's own ring
    (the system accent, e.g. orange) would linger. Our own quiet edge
    instead, still there for keyboard use. */
-.settings-log-range:focus {
+.settings-picker:focus {
   outline: none;
 }
 
-.settings-log-range:focus-visible {
+.settings-picker:focus-visible {
   border-color: var(--hairline);
+}
+
+/* A row of controls over a list (Archive: filter, then order). The
+   picker there sits level with the segmented control beside it. */
+.settings-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.settings-toolbar .settings-picker {
+  margin: 0;
+  padding: 0.2rem var(--space-2);
+  font-size: var(--font-size-xs);
 }

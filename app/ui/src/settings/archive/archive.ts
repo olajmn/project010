@@ -1,10 +1,11 @@
-// Archive — Settings → Archive: soft-archived accounts, each with the
-// projects it still holds, and closed projects of live accounts; restore,
-// send, or permanently delete. One row each (../rows.ts).
+// Archive — Settings → Archive: soft-archived accounts with the projects
+// they still hold, and closed projects of live accounts; restore, send,
+// or permanently delete. All and Projects are one list by time; Accounts
+// is one box per account. One row each (../rows.ts).
 
 // Contents
 //  1. Rows
-//      - accountRows() / heldProjectRow() / closedProjectRow()
+//      - accountRow() / projectRow() / accountBox()
 //  2. mountArchive()
 
 import {
@@ -73,49 +74,68 @@ function deleteAction(what: string, page: Page, onDelete: () => Promise<unknown>
   );
 }
 
-function projectDetails(project: ProjectView): string {
-  return [projectState(project), madeAndChanged(project.started_at, project.created_at)]
-    .filter(Boolean)
-    .join(" · ");
+function plural(n: number, word: string): string {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
-/** The account row, then the projects it still holds. Delete is offered
- *  only once it holds none: a project is never left without an account. */
-function accountRows(account: AccountView, held: ProjectView[], page: Page): HTMLElement[] {
-  const name = `“${userLabel(account)}”`;
-  const details = held.length > 0
-    ? `holds ${held.length} project${held.length === 1 ? "" : "s"}`
-    : shortDate(account.created_at);
-  const row = settingsListRow(userLabel(account), details, [
+/** An archived account's row. `flat` (one list of everything) adds what
+ *  it is and when it was archived. Delete is offered only once it holds
+ *  no projects: a project is never left without an account. */
+function accountRow(account: AccountView, holds: number, page: Page, flat: boolean): HTMLElement {
+  const details = flat
+    ? ["account", `archived ${shortDate(account.archived_at)}`, holds ? `holds ${plural(holds, "project")}` : ""]
+    : [holds ? `holds ${plural(holds, "project")}` : shortDate(account.created_at)];
+  return settingsListRow(userLabel(account), details.filter(Boolean).join(" · "), [
     settingsAction("Restore", (btn) => void busy(btn, page, () => restoreAccount(account.id))),
-    ...(held.length === 0 ? [deleteAction(name, page, () => deleteAccount(account.id))] : []),
+    ...(holds === 0
+      ? [deleteAction(`“${userLabel(account)}”`, page, () => deleteAccount(account.id))]
+      : []),
     detailsAction("account", account.id, "archive"),
   ]);
-  return [row, ...held.map((p) => heldProjectRow(p, page))];
 }
 
-/** A project under an archived account: send it to another account, or
- *  delete it for good. Sending keeps whether it is archived. */
-function heldProjectRow(project: ProjectView, page: Page): HTMLElement {
-  const send = sendAction(project, page.accounts, page.repaint, page.showError);
-  return settingsListRow(project.name, projectDetails(project), [
+/** A project in the archive. Under an archived account it can be sent
+ *  elsewhere (keeping whether it is archived); otherwise it is a closed
+ *  project of a live account and can be restored. `flat` adds what it is
+ *  and who holds it. */
+function projectRow(project: ProjectView, page: Page, flat: boolean): HTMLElement {
+  const holder = page.accounts.find((a) => a.id === project.account_id);
+  const details = [
+    flat ? "project" : "",
+    projectState(project),
+    flat && holder ? `held by ${userLabel(holder)}` : "",
+    madeAndChanged(project.started_at, project.created_at),
+  ];
+  const send = holder?.archived ? sendAction(project, page.accounts, page.repaint, page.showError) : null;
+  const restore = holder?.archived
+    ? null
+    : settingsAction("Restore", (btn) => void busy(btn, page, () => restoreProject(project.project_id)));
+  return settingsListRow(project.name, details.filter(Boolean).join(" · "), [
     ...(send ? [send] : []),
+    ...(restore ? [restore] : []),
     deleteAction(`“${project.name}”`, page, () => deleteProject(project.project_id)),
     detailsAction("project", project.project_id, "archive"),
   ]);
 }
 
-function closedProjectRow(project: ProjectView, page: Page): HTMLElement {
-  return settingsListRow(project.name, projectDetails(project), [
-    settingsAction("Restore", (btn) => void busy(btn, page, () => restoreProject(project.project_id))),
-    deleteAction(`“${project.name}”`, page, () => deleteProject(project.project_id)),
-    detailsAction("project", project.project_id, "archive"),
+/** One box: the account row, then the projects it still holds. */
+function accountBox(account: AccountView, held: ProjectView[], page: Page): HTMLElement {
+  return settingsGroup([
+    accountRow(account, held.length, page, false),
+    ...held.map((p) => projectRow(p, page, false)),
   ]);
 }
 
 // 2. mountArchive()
 
 type ArchiveFilter = "all" | "accounts" | "projects";
+type ArchiveOrder = "newest" | "oldest";
+
+/** Newest first by `when` (an ISO time), or oldest first. */
+function byTime<T>(items: T[], when: (item: T) => string | null | undefined, order: ArchiveOrder): T[] {
+  const sign = order === "newest" ? -1 : 1;
+  return [...items].sort((a, b) => sign * (when(a) ?? "").localeCompare(when(b) ?? ""));
+}
 
 export async function mountArchive(host: HTMLElement): Promise<void> {
   const hint = settingsHint(
@@ -127,15 +147,26 @@ export async function mountArchive(host: HTMLElement): Promise<void> {
   filterBar.setAttribute("role", "group");
   filterBar.setAttribute("aria-label", "Show");
 
+  const orderPicker = document.createElement("select");
+  orderPicker.className = "settings-picker";
+  orderPicker.setAttribute("aria-label", "Order");
+  orderPicker.add(new Option("Newest first", "newest"));
+  orderPicker.add(new Option("Oldest first", "oldest"));
+
+  const toolbar = document.createElement("div");
+  toolbar.className = "settings-toolbar";
+  toolbar.append(filterBar, orderPicker);
+
   const lists = document.createElement("div");
   lists.className = "settings-lists";
   const empty = settingsHint("");
   empty.hidden = true;
   const error = settingsError();
-  host.replaceChildren(hint, filterBar, lists, empty, error);
+  host.replaceChildren(hint, toolbar, lists, empty, error);
 
-  // Survives repaints, so restore / delete keeps the current view.
+  // Survive repaints, so restore / send / delete keeps the current view.
   let filter: ArchiveFilter = "all";
+  let order: ArchiveOrder = "newest";
   let archivedAccounts: AccountView[] = [];
   // Projects held by an archived account, archived or not, by account id.
   let held = new Map<string, ProjectView[]>();
@@ -153,6 +184,10 @@ export async function mountArchive(host: HTMLElement): Promise<void> {
     filterButtons.set(key, btn);
     filterBar.appendChild(btn);
   }
+  orderPicker.addEventListener("change", () => {
+    order = orderPicker.value as ArchiveOrder;
+    render();
+  });
 
   const showError = (message: string): void => {
     error.hidden = false;
@@ -187,10 +222,11 @@ export async function mountArchive(host: HTMLElement): Promise<void> {
   };
 
   const render = (): void => {
+    const allProjects = [...[...held.values()].flat(), ...projects];
     const counts: Record<ArchiveFilter, number> = {
-      all: archivedAccounts.length + projects.length,
+      all: archivedAccounts.length + allProjects.length,
       accounts: archivedAccounts.length,
-      projects: projects.length,
+      projects: allProjects.length,
     };
     const labels: Record<ArchiveFilter, string> = {
       all: "All",
@@ -203,20 +239,26 @@ export async function mountArchive(host: HTMLElement): Promise<void> {
     }
 
     lists.replaceChildren();
-    if (filter !== "projects" && archivedAccounts.length > 0) {
-      // One box per account: the account row heads it, its projects below.
-      const groups = archivedAccounts.map((a) =>
-        settingsGroup(accountRows(a, held.get(a.id) ?? [], page)),
+    if (filter === "accounts" && archivedAccounts.length > 0) {
+      // Accounts by when they were archived, their projects by last change.
+      const boxes = byTime(archivedAccounts, (a) => a.archived_at, order).map((a) =>
+        accountBox(a, byTime(held.get(a.id) ?? [], (p) => p.created_at, order), page),
       );
-      lists.appendChild(settingsSection("Accounts", ...groups));
-    }
-    if (filter !== "accounts" && projects.length > 0) {
-      lists.appendChild(
-        settingsSection(
-          "Projects",
-          settingsGroup(projects.map((p) => closedProjectRow(p, page))),
-        ),
-      );
+      lists.appendChild(settingsSection("Accounts", ...boxes));
+    } else if (filter !== "accounts" && counts[filter] > 0) {
+      // One list by time: an account by when it was archived, a project
+      // by its last change.
+      type Item = { when: string | null | undefined; row: () => HTMLElement };
+      const items: Item[] = allProjects.map((p) => ({
+        when: p.created_at,
+        row: () => projectRow(p, page, true),
+      }));
+      if (filter === "all") {
+        for (const a of archivedAccounts) {
+          items.push({ when: a.archived_at, row: () => accountRow(a, held.get(a.id)?.length ?? 0, page, true) });
+        }
+      }
+      lists.appendChild(settingsGroup(byTime(items, (i) => i.when, order).map((i) => i.row())));
     }
 
     empty.hidden = counts[filter] > 0;
@@ -224,7 +266,7 @@ export async function mountArchive(host: HTMLElement): Promise<void> {
       filter === "accounts"
         ? "No archived accounts."
         : filter === "projects"
-          ? "No closed projects."
+          ? "No projects in the archive."
           : "Nothing in the archive.";
   };
 
