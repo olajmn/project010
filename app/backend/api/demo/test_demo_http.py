@@ -34,7 +34,10 @@ def test_login(demo_api) -> None:
 def test_each_session_has_its_own_sandbox(demo_api) -> None:
     login(demo_api)
     first = demo_api.cookie
-    assert demo_api.post("/api/projects", {"text": "Only mine"})[0] == 200
+    assert (
+        demo_api.post("/api/projects", {"text": "Only mine", "account_id": "1"})[0]
+        == 200
+    )
     login(demo_api)
     assert demo_api.get("/api/projects") == (200, [])
     demo_api.cookie = first
@@ -56,7 +59,9 @@ def test_server_routes_are_blocked(demo_api) -> None:
 def test_chat_limits(demo_api, monkeypatch) -> None:
     monkeypatch.setattr(reply_module, "send_chat", lambda messages: "Fine.")
     login(demo_api)
-    pid = demo_api.post("/api/projects", {"text": "P"})[1]["project_id"]
+    pid = demo_api.post("/api/projects", {"text": "P", "account_id": "1"})[1][
+        "project_id"
+    ]
     assert demo_api.post(f"/api/projects/{pid}/chat", {"text": "x" * 9000})[0] == 413
     for _ in range(2):  # 2 a minute per session here
         assert demo_api.post(f"/api/projects/{pid}/chat", {"text": "hi"})[0] == 200
@@ -75,7 +80,9 @@ def test_start_project_is_found_by_name(demo_api, monkeypatch) -> None:
     from backend.api import demo
 
     login(demo_api)
-    pid = demo_api.post("/api/projects", {"text": "Start here"})[1]["project_id"]
+    pid = demo_api.post("/api/projects", {"text": "Start here", "account_id": "1"})[1][
+        "project_id"
+    ]
     monkeypatch.setattr(demo, "START_PROJECT", "Start here")
     assert demo_api.get("/api/session")[1]["start_project_id"] == pid
     monkeypatch.setattr(demo, "START_PROJECT", "Not a project")

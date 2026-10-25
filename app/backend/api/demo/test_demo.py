@@ -82,7 +82,7 @@ def clock(tmp_path, monkeypatch) -> Clock:
     monkeypatch.setattr(settings, "SECURE_COOKIE", True)
     seed = tmp_path / "seed"
     seed.mkdir()
-    (seed / "accounts.json").write_text('[{"id": 1, "text": "Demo"}]')
+    (seed / "accounts.json").write_text('[{"id": "1", "text": "Demo"}]')
     monkeypatch.setattr(sandboxes, "ROOT", tmp_path / "boxes")
     monkeypatch.setattr(sandboxes, "SEED_DIR", seed)
     yield clock
@@ -285,7 +285,7 @@ def test_each_login_gets_its_own_sandbox(clock) -> None:
     box_a = sandboxes.ROOT / g.sessions.get(a).sandbox
     box_b = sandboxes.ROOT / g.sessions.get(b).sandbox
     assert box_a != box_b
-    assert (box_a / "accounts.json").read_text() == '[{"id": 1, "text": "Demo"}]'
+    assert (box_a / "accounts.json").read_text() == '[{"id": "1", "text": "Demo"}]'
 
     assert g.guard(FakeRequest("/api/projects", cookie=a), "GET") is False
     assert paths.data_dir() == box_a

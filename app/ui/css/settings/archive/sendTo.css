@@ -1,0 +1,8 @@
+/* "Send to" box in Settings → Archive.
+ * Mirrors src/settings/archive/sendTo.ts. The box and its choices are
+ * .progress-menu / .confirm-popover (css/panes/canvas/map.css). */
+
+/* The title is not a choice, so it is grey. */
+.send-to-title {
+  color: var(--color-text-muted);
+}

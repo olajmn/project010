@@ -149,7 +149,7 @@ def test_project_erase() -> None:
 def test_empty_create_name_becomes_next_new_project() -> None:
     from backend.project.panes.create.lifecycle import cancel_project, create_project
 
-    a, b, c = "account_a", "account_b", "account_c"
+    a, b, c = (ap.save_account(text)["id"] for text in ("A", "B", "C"))
     assert create_project("", a)["name"] == "New project 1"
     assert create_project("  ", a)["name"] == "New project 2"
     assert create_project("", b)["name"] == "New project 1"  # per account
@@ -158,6 +158,16 @@ def test_empty_create_name_becomes_next_new_project() -> None:
     assert create_project("Typed", a)["name"] == "Typed"
     cancel_project(create_project("", c)["project_id"])
     assert create_project("", c)["name"] == "New project 1"  # archived don't count
+
+
+def test_a_project_is_never_made_without_an_account() -> None:
+    from backend.project.panes.create.lifecycle import create_project
+
+    archived = ap.save_account("Old")["id"]
+    ap.archive_account(archived)
+    for account_id in ("", "account_none", archived):
+        assert create_project("X", account_id) is None, account_id
+    assert not pp.PROJECTS_DIR.exists() or not any(pp.PROJECTS_DIR.iterdir())
 
 
 def test_a_change_record_goes_to_the_log_not_the_current_state() -> None:

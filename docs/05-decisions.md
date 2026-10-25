@@ -1072,6 +1072,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Follow-up (same day):** A details page sits a level below its tab, so it shows no tabs, only a way back to the tab it was opened from ("‹ Directory" or "‹ Archive"). "Details" is the last action on every row, so it lines up down the list.
 
+## 89. 2026-10-25 — A project is always held by an account; archived means laid away
+
+**Decision:** Every project that exists has an account. `create_project()` refuses one without a live, unarchived account (`POST /api/projects` answers 404), and `set_project_user()` only sends a project to another account: there is no way to take it from its account (null answers 404). Archiving an account no longer detaches its projects; they stay held by it, out of the daily view, and come back with it. An account that still holds projects, archived or not, is not deleted for good (`holds_projects()`, 409); first each one is sent or deleted, or the account is restored. Archived means laid away, not a different holder: an archived project or account keeps its holder, can send and receive, and its content is locked until it is brought back. Sending changes the holder, never the archived state, so an archived project can go to an archived account. Settings → Archive lists an archived account's projects under it, with Send… and Delete; "Projects without an account" and "Assign N unowned" are gone. A project deleted for good no longer exists, so it needs no holder; whether it leaves a record is open (the account's own log, `TODO.md` 77). `TODO.md` 77, stage 1, part A.
+
+**Date:** 2026-10-25
+
+**Alternatives considered:** detaching projects when their account is archived (as before: a project with no holder); deleting an account together with its projects behind one confirmation (deletes more than asked for at once); Archive as an account of its own that archived things are sent to (loses who held them, so restoring needs a second record of the old holder, and an account cannot be sent anywhere).
+
+**Why this choice:** "Nothing exists without a holder" is the rule the later stages of `TODO.md` 77 build on, and a holder is the one answer to who is responsible for a thing. Keeping archived as a mark on the thing, not a move, leaves the holder intact, so restore needs nothing else.
+
+**Reversible?** Yes; saved data keeps its shape. No saved project lacked an account when this was made.
+
 ## See also
 
 - [[03-architecture]]

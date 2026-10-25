@@ -61,14 +61,9 @@ export async function fetchProjects(): Promise<ProjectView[]> {
 /** Mint a project: `text` is the name, canvas starts empty. */
 export async function createProject(
   text: string,
-  accountId?: string | null,
+  accountId: string,
 ): Promise<ProjectView> {
-  const body: { text: string; account_id?: string } = {
-    text,
-  };
-  if (accountId != null) {
-    body.account_id = accountId;
-  }
+  const body = { text, account_id: accountId };
   const res = await fetch("/api/projects", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -127,7 +122,7 @@ export async function deleteProject(projectId: string): Promise<void> {
   }
 }
 
-export async function setProjectUser(projectId: string, accountId: string | null): Promise<ProjectView> {
+export async function setProjectUser(projectId: string, accountId: string): Promise<ProjectView> {
   const res = await fetch(`/api/projects/${projectId}/user`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

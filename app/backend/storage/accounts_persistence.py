@@ -6,17 +6,16 @@ Project current + events live in project_persistence.py. Shared roots
 (DATA_DIR, now_utc, …) live in paths.py.
 
 An account is a plain {id, text, created_at} record — no history.
-Projects may reference one via optional account_id. Archiving mutates
-the account record in place; detaching projects is a higher-level decision
-(project_account.archive_account()).
+Every project is held by one, via account_id. Archiving mutates the
+account record in place; its projects stay held by it.
 
 Every record also carries a stub user_id (DEFAULT_USER_ID) — the
 operator of this app, not the multi-account filter.
 
 Permanent delete leaves a tombstone ({id, user_id, deleted, deleted_at})
-so the deletion stays on record: closed projects keep their account_id,
-which names that account and no other. Tombstones are invisible to every
-other function here.
+so the deletion stays on record. Refusing to delete an account that still
+holds projects is the caller's (project_account.holds_projects()).
+Tombstones are invisible to every other function here.
 """
 
 # Contents
@@ -84,8 +83,8 @@ def _live(accounts: list[dict]) -> list[dict]:
 
 def save_account(text: str) -> dict:
     """
-    Create an account and persist it — a tenant slot projects can
-    optionally reference via account_id.
+    Create an account and persist it — a tenant slot that holds
+    projects via their account_id.
 
     No history, no revisions: a single mutable fact, not a chain.
 

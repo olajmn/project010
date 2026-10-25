@@ -19,8 +19,6 @@ class CreateProject(BaseModel):
 
 
 class ProjectOwner(BaseModel):
-    """account_id null unlinks the project."""
-
     account_id: str | None = None
 
 

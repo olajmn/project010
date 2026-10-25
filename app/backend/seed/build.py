@@ -145,7 +145,10 @@ def _run_project(name: str, days: list, account_id: str, clock: Clock) -> str:
             minutes = clock.moment.astimezone(LOCAL).hour * 60
             minutes += clock.moment.astimezone(LOCAL).minute + rng.randint(4, 40)
             if action["do"] == "create":
-                project_id = create_project(name, account_id)["project_id"]
+                created = create_project(name, account_id)
+                if created is None:
+                    raise ValueError(f"{name}: no account {account_id}")
+                project_id = created["project_id"]
             else:
                 _do(action, load_current(project_id) or {}, clock)
     return project_id

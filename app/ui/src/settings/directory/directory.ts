@@ -104,7 +104,7 @@ function accountRows(
     async (btn) => {
       const ok = await askToConfirm(
         btn.getBoundingClientRect(),
-        `Delete “${name}”? It moves to Archive; its projects stay, without this account.`,
+        `Delete “${name}”? It moves to Archive with its projects; restoring it brings them back.`,
         "Delete",
       );
       if (!ok) return;
@@ -179,7 +179,6 @@ export async function mountDirectory(host: HTMLElement): Promise<void> {
       const [users, projects] = await Promise.all([fetchAccounts(), fetchProjects()]);
       const active = users.filter((u) => !u.archived);
       const activeId = getActiveUserId();
-      const orphans = projects.filter((p) => p.account_id === null);
 
       lists.replaceChildren();
       if (active.length > 0) {
@@ -198,12 +197,7 @@ export async function mountDirectory(host: HTMLElement): Promise<void> {
         );
         lists.appendChild(settingsSection("Accounts", ...groups));
       }
-      if (orphans.length > 0) {
-        lists.appendChild(
-          settingsSection("Projects without an account", settingsGroup(orphans.map(childProjectRow))),
-        );
-      }
-      if (active.length === 0 && orphans.length === 0) {
+      if (active.length === 0) {
         lists.appendChild(settingsHint("No accounts yet — create one above."));
       }
     } catch (err) {

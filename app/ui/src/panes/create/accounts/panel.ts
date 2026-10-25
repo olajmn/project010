@@ -1,4 +1,4 @@
-// Accounts panel: accounts + nested projects, claim orphans.
+// Accounts panel: accounts + nested projects.
 // Opens in-flow under the brand. Closes only via the Accounts brand
 // (toggle) — not outside click or Escape. Create / rename / delete
 // live in Settings → Directory.
@@ -8,16 +8,13 @@
 //  2. Public API
 //      - installAccountsPanel()
 
-import { setButtonBusy } from "../../../shell/busyButton.js";
 import {
   getActiveUserId,
   setActiveUserId,
-  userLabel,
   ACCOUNTS_BRAND,
 } from "../../../user/activeAccount.js";
 import type { AccountView, ProjectView } from "../../../dataShapes.js";
 import { buildAccountCard } from "./accountCard.js";
-import { claimUnassigned, showError } from "./helpers.js";
 
 // 1. Types
 
@@ -31,7 +28,6 @@ export type AccountsPanelOptions = {
   getProjects: () => ProjectView[];
   getSelectedId: () => string | null;
   onUsersChanged: (users: AccountView[]) => void;
-  onProjectsUpdated: (updated: ProjectView[]) => void;
   onActiveUserChanged: (userId: string | null) => void;
   onSelectProject: (projectId: string) => void;
 };
@@ -73,10 +69,6 @@ export function installAccountsPanel(
   const list = document.createElement("div");
   list.className = "sidebar-accounts-list";
   menu.appendChild(list);
-
-  const foot = document.createElement("div");
-  foot.className = "sidebar-accounts-foot";
-  menu.appendChild(foot);
 
   let open = false;
 
@@ -155,7 +147,6 @@ export function installAccountsPanel(
     // were still nested under an account card.
     placeCreateButton(null);
     list.innerHTML = "";
-    foot.innerHTML = "";
 
     const users = opts.getUsers().filter((u) => !u.archived);
     const projects = opts.getProjects();
@@ -187,34 +178,6 @@ export function installAccountsPanel(
         if (activeId === user.id) activeCard = card;
       }
       placeCreateButton(activeCard);
-    }
-
-    const orphans = projects.filter((p) => p.account_id === null);
-    if (orphans.length > 0 && activeId !== null) {
-      const claim = document.createElement("button");
-      claim.type = "button";
-      claim.className = "sidebar-accounts-claim";
-      claim.textContent = `Assign ${orphans.length} unowned → ${userLabel(
-        users.find((u) => u.id === activeId) ?? { id: activeId },
-      )}`;
-      claim.addEventListener("click", async (event) => {
-        event.stopPropagation();
-        setButtonBusy(claim, true);
-        try {
-          const claimed = await claimUnassigned(activeId, projects);
-          if (claimed.length > 0) opts.onProjectsUpdated(claimed);
-          opts.onActiveUserChanged(activeId);
-        } catch (err) {
-          setButtonBusy(claim, false);
-          showError(foot, err);
-        }
-      });
-      foot.appendChild(claim);
-    } else if (orphans.length > 0) {
-      const note = document.createElement("p");
-      note.className = "sidebar-accounts-empty";
-      note.textContent = `${orphans.length} project(s) have no account yet.`;
-      foot.appendChild(note);
     }
   }
 }

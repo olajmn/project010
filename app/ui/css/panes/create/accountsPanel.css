@@ -4,7 +4,6 @@
  * Contents
  *  1. Panel shell + one-column account stack
  *  2. Account card (name, wire id, projects)
- *  3. Foot (claim orphans)
  */
 
 /* 1. Panel shell + one-column account stack */
@@ -176,20 +175,4 @@
   padding: 0.15rem 0;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
-}
-
-/* 3. Foot (claim orphans) */
-
-.sidebar-accounts-foot {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  flex: 0 0 auto;
-}
-
-.sidebar-accounts-claim {
-  width: 100%;
-  padding: 0.35rem var(--space-2);
-  font: inherit;
-  font-size: var(--font-size-sm);
 }

@@ -132,7 +132,7 @@ def demo_api(data_dir, tmp_path, monkeypatch, server) -> Api:
     seed = tmp_path / "seed"
     seed.mkdir()
     (seed / "accounts.json").write_text(
-        '[{"id": 1, "text": "Demo", "created_at": "2026-10-14T00:00:00.000+00:00"}]'
+        '[{"id": "1", "text": "Demo", "created_at": "2026-10-14T00:00:00.000+00:00"}]'
     )
     monkeypatch.setattr(sandboxes, "ROOT", tmp_path / "boxes")
     monkeypatch.setattr(sandboxes, "SEED_DIR", seed)

@@ -61,7 +61,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Feature | Backend | UI |
 |---|---|---|
 | Create, rename, archive, restore projects | `project/panes/create/` (`lifecycle.py`, `rename.py`) | `ui/src/panes/create/` |
-| Accounts and which one owns a project | `storage/accounts_persistence.py`, `panes/create/project_account.py` | `panes/create/accounts/`, `settings/directory/` |
+| Accounts and which one holds a project (always one; archiving an account keeps its projects with it) | `storage/accounts_persistence.py`, `panes/create/project_account.py` | `panes/create/accounts/`, `settings/directory/` |
 | What a node is; ids; sibling names | `project/node/` (see its `README.md`) | — |
 | Add, remove, move, rename, paste, folder | `panes/canvas/edit_map.py`, `text_to_tree.py`, `add_folder/` | `panes/canvas/` |
 | Undo and redo of map edits (arrows in the map's top bar, Ctrl+Z / Ctrl+Shift+Z) | `panes/canvas/undo.py`, `project/changes/undo.py` | `panes/canvas/undo.ts` |
@@ -72,7 +72,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | The chat thread and its About frames (node by id, or day); rename notes | `panes/chat/screen/chat_thread.py` | `panes/chat/showOnlyThis.ts`, `currentState/` |
 | Current state panel | `project/current_state/` | `panes/chat/currentState/` |
 | A project's or account's details page and its log | `project/timeline.py` | `settings/details/` |
-| Archive (restore / delete) | `panes/create/lifecycle.py`, `storage/accounts_persistence.py` | `settings/archive/` |
+| Archive (restore / delete; an archived account's projects listed under it, to send or delete; an account that holds projects is not deleted) | `panes/create/lifecycle.py`, `panes/create/project_account.py`, `storage/accounts_persistence.py` | `settings/archive/` |
 | Every HTTP route | `api/app.py` (FastAPI) | `api.ts` |
 | Demo mode: login, sessions, limits | `api/demo/` | `demo/`, `ui/login.html` |
 

@@ -14,7 +14,6 @@ import { installChatResize, installSidebarResize } from "./shell/columnWidths.js
 import { installAccountsPanel } from "./panes/create/accounts/panel.js";
 import { renderAccountsBrand } from "./panes/create/accounts/brandButton.js";
 import {
-  detachArchivedOwners,
   ensureSelectionInActiveUser,
   syncActiveUser,
   type SelectionState,
@@ -129,15 +128,6 @@ const accountsPanel = installAccountsPanel({
   onUsersChanged: (next) => {
     applyUsers(next);
   },
-  onProjectsUpdated: (updated) => {
-    for (const u of updated) {
-      projects = projects.map((p) =>
-        p.project_id === u.project_id ? u : p,
-      );
-    }
-    ensureSel();
-    renderAll();
-  },
   onActiveUserChanged: () => {
     ensureSel();
     if (selected()) createPanel.close();
@@ -220,7 +210,6 @@ const mapPane = installMapPane({
 
 function applyUsers(next: AccountView[]): void {
   users = next;
-  projects = detachArchivedOwners(projects, next);
   syncActiveUser(next);
   ensureSel();
   renderAll();

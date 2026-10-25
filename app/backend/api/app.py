@@ -83,7 +83,7 @@ from backend.project.panes.create.lifecycle import (
     restore_project,
 )
 from backend.project.panes.create.project_account import (
-    archive_account,
+    holds_projects,
     set_project_user,
 )
 from backend.project.panes.create.rename import rename_project
@@ -96,6 +96,7 @@ from backend.project.saved_trees import (
 )
 from backend.project.timeline import project_timeline
 from backend.storage.accounts_persistence import (
+    archive_account,
     delete_account,
     load_accounts,
     rename_account,
@@ -219,8 +220,10 @@ def post_create_project(
     body: Annotated[CreateProject, Body(default_factory=CreateProject)],
 ) -> dict:
     # Empty text is allowed: create_project() picks `New project N`.
-    account_id = str(body.account_id) if body.account_id is not None else ""
-    return project_view(create_project((body.text or "").strip(), account_id))
+    record = create_project((body.text or "").strip(), body.account_id or "")
+    if record is None:
+        raise fail(404, "no such account")
+    return project_view(record)
 
 
 @app.post("/api/projects/{project_id}/name")
@@ -493,6 +496,8 @@ def post_restore_account(account_id: str) -> dict:
 
 @app.post("/api/accounts/{account_id}/delete")
 def post_delete_account(account_id: str) -> dict:
+    if holds_projects(account_id):
+        raise fail(409, "the account still holds projects")
     return _account_or_404(delete_account(account_id))
 
 

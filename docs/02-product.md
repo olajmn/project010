@@ -50,9 +50,9 @@ helps but does not take over.
 - **Projects and accounts:** switch account in the sidebar. Create a
   project with `+` — give it a name, leave it empty for `New project N`,
   or start it from a folder on disk. Rename a project by clicking its
-  title on the map; archive it from the bar under the map. Projects
-  without an account can be assigned to the active one from the
-  Accounts panel.
+  title on the map; archive it from the bar under the map. A project
+  always belongs to an account; archiving an account lays its projects
+  away with it.
 - **Build the map:** add a node (`+` at the end, or ⋯ Add here) and
   remove one (⋯ Remove; a node with children asks first, since its
   children go with it). Move a node up or down among its siblings

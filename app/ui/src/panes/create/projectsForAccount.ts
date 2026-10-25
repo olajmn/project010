@@ -8,7 +8,6 @@
 //      - ensureSelectionInActiveUser()
 //  3. Active account
 //      - syncActiveUser()
-//      - detachArchivedOwners()
 
 import { projectsChronologicalForUser } from "./projectOrder.js";
 import {
@@ -78,17 +77,3 @@ export function syncActiveUser(nextUsers: AccountView[]): void {
   setActiveUserId(live.reduce((a, b) => (a.id > b.id ? a : b)).id);
 }
 
-/** Clear account_id on projects whose owner account was archived. */
-export function detachArchivedOwners(
-  projects: ProjectView[],
-  users: AccountView[],
-): ProjectView[] {
-  const activeIds = new Set(
-    users.filter((v) => !v.archived).map((v) => v.id),
-  );
-  return projects.map((p) =>
-    p.account_id != null && !activeIds.has(p.account_id)
-      ? { ...p, account_id: null }
-      : p,
-  );
-}

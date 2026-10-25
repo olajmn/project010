@@ -25,9 +25,15 @@ def labels(node: dict) -> list:
 
 
 @pytest.fixture
-def project(api) -> dict:
+def account(api) -> str:
+    """The id of a live account, "Home"."""
+    return api.post("/api/accounts", {"text": "Home"})[1]["id"]
+
+
+@pytest.fixture
+def project(api, account) -> dict:
     """Project 1, "House", with Rooms > Kitchen and Garden at the top."""
-    _, view = api.post("/api/projects", {"text": "House"})
+    _, view = api.post("/api/projects", {"text": "House", "account_id": account})
     pid = view["project_id"]
     api.post(f"/api/projects/{pid}/map", {"label": "Rooms"})
     _, view = api.post(f"/api/projects/{pid}/map", {"label": "Garden"})
@@ -78,8 +84,10 @@ def test_unknown_post_route(api) -> None:
 # 2. Projects
 
 
-def test_create_project(api) -> None:
-    status, view = api.post("/api/projects", {"text": "  House  "})
+def test_create_project(api, account) -> None:
+    status, view = api.post(
+        "/api/projects", {"text": "  House  ", "account_id": account}
+    )
     assert status == 200
     import uuid
 
@@ -87,11 +95,19 @@ def test_create_project(api) -> None:
     assert view["node"] is None  # an empty map has no tree yet
     assert {"thread", "current_state", "cancelled", "account_id"} <= set(view)
     # Empty text picks the next `New project N`.
-    assert api.post("/api/projects", {"text": ""})[1]["name"] == "New project 1"
+    assert (
+        api.post("/api/projects", {"text": "", "account_id": account})[1]["name"]
+        == "New project 1"
+    )
     assert [p["name"] for p in api.get("/api/projects")[1]] == [
         "New project 1",
         "House",
     ]
+    # A project is always held.
+    assert api.post("/api/projects", {"text": "X"}) == (404, "no such account")
+    assert (
+        api.post("/api/projects", {"text": "X", "account_id": "account_none"})[0] == 404
+    )
 
 
 def test_rename_project(api, project) -> None:
@@ -109,8 +125,7 @@ def test_bad_json_body(api) -> None:
 
 
 def test_missing_body_counts_as_empty(api) -> None:
-    status, view = api.post("/api/projects", raw=b"")
-    assert status == 200 and view["name"] == "New project 1"
+    assert api.post("/api/projects", raw=b"") == (404, "no such account")
     assert api.post("/api/accounts", raw=b"") == (400, "empty text")
 
 
@@ -135,11 +150,16 @@ def test_project_owner(api, project) -> None:
     _, account = api.post("/api/accounts", {"text": "Me"})
     status, view = api.post(f"/api/projects/{pid}/user", {"account_id": account["id"]})
     assert status == 200 and view["account_id"] == account["id"]
-    status, view = api.post(f"/api/projects/{pid}/user", {"account_id": None})
-    assert status == 200 and view["account_id"] is None
-    assert (
-        api.post(f"/api/projects/{pid}/user", {"account_id": "account_none"})[0] == 404
-    )
+    # A project is always held: no way to take it without giving it.
+    for body in ({"account_id": None}, {}, {"account_id": "account_none"}):
+        assert api.post(f"/api/projects/{pid}/user", body)[0] == 404, body
+    # Archived to archived: the holder changes, the archived state stays.
+    api.post(f"/api/projects/{pid}/cancel")
+    api.post(f"/api/accounts/{account['id']}/archive")
+    _, other = api.post("/api/accounts", {"text": "Old"})
+    api.post(f"/api/accounts/{other['id']}/archive")
+    status, view = api.post(f"/api/projects/{pid}/user", {"account_id": other["id"]})
+    assert status == 200 and view["account_id"] == other["id"] and view["cancelled"]
 
 
 # 3. The map
@@ -342,6 +362,27 @@ def test_accounts(api) -> None:
     for action in ("rename", "archive", "restore", "delete"):
         status, text = api.post(f"/api/accounts/{aid}/{action}", {"text": "X"})
         assert (status, text) == (404, "no such account"), action
+
+
+def test_an_archived_account_keeps_its_projects(api, account, project) -> None:
+    pid = project["project_id"]
+    api.post(f"/api/accounts/{account}/archive")
+    [view] = api.get("/api/projects")[1]
+    assert view["project_id"] == pid and view["account_id"] == account
+    assert view["cancelled"] is False
+    api.post(f"/api/accounts/{account}/restore")
+    assert api.get("/api/projects")[1][0]["account_id"] == account
+
+
+def test_an_account_holding_projects_cannot_be_deleted(api, account, project) -> None:
+    pid = project["project_id"]
+    refused = (409, "the account still holds projects")
+    api.post(f"/api/accounts/{account}/archive")
+    assert api.post(f"/api/accounts/{account}/delete") == refused
+    api.post(f"/api/projects/{pid}/cancel")  # archived projects count too
+    assert api.post(f"/api/accounts/{account}/delete") == refused
+    api.post(f"/api/projects/{pid}/delete")
+    assert api.post(f"/api/accounts/{account}/delete")[0] == 200
 
 
 def test_chat_about_a_removed_part_is_saved_without_it(

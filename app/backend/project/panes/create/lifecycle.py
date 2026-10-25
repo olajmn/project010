@@ -36,15 +36,20 @@ from backend.storage.project_persistence import (
 # ============================================================
 
 
-def create_project(typed_text: str, account_id_value: str) -> dict:
+def create_project(typed_text: str, account_id: str) -> dict | None:
     """
     Mint a project: a name and an empty canvas. No engine.
 
     The typed text is only a label. The tree arrives afterwards —
     built by hand, pasted, or walked in from a folder. Empty text gets
     `next_default_name()`, so every client names the same way.
+
+    A project is always held: returns None, and saves nothing, unless
+    `account_id` names a live, unarchived account.
     """
-    account_id = account_id_value or None
+    account = get_account(account_id)
+    if account is None or account.get("archived"):
+        return None
     name = typed_text.strip() or next_default_name(account_id)
     return save_project(
         name,

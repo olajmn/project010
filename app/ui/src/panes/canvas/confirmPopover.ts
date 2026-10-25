@@ -7,7 +7,7 @@
 //  1. Public API
 //      - askToConfirm()
 
-import { placePopover } from "./placePopover.js";
+import { openPopover } from "./openPopover.js";
 
 // 1. Public API
 
@@ -45,33 +45,13 @@ export function askToConfirm(
     box.append(text, buttons);
 
     const finish = (answer: boolean) => {
-      box.remove();
-      document.removeEventListener("click", onOutside, true);
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("wheel", onCancel);
-      window.removeEventListener("resize", onCancel);
+      close();
       resolve(answer);
     };
-    const onCancel = () => finish(false);
-    const onOutside = (event: MouseEvent) => {
-      if (!box.contains(event.target as Node)) finish(false);
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") finish(false);
-    };
-
-    cancel.addEventListener("click", onCancel);
+    cancel.addEventListener("click", () => finish(false));
     act.addEventListener("click", () => finish(true));
 
-    document.body.appendChild(box);
-    placePopover(box, anchor);
+    const close = openPopover(box, anchor, () => resolve(false));
     cancel.focus();
-    // Next tick: the click that opened this must not also close it.
-    setTimeout(() => {
-      document.addEventListener("click", onOutside, true);
-      document.addEventListener("keydown", onKey);
-      document.addEventListener("wheel", onCancel);
-      window.addEventListener("resize", onCancel);
-    }, 0);
   });
 }

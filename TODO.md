@@ -24,31 +24,20 @@ next.
     already fit; stages 1 and 2 barely touch today's change records,
     replay, and undo. Planned 2026-10-24, in stages, each usable on its
     own.
-    1. **Everything is always held.** Today a project may have no
-       account (`account_id` null). Where that is allowed: creating a
-       project without one (`panes/create/lifecycle.py`), unlinking one
-       (`panes/create/project_account.py`, `POST /api/projects/{id}/user`
-       with null), and deleting an account, which detaches its projects
-       (`archive_account()` there; `detachArchivedOwners()` in
-       `ui/src/panes/create/projectsForAccount.ts`). The UI that handles
-       the gap goes with it: "Projects without an account" in
-       `settings/directory/directory.ts` and "Assign N unowned" in
-       `panes/create/accounts/` (`panel.ts`, `helpers.ts`). No saved
-       project lacks an account today. Deleting an account moves it to
-       Archive *with* its projects, still held by it; restoring it brings
-       them back. Moving a project to another account stays (saved as
-       `owner_changed`), from its details page ("Move…" by Account).
-       Open: deleting an archived account for good while it still holds
-       projects (likely refused, or only with an explicit "and its N
-       projects"). Phrase the rule as "held", not "has an `account_id`",
-       so the later stages fit. **The account's own log:** what the
-       account has and has had, not what happens inside its projects
-       (those are the project's log): a project made, archived, brought
-       back, deleted for good, sent to another account, received from
-       one. Kept on the account, append-only and never rewritten, so a
-       deleted project and a sent one stay in it; a transfer saves both
-       its from and to account. The account's details page shows this
-       log instead of today's merge of its projects' logs.
+    1. **Everything is always held.** Part A is done (a project always
+       has an account; archived means laid away; [[05-decisions]] #89).
+       Still missing from it: sending a project between live accounts
+       from the UI ("Move…" on its details page). **Part B, the
+       account's own log:** what the account has and has had, not what
+       happens inside its projects (those are the project's log): a
+       project made, archived, brought back, deleted for good, sent to
+       another account, received from one. Kept on the account,
+       append-only and never rewritten, so a deleted project and a sent
+       one stay in it; a transfer saves both its from and to account.
+       The account's details page shows this log instead of today's
+       merge of its projects' logs. Open: whether the log is built up
+       from the projects' logs for what happened before it (a deleted
+       project's log is gone either way), or starts empty.
     2. **A project is a root node.** Project and node become the same
        kind of thing in code and data: a project is a node with no
        parent, held by an account. A decision in `05-decisions.md`, and
@@ -228,7 +217,7 @@ when a path is deleted, rewired, or reclassified.
 | P2 | Even-slice `step_plan` vs dates on the step | Time Faculty only | `frozen_duration.step_plan`; nothing in the product calls it — Queue 66 |
 | P4 | Tree as text: indented labels vs ASCII tree | Deliberate, one per side | `project/node/tree_as_text.py` (`tree_lines()`, for the model) vs `ui/src/panes/canvas/copyAsText.ts` (clipboard); same walk, the model side cannot run in the browser and the clipboard should not need a server round trip |
 | P5 | Event kind → word: Logs titles vs day tally | Deliberate, different grain | `project/timeline.py` `GROUPS` ("Map") vs `project/current_state/build_current_state.py` `_TALLY_WORDS` ("added", "removed", "imported"); a new event type goes in both, or it shows as Other / other |
-| P7 | Popover dismiss (close on outside click / Esc) | Five copies, all working | The node ⋯ menu (`panes/canvas/drawNodes.ts`), the confirmation (`confirmPopover.ts`), the saved-tree picker (`savedTrees/insertTree.ts`), + Add (`addMenu.ts`, copied from the picker) and the chat / menu (`panes/chat/commands/menu.ts`) each close themselves with their own code. One shared helper next to `placePopover.ts` would let a change (e.g. close on scroll) happen in one place |
+| P7 | Popover dismiss (close on outside click / Esc) | Shared helper exists, three copies left | `panes/canvas/openPopover.ts` `openPopover()` is used by the confirmation (`confirmPopover.ts`) and Send to (`settings/archive/sendTo.ts`). The node ⋯ menu (`panes/canvas/drawNodes.ts`), the saved-tree picker (`savedTrees/insertTree.ts`), + Add (`addMenu.ts`) and the chat / menu (`panes/chat/commands/menu.ts`) still close themselves with their own code; each differs a little (scroll inside the picker, the menu's toggle) |
 | P8 | Chat model call: local Ollama vs hosted OpenRouter | Deliberate, one per environment | `backend/model/client.py` `send_chat()` picks one by `TALK_PROVIDER`: `ollama.chat()` (default) or `openrouter.chat()` (public demo, [[05-decisions]] #70). Same model, temperature, and no-reasoning setting on both; a change to one (e.g. a new option) must be made in both |
 | P9 | Default theme: page script vs `theme.ts` | Deliberate, the script prevents a light flash | Every page in `app/ui/` (`index.html`, `login.html`, `settings/*.html`) sets `data-theme` in a small inline script before the CSS loads; `src/user/theme.ts` `getTheme()` decides the same default for the code. Dark unless the user chose light: a change to the default goes in both |
 | P10 | Short id for display: Python vs TypeScript | Deliberate, one per side | `backend/identity/ids.py` `short_id()` (the `/id` command) and `ui/src/ids.ts` `shortId()` (the map, Settings) both drop the kind and keep 8 characters (`SHORT_LENGTH`); the page shows ids without asking the server. A change to the length or form goes in both |
