@@ -1,7 +1,6 @@
-// Accounts panel: accounts + nested projects.
-// Opens in-flow under the brand. Closes only via the Accounts brand
-// (toggle) — not outside click or Escape. Create / rename / delete
-// live in Settings → Directory.
+// Accounts panel: accounts + nested projects, always shown under the
+// account switcher (accountSwitcher.ts). Create / rename / delete live
+// in Settings → Directory.
 
 // Contents
 //  1. Types
@@ -11,15 +10,11 @@
 import {
   getActiveUserId,
   setActiveUserId,
-  ACCOUNTS_BRAND,
 } from "../../../user/activeAccount.js";
 import type { AccountView, ProjectView } from "../../../dataShapes.js";
 import { buildAccountCard } from "./accountCard.js";
 
 // 1. Types
-
-const OPEN_KEY = "accounts.panelOpen";
-const LEGACY_OPEN_KEY = "projects.idMenuOpen";
 
 export type AccountsPanelOptions = {
   anchor: HTMLElement;
@@ -33,26 +28,9 @@ export type AccountsPanelOptions = {
 };
 
 export type AccountsPanelApi = {
-  open: () => void;
-  close: () => void;
-  toggle: () => void;
-  isOpen: () => boolean;
+  /** Redraw from the current accounts and projects. */
   refresh: () => void;
-  /** Call after users/projects are loaded — reopen if left open last time. */
-  restoreIfRemembered: () => void;
 };
-
-function readRememberedOpen(): boolean {
-  try {
-    const next = localStorage.getItem(OPEN_KEY);
-    if (next !== null) return next !== "0";
-    const legacy = localStorage.getItem(LEGACY_OPEN_KEY);
-    if (legacy !== null) return legacy !== "0";
-  } catch {
-    /* ignore */
-  }
-  return true;
-}
 
 // 2. Public API
 
@@ -61,7 +39,6 @@ export function installAccountsPanel(
 ): AccountsPanelApi {
   const menu = document.createElement("div");
   menu.className = "sidebar-accounts-panel";
-  menu.hidden = true;
   menu.setAttribute("role", "region");
   menu.setAttribute("aria-label", "Accounts");
   opts.host.appendChild(menu);
@@ -70,19 +47,8 @@ export function installAccountsPanel(
   list.className = "sidebar-accounts-list";
   menu.appendChild(list);
 
-  let open = false;
-
-  const rememberOpen = (next: boolean): void => {
-    try {
-      localStorage.setItem(OPEN_KEY, next ? "1" : "0");
-    } catch {
-      /* private mode / quota — open state is best-effort */
-    }
-  };
-
   const afterChange = (): void => {
     rebuild();
-    opts.anchor.textContent = ACCOUNTS_BRAND;
   };
 
   /** Keep "+" in the Accounts block: under the active card when open,
@@ -101,46 +67,7 @@ export function installAccountsPanel(
     else opts.host.appendChild(btn);
   };
 
-  const api: AccountsPanelApi = {
-    open: () => {
-      if (open) return;
-      open = true;
-      rebuild();
-      menu.hidden = false;
-      opts.anchor.setAttribute("aria-expanded", "true");
-      opts.anchor.classList.add("is-active");
-      rememberOpen(true);
-    },
-    close: () => {
-      if (!open) return;
-      open = false;
-      placeCreateButton(null);
-      menu.hidden = true;
-      opts.anchor.setAttribute("aria-expanded", "false");
-      opts.anchor.classList.remove("is-active");
-      rememberOpen(false);
-    },
-    toggle: () => {
-      if (open) api.close();
-      else api.open();
-    },
-    isOpen: () => open,
-    refresh: () => {
-      if (open) rebuild();
-    },
-    restoreIfRemembered: () => {
-      if (readRememberedOpen()) api.open();
-    },
-  };
-
-  opts.anchor.setAttribute("aria-haspopup", "true");
-  opts.anchor.setAttribute("aria-expanded", "false");
-  opts.anchor.addEventListener("click", (event) => {
-    event.stopPropagation();
-    api.toggle();
-  });
-
-  return api;
+  return { refresh: rebuild };
 
   function rebuild(): void {
     // Park "+" outside the list first — innerHTML would destroy it if it

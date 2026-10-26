@@ -1,5 +1,6 @@
 // Project workspace — Notion-ish shell over Project records.
-// Left (sidebar): Accounts panel (projects nest under each account) + create.
+// Left (sidebar): account switcher, Accounts panel (projects nest under each
+// account) + create.
 // Center: open project map. Close lives in the map's own top bar.
 // Right: conversation for that project. Wire: project_id / /api/projects.
 
@@ -13,6 +14,7 @@ import { fetchProjects, fetchAccounts, fetchSession } from "./api.js";
 import { installChatResize, installSidebarResize } from "./shell/columnWidths.js";
 import { installAccountsPanel } from "./panes/create/accounts/panel.js";
 import { renderAccountsBrand } from "./panes/create/accounts/brandButton.js";
+import { installAccountSwitcher } from "./panes/create/accounts/accountSwitcher.js";
 import {
   ensureSelectionInActiveUser,
   syncActiveUser,
@@ -130,6 +132,20 @@ installChatToggle(workspace, () => {
   else chatRailApi.collapse();
 });
 
+/** After the active account changes, from the switcher or the panel. */
+function afterAccountSwitch(): void {
+  ensureSel();
+  if (selected()) createPanel.close();
+  chatPane.clearIsolate();
+  renderAll();
+}
+
+installAccountSwitcher({
+  brand: sidebarBrand,
+  getUsers: () => users,
+  onActiveUserChanged: afterAccountSwitch,
+});
+
 const accountsPanel = installAccountsPanel({
   anchor: sidebarBrand,
   host: sidebarAccountsHost,
@@ -139,12 +155,7 @@ const accountsPanel = installAccountsPanel({
   onUsersChanged: (next) => {
     applyUsers(next);
   },
-  onActiveUserChanged: () => {
-    ensureSel();
-    if (selected()) createPanel.close();
-    chatPane.clearIsolate();
-    renderAll();
-  },
+  onActiveUserChanged: afterAccountSwitch,
   onSelectProject: (projectId) => {
     const target = projects.find((p) => p.project_id === projectId);
     if (!target) return;
@@ -162,7 +173,7 @@ const accountsPanel = installAccountsPanel({
 });
 
 const createPanel = installCreatePanel({
-  onNeedUser: () => accountsPanel.open(),
+  onNeedUser: () => sidebarBrand.click(),
   onChange: () => mapPane.render(),
   onCreated: (created) => {
     projects = [
@@ -216,7 +227,7 @@ const mapPane = installMapPane({
     renderAll();
   },
   onBrandRender: () =>
-    renderAccountsBrand(sidebarBrand, accountsPanel.isOpen()),
+    renderAccountsBrand(sidebarBrand, users),
 });
 
 // 3. Data
@@ -279,10 +290,6 @@ async function load(startProjectId: string | null = null): Promise<void> {
     ensureSel();
   }
   renderAll();
-  accountsPanel.restoreIfRemembered();
-  if (getActiveUserId() === null) {
-    accountsPanel.open();
-  }
 }
 
 // 4. Initialization

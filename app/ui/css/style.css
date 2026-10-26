@@ -16,6 +16,7 @@
 @import url("shell/tip.css");
 @import url("panes/create/sidebar.css");
 @import url("panes/create/accountsPanel.css");
+@import url("panes/create/accountSwitcher.css");
 @import url("panes/create/panel.css");
 @import url("panes/canvas/pane.css");
 @import url("panes/canvas/frame.css");

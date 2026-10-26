@@ -8,8 +8,6 @@ const STORAGE_KEY = "activeAccountId";
 const LEGACY_STORAGE_KEY = "activeSimUserId";
 
 /** Top sidebar brand — opens the accounts panel. */
-export const ACCOUNTS_BRAND = "Accounts";
-
 export function getActiveUserId(): string | null {
   const raw =
     localStorage.getItem(STORAGE_KEY) ??

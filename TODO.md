@@ -78,6 +78,13 @@ next.
          stay in separate files with one job each, and each lands as
          its own commit (switcher, then list), so either can be
          adjusted or reverted alone.
+       - Commit 1 (switcher) done: `accountSwitcher.ts` /
+         `accountSwitcher.css`, the brand's label in `brandButton.ts`,
+         and the panel always shown (its toggle went with it, since the
+         brand now opens the switcher). Still to do in commit 2: the
+         flat list, and moving the `settings-active-pulse` keyframes
+         from `accountsPanel.css` to `accountSwitcher.css` when the card
+         rules go.
        - Review: grep for `buildAccountCard`, `isAccountCardExpanded`,
          `sidebar-account-card`, `accounts.panelOpen`; run
          `/full-check`.

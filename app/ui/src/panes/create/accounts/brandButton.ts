@@ -1,27 +1,26 @@
-// The "Accounts" brand at the top of the sidebar that opens the panel.
+// The button at the top of the sidebar: it names the active account and
+// opens the account switcher (accountSwitcher.ts).
 
 // Contents
 //  1. Public API
 //      - renderAccountsBrand()
 
-import { getActiveUserId, ACCOUNTS_BRAND } from "../../../user/activeAccount.js";
+import { getActiveUserId, userLabel } from "../../../user/activeAccount.js";
+import type { AccountView } from "../../../dataShapes.js";
 
 // 1. Public API
 
-/** Refresh the sidebar brand label and aria (open-state class stays on panel). */
+/** The active account's name, or a prompt when there is none. */
 export function renderAccountsBrand(
   brand: HTMLButtonElement,
-  panelOpen: boolean,
+  users: AccountView[],
 ): void {
-  const active = getActiveUserId();
-  brand.textContent = ACCOUNTS_BRAND;
-  if (!panelOpen) {
-    brand.classList.remove("is-active");
-  }
+  const active = users.find((u) => u.id === getActiveUserId() && !u.archived);
+  brand.textContent = active ? userLabel(active) : "Choose an account";
   brand.setAttribute(
     "aria-label",
-    active !== null
-      ? "Active account. Click to switch accounts."
-      : "No active account. Click to pick one, or create in Settings → Directory.",
+    active
+      ? `Account: ${userLabel(active)}. Click to switch accounts.`
+      : "No active account. Click to pick one.",
   );
 }

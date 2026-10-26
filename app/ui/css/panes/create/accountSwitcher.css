@@ -1,0 +1,48 @@
+/* Account switcher: the menu under the sidebar's top button.
+ * Mirrors src/panes/create/accounts/accountSwitcher.ts. The box and its
+ * rows are the shared .progress-menu / .progress-menu-item
+ * (css/panes/canvas/map.css); this file adds the rule and the active dot.
+ *
+ * Contents
+ *  1. Menu
+ *  2. Active account
+ */
+
+/* 1. Menu */
+
+.account-switcher {
+  min-width: 12rem;
+}
+
+/* "Manage accounts" is a link styled as a row. */
+.account-switcher a.progress-menu-item {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.account-switcher-rule {
+  margin: var(--space-1) 0;
+  border: none;
+  border-top: 1px solid var(--hairline);
+}
+
+/* 2. Active account: the same pulsing dot the sidebar has used for it. */
+
+.account-switcher-item.is-active::after {
+  content: "";
+  display: inline-block;
+  width: 0.4em;
+  height: 0.4em;
+  margin-left: 0.45em;
+  border-radius: 50%;
+  background: var(--color-accent);
+  vertical-align: 0.12em;
+  animation: settings-active-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-switcher-item.is-active::after {
+    animation: none;
+    opacity: 0.85;
+  }
+}
