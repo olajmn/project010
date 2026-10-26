@@ -3,6 +3,8 @@
 // restores scroll. A node's frame follows its id, not its label, and is
 // headed by the node's current name, so a rename does not split it
 // (docs/05-decisions.md #71).
+// The frame the chat is about now is marked; redrawing the same thread
+// keeps the scroll, a new message goes to the end (docs/chat.md).
 // Framing (About "…") and filter live here — message rows in messageRow.ts.
 
 // Contents
