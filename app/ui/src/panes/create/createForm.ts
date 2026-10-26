@@ -38,7 +38,7 @@ export function installCreatePanel(opts: CreatePanelOpts): CreatePanelHandle {
   const openBtn = document.getElementById("create-open") as HTMLButtonElement;
   // Left edge of the sidebar, and its block clips below: the label goes
   // above and starts at the button.
-  setTip(openBtn, "Create project", "above", "start");
+  setTip(openBtn, "Create project", "below", "start");
   const panel = document.getElementById("create-panel") as HTMLElement;
   const heading = document.getElementById("create-heading") as HTMLParagraphElement;
   const form = document.getElementById("create-form") as HTMLFormElement;

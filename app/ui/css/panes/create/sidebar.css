@@ -37,6 +37,8 @@
   flex: 0 1 auto;
   min-height: 0;
   overflow: hidden;
+  /* Room for "+"'s hover label below it, which the clip would cut. */
+  padding-bottom: 2.25rem;
 }
 
 .sidebar-brand {
