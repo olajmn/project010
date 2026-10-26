@@ -88,9 +88,6 @@ export function installCollapseRail(opts: CollapseRailOpts): CollapseRailApi {
       "aria-label",
       collapsed ? "Expand column" : "Resize column",
     );
-    opts.handle.title = collapsed
-      ? "Drag to expand column"
-      : "Drag to resize column";
   };
 
   const endDrag = (): void => {

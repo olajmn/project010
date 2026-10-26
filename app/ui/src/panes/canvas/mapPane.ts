@@ -333,6 +333,7 @@ export function installMapPane(opts: MapPaneOpts): MapPane {
 
     opts.chatPane.fillProject({
       project,
+      selectedNodeId: opts.getSelectedNodeId(),
       selectedDay: opts.getSelectedDay(),
       onSelectDay: (day) => {
         opts.setSelectedDay(day);

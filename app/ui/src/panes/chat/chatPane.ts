@@ -11,7 +11,11 @@
 //      - installChatPane()
 
 import type { ProjectView } from "../../dataShapes.js";
-import { createIsolateChat, type RemovedFocus } from "./showOnlyThis.js";
+import {
+  createIsolateChat,
+  type ChosenFocus,
+  type RemovedFocus,
+} from "./showOnlyThis.js";
 import { createCurrentStatePanel } from "./currentState/currentStatePanel.js";
 
 // 1. Types
@@ -26,10 +30,13 @@ export type ChatPane = {
     resolveNodeId: (label: string) => string | null;
     /** A node's current label, so chat frames show today's name. */
     labelForNodeId: (nodeId: string) => string | null;
+    selectedNodeId: string | null;
     selectedDay: string | null;
     onSelectDay: (day: string | null) => void;
   }) => void;
   clearIsolate: () => void;
+  /** Mark the About frame the chat is about now (none for the project). */
+  markChosen: (chosen: ChosenFocus) => void;
   /** The removed node whose conversation is shown alone, if any. */
   removedFocus: () => RemovedFocus | null;
   readonly threadEl: HTMLDivElement;
@@ -74,6 +81,7 @@ export function installChatPane(opts: ChatPaneOpts): ChatPane {
   return {
     threadEl: opts.threadEl,
     clearIsolate: () => isolateChat.clear(),
+    markChosen: (chosen) => isolateChat.markChosen(chosen),
     removedFocus: () => isolateChat.removedFocus(),
     fillEmpty: (placeholder) => {
       resolveNodeIdLive = null;
@@ -81,11 +89,12 @@ export function installChatPane(opts: ChatPaneOpts): ChatPane {
       fillPlaceholder(placeholder);
       currentStatePanel.fill(null, () => {});
     },
-    fillProject: ({ project, onSelectNode, resolveNodeId, labelForNodeId, selectedDay, onSelectDay }) => {
+    fillProject: ({ project, onSelectNode, resolveNodeId, labelForNodeId, selectedNodeId, selectedDay, onSelectDay }) => {
       resolveNodeIdLive = resolveNodeId;
       labelForNodeIdLive = labelForNodeId;
       isolateChat.fill(
         project.thread ?? [],
+        { nodeId: selectedNodeId, day: selectedDay },
         (nodeId, label) => onSelectNode(nodeId, label),
         (day) => onSelectDay(day),
       );

@@ -121,7 +121,9 @@
   cursor: pointer;
 }
 
-.project-chat .chat-focus-section.is-clickable:hover {
+/* Hover, and the frame the chat is about now (the input's "Talk about …"). */
+.project-chat .chat-focus-section.is-clickable:hover,
+.project-chat .chat-focus-section.is-selected {
   border-color: var(--color-text);
 }
 

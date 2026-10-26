@@ -77,6 +77,14 @@ function ensureSel(): void {
   ensureSelectionInActiveUser(projects, selection);
 }
 
+/** Keep the chat's About frame marked as the selection changes. */
+function markChosenFrame(): void {
+  chatPane.markChosen({
+    nodeId: selection.selectedNodeId,
+    day: selection.selectedDay,
+  });
+}
+
 function renderAll(): void {
   accountsPanel.refresh();
   mapPane.render();
@@ -182,6 +190,7 @@ const mapPane = installMapPane({
     selection.selectedNodeId = nodeId;
     selection.selectedNodeLabel = label;
     if (nodeId) selection.selectedDay = null;
+    markChosenFrame();
   },
   getSelectedDay: () => selection.selectedDay,
   setSelectedDay: (day) => {
@@ -190,6 +199,7 @@ const mapPane = installMapPane({
       selection.selectedNodeId = null;
       selection.selectedNodeLabel = null;
     }
+    markChosenFrame();
   },
   onCloseProject: () => {
     selection.selectedId = null;

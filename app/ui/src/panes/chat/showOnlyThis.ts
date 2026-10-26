@@ -8,6 +8,7 @@
 // Contents
 //  1. Types
 //      - RemovedFocus
+//      - ChosenFocus
 //      - IsolateChat
 //      - IsolateChatOptions
 //  2. Helpers
@@ -25,18 +26,25 @@ import type { ChatMessage } from "../../dataShapes.js";
 /** A removed node whose conversation is shown alone. */
 export type RemovedFocus = { nodeId: string; label: string };
 
+/** What the chat is about now: a node, a day of changes, or neither. */
+export type ChosenFocus = { nodeId: string | null; day: string | null };
+
 export type IsolateChat = {
   /** Drop isolation (full thread again). */
   clear: () => void;
   /** The removed node whose conversation is shown alone, if any: a
    * message sent now is about it. */
   removedFocus: () => RemovedFocus | null;
-  /** Render thread into `threadEl`, applying isolation if set. */
+  /** Render thread into `threadEl`, applying isolation if set; the
+   * frame matching `chosen` is marked. */
   fill: (
     messages: ChatMessage[],
+    chosen: ChosenFocus,
     onFocusClick?: (nodeId: string, label: string) => void,
     onDayClick?: (day: string) => void,
   ) => void;
+  /** Mark the frame matching `chosen` without re-rendering. */
+  markChosen: (chosen: ChosenFocus) => void;
 };
 
 export type IsolateChatOptions = {
@@ -109,6 +117,20 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
     frameOf(message, labelForNodeId);
   let isolatedFocus: Frame | null = null;
   let preIsolationScrollTop: number | null = null;
+  /** The thread's last message as last drawn, to tell a re-render of the
+   * same thread from a new message or another project's thread. */
+  let lastDrawnKey: string | null = null;
+
+  function markChosen(chosen: ChosenFocus): void {
+    threadEl.querySelectorAll<HTMLElement>(".chat-focus-section").forEach((frame) => {
+      const { focusNodeId, focusDay } = frame.dataset;
+      frame.classList.toggle(
+        "is-selected",
+        (chosen.nodeId != null && focusNodeId === chosen.nodeId) ||
+          (chosen.day != null && focusDay === chosen.day),
+      );
+    });
+  }
 
   function isolationBanner(): HTMLDivElement {
     const banner = document.createElement("div");
@@ -129,9 +151,17 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
 
   function fill(
     messages: ChatMessage[],
+    chosen: ChosenFocus,
     onFocusClick?: (nodeId: string, label: string) => void,
     onDayClick?: (day: string) => void,
   ): void {
+    const last = messages[messages.length - 1];
+    const key = `${messages.length}|${last?.at ?? ""}|${last?.text ?? ""}`;
+    const sameThread = key === lastDrawnKey;
+    lastDrawnKey = key;
+    const keptScrollTop = threadEl.scrollTop;
+    const wasAtBottom =
+      threadEl.scrollHeight - threadEl.scrollTop - threadEl.clientHeight < 4;
     threadEl.innerHTML = "";
 
     if (isolatedFocus) {
@@ -158,6 +188,7 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
           const nodeId = message.focus_node_id?.trim();
           if (focus) frame.dataset.focusLabel = focus;
           if (nodeId) frame.dataset.focusNodeId = nodeId;
+          if (current.day) frame.dataset.focusDay = current.day;
           if (current.day && onDayClick) {
             const day = current.day;
             frame.classList.add("is-clickable");
@@ -208,9 +239,14 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
       }
       (section ?? threadEl).appendChild(messageRow(message));
     }
+    markChosen(chosen);
+    // Re-drawing the same thread (choosing a frame) keeps the reader's
+    // place; a new message, another thread, or reading at the end goes down.
     if (preIsolationScrollTop !== null) {
       threadEl.scrollTop = preIsolationScrollTop;
       preIsolationScrollTop = null;
+    } else if (sameThread && !wasAtBottom) {
+      threadEl.scrollTop = keptScrollTop;
     } else {
       threadEl.scrollTop = threadEl.scrollHeight;
     }
@@ -223,5 +259,6 @@ export function createIsolateChat(options: IsolateChatOptions): IsolateChat {
     },
     removedFocus: () => isolatedFocus?.removed ?? null,
     fill,
+    markChosen,
   };
 }

@@ -11,30 +11,6 @@ next.
 
 ## Active
 
-79. **Chat About-frames: show which one is chosen, keep the scroll**
-    (Step) — second part of the user-experience pass. Clicking an
-    About "…" frame chooses it (the input then reads "Talk about …"),
-    but nothing on the frame says so once the pointer leaves it, and
-    the thread sometimes jumps to the bottom. Both are the same concern
-    as today's code, so no new files: `src/panes/chat/showOnlyThis.ts`
-    (`createIsolateChat()` `fill()`) and
-    `css/panes/chat/agent-chat.css` (`.chat-focus-section`).
-    1. **The chosen frame stays marked.** `fill()` gets what the chat
-       is about now (a node id or a day) and gives the matching frame
-       an `is-selected` class; the CSS gives it the same outline as
-       `:hover`, kept while it is chosen. It clears when the chat is
-       about the whole project again. The map's own mark (dashed
-       outline, "Looking at: …") stays as it is.
-    2. **The thread keeps its place.** `fill()` sets `scrollTop` to the
-       bottom on every render unless it is leaving Show only this.
-       Assumption: choosing a frame re-renders the thread through
-       `fill()`, and that is the jump; check before changing. Then:
-       keep the scroll position on a re-render, and go to the bottom
-       only when a new message arrives or the thread was already at
-       the bottom.
-    3. **Review.** Read the diff for duplicate or unused code, run
-       `/full-check`, and update `docs/chat.md` or `docs/ui.md` where
-       they describe the frames.
 80. **Settings** (Step, placeholder) — third part of the
     user-experience pass: where things sit in Settings and how one
     moves through it. Scope not set yet. Related: Ideas, "Calmer row
