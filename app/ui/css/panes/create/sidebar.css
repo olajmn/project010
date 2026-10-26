@@ -48,17 +48,13 @@
   font-size: var(--font-size-sm);
   font-weight: 600;
   text-align: left;
-  color: var(--color-text-muted);
+  /* The account heads the list: full text colour, the projects muted. */
+  color: var(--color-text);
   background: transparent;
   border: none;
   border-radius: var(--radius);
   padding: var(--space-2) var(--space-2);
   cursor: pointer;
-}
-
-.sidebar-brand:hover,
-.sidebar-brand.is-active {
-  color: var(--color-text);
 }
 
 /* 2. Add button */
