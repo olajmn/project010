@@ -12,12 +12,18 @@ How the app's screen is laid out, how it should look, and where its code lives.
 
 | Column | Job | Not its job |
 |---|---|---|
-| **Sidebar** | Accounts and their projects; create a project; Settings | The map; column widths |
+| **Sidebar** | The active account's projects; switch account; create a project; Settings | The map; column widths; making or changing accounts (Settings → Directory) |
 | **Canvas** | The open project's nodes | Files on disk; old plan fields |
 | **Chat** | The conversation, optionally about one node or one day of changes | The map itself |
 
 The canvas is not a file browser: a future files view belongs in the
 sidebar, not the middle column.
+
+The sidebar shows one account at a time. Its top button names the
+active account; a click opens a menu of every live account as equals
+(the active one marked) and "Manage accounts". Below it are that
+account's projects, newest first, with "+" under them
+(`panes/create/accounts/`).
 
 The three columns float as **one block** on the page, with round outer
 corners and one line where two columns meet. The chat can be hidden with

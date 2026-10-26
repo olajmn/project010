@@ -1,10 +1,11 @@
-/* Left pane (sidebar) chrome: Accounts brand, project add, Settings.
+/* Left pane (sidebar) chrome: the account switcher's button, project
+ * add, Settings and Log out.
  * Values from css/tokens.css.
  *
- * Split with css/panes/create/accountsPanel.css: that file owns the look
- * *inside* the Accounts panel. .sidebar-add is the project mint control;
- * it stays in the Accounts block (under the active card when open, under
- * the brand when closed). Settings is pinned to the sidebar foot.
+ * Split with css/panes/create/accountsPanel.css (the project list) and
+ * accountSwitcher.css (the switcher's menu). .sidebar-add is the project
+ * mint control, under the project list. Settings is pinned to the
+ * sidebar foot.
  *
  * Contents
  *  1. Sidebar frame + brand
@@ -87,15 +88,9 @@
   background: var(--fill-control-hover);
 }
 
-/* Under the Accounts brand when the panel is closed. */
+/* Under the project list. */
 .sidebar-accounts > .sidebar-add {
   margin-top: var(--space-2);
-}
-
-/* Nested under the active account card while Accounts is open. */
-.sidebar-add--under-account {
-  margin-top: var(--space-2);
-  margin-bottom: var(--space-1);
 }
 
 /* 3. Bottom bar (Settings) */
@@ -108,8 +103,8 @@
  * with the frame, and the inline padding puts Settings back on the
  * sidebar's text inset.
  *
- * `margin-top: auto` pins Settings to the foot; project "+" stays in the
- * Accounts block and does not share this spacer.
+ * `margin-top: auto` pins Settings to the foot; project "+" stays under the
+ * project list and does not share this spacer.
  *
  * Also opts out of the generic `nav` bottom treatment in css/base.css —
  * that rule dresses the Settings pages' top nav, where a rule underneath

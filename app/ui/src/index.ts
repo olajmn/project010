@@ -1,13 +1,12 @@
 // Project workspace — Notion-ish shell over Project records.
-// Left (sidebar): account switcher, Accounts panel (projects nest under each
-// account) + create.
+// Left (sidebar): account switcher, the active account's projects + create.
 // Center: open project map. Close lives in the map's own top bar.
 // Right: conversation for that project. Wire: project_id / /api/projects.
 
 // Contents
 //  1. Shell + state
 //  2. Install panes
-//  3. Data (load / replace / applyUsers)
+//  3. Data (load / replace)
 //  4. Initialization
 
 import { fetchProjects, fetchAccounts, fetchSession } from "./api.js";
@@ -132,7 +131,7 @@ installChatToggle(workspace, () => {
   else chatRailApi.collapse();
 });
 
-/** After the active account changes, from the switcher or the panel. */
+/** After the account switcher picks another account. */
 function afterAccountSwitch(): void {
   ensureSel();
   if (selected()) createPanel.close();
@@ -147,15 +146,11 @@ installAccountSwitcher({
 });
 
 const accountsPanel = installAccountsPanel({
-  anchor: sidebarBrand,
   host: sidebarAccountsHost,
+  createButton: document.getElementById("create-open") as HTMLElement,
   getUsers: () => users,
   getProjects: () => projects,
   getSelectedId: () => selection.selectedId,
-  onUsersChanged: (next) => {
-    applyUsers(next);
-  },
-  onActiveUserChanged: afterAccountSwitch,
   onSelectProject: (projectId) => {
     const target = projects.find((p) => p.project_id === projectId);
     if (!target) return;
@@ -231,14 +226,6 @@ const mapPane = installMapPane({
 });
 
 // 3. Data
-
-function applyUsers(next: AccountView[]): void {
-  users = next;
-  syncActiveUser(next);
-  ensureSel();
-  renderAll();
-  accountsPanel.refresh();
-}
 
 function replaceProject(updated: ProjectView): void {
   projects = projects.map((p) =>

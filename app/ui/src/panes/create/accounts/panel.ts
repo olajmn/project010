@@ -1,6 +1,7 @@
-// Accounts panel: accounts + nested projects, always shown under the
-// account switcher (accountSwitcher.ts). Create / rename / delete live
-// in Settings → Directory.
+// The sidebar's project area: the active account's projects
+// (projectList.ts), always shown under the account switcher
+// (accountSwitcher.ts), with "+" under them. Accounts are made and
+// changed in Settings → Directory.
 
 // Contents
 //  1. Types
@@ -12,18 +13,17 @@ import {
   setActiveUserId,
 } from "../../../user/activeAccount.js";
 import type { AccountView, ProjectView } from "../../../dataShapes.js";
-import { buildAccountCard } from "./accountCard.js";
+import { buildProjectList } from "./projectList.js";
 
 // 1. Types
 
 export type AccountsPanelOptions = {
-  anchor: HTMLElement;
   host: HTMLElement;
+  /** The "+" button; the list sits right above it. */
+  createButton: HTMLElement;
   getUsers: () => AccountView[];
   getProjects: () => ProjectView[];
   getSelectedId: () => string | null;
-  onUsersChanged: (users: AccountView[]) => void;
-  onActiveUserChanged: (userId: string | null) => void;
   onSelectProject: (projectId: string) => void;
 };
 
@@ -37,74 +37,41 @@ export type AccountsPanelApi = {
 export function installAccountsPanel(
   opts: AccountsPanelOptions,
 ): AccountsPanelApi {
-  const menu = document.createElement("div");
-  menu.className = "sidebar-accounts-panel";
-  menu.setAttribute("role", "region");
-  menu.setAttribute("aria-label", "Accounts");
-  opts.host.appendChild(menu);
+  const panel = document.createElement("div");
+  panel.className = "sidebar-accounts-panel";
+  panel.setAttribute("role", "region");
+  panel.setAttribute("aria-label", "Projects");
+  opts.host.insertBefore(panel, opts.createButton);
 
-  const list = document.createElement("div");
-  list.className = "sidebar-accounts-list";
-  menu.appendChild(list);
-
-  const afterChange = (): void => {
-    rebuild();
-  };
-
-  /** Keep "+" in the Accounts block: under the active card when open,
-   * otherwise under the brand — never park it above Settings. */
-  const placeCreateButton = (activeCard: HTMLElement | null): void => {
-    const btn = document.getElementById("create-open");
-    if (!(btn instanceof HTMLButtonElement)) return;
-    if (activeCard) {
-      activeCard.appendChild(btn);
-      btn.classList.add("sidebar-add--under-account");
-      return;
-    }
-    btn.classList.remove("sidebar-add--under-account");
-    const afterBrand = opts.anchor.nextSibling;
-    if (afterBrand) opts.host.insertBefore(btn, afterBrand);
-    else opts.host.appendChild(btn);
-  };
-
-  return { refresh: rebuild };
-
-  function rebuild(): void {
-    // Park "+" outside the list first — innerHTML would destroy it if it
-    // were still nested under an account card.
-    placeCreateButton(null);
-    list.innerHTML = "";
-
+  const rebuild = (): void => {
+    panel.innerHTML = "";
     const users = opts.getUsers().filter((u) => !u.archived);
-    const projects = opts.getProjects();
     let activeId = getActiveUserId();
     if (activeId !== null && !users.some((u) => u.id === activeId)) {
       activeId = null;
       setActiveUserId(null);
     }
 
-    if (users.length === 0) {
+    if (activeId === null) {
       const empty = document.createElement("p");
-      empty.className = "sidebar-accounts-empty";
+      empty.className = "sidebar-empty";
       empty.textContent =
-        "No accounts yet — create one in Settings → Directory.";
-      list.appendChild(empty);
-      placeCreateButton(null);
-    } else {
-      let activeCard: HTMLElement | null = null;
-      for (const user of users) {
-        const card = buildAccountCard(user, activeId === user.id, projects, {
-          getUsers: opts.getUsers,
-          getSelectedId: opts.getSelectedId,
-          onUsersChanged: opts.onUsersChanged,
-          onActiveUserChanged: opts.onActiveUserChanged,
-          onSelectProject: opts.onSelectProject,
-          afterChange,
-        });
-        list.appendChild(card);
-        if (activeId === user.id) activeCard = card;
-      }
-      placeCreateButton(activeCard);
+        users.length === 0
+          ? "No accounts yet — create one in Settings → Directory."
+          : "Pick an account above.";
+      panel.appendChild(empty);
+      return;
     }
-  }
+
+    panel.appendChild(
+      buildProjectList(
+        activeId,
+        opts.getProjects(),
+        opts.getSelectedId(),
+        opts.onSelectProject,
+      ),
+    );
+  };
+
+  return { refresh: rebuild };
 }

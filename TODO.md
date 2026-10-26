@@ -84,7 +84,11 @@ next.
          brand now opens the switcher). Still to do in commit 2: the
          flat list, and moving the `settings-active-pulse` keyframes
          from `accountsPanel.css` to `accountSwitcher.css` when the card
-         rules go.
+         rules go. Commit 2 (list) done and tested: `projectList.ts`,
+         `panel.ts` reduced to the list and its empty notes, "+" placed
+         once under the list, `accountCard.ts` deleted, and the unused
+         `applyUsers()` in `index.ts` removed (the card took it but
+         never called it).
        - Review: grep for `buildAccountCard`, `isAccountCardExpanded`,
          `sidebar-account-card`, `accounts.panelOpen`; run
          `/full-check`.

@@ -37,7 +37,17 @@
   border-radius: 50%;
   background: var(--color-accent);
   vertical-align: 0.12em;
-  animation: settings-active-pulse 1.8s ease-in-out infinite;
+  animation: account-active-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes account-active-pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
