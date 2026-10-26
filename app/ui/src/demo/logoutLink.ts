@@ -1,17 +1,14 @@
-// "Log out" at the foot of the sidebar, next to Settings — only when the
-// server runs the public demo (docs/demo.md).
+// The sidebar's "Log out" link (ui/index.html): logs out in the public
+// demo (docs/demo.md); outside it the link is a placeholder that does
+// nothing.
 
 import { logOut } from "../api.js";
 
-export function installLogoutLink(nav: HTMLElement, demo: boolean): void {
-  if (!demo) return;
-  const link = document.createElement("a");
-  link.href = "/login.html";
-  link.textContent = "Log out";
+export function wireLogoutLink(link: HTMLAnchorElement, demo: boolean): void {
   link.addEventListener("click", async (event) => {
     event.preventDefault();
+    if (!demo) return;
     await logOut();
     window.location.assign("/login.html");
   });
-  nav.appendChild(link);
 }

@@ -28,7 +28,8 @@ front of every request (`backend/api/demo/`, [[05-decisions]] #70). Off by
 default, and then nothing changes. On:
 
 - One shared password; `POST /api/login` gives an in-memory session
-  cookie, which ends on logout (sidebar, next to Settings), after
+  cookie, which ends on logout (sidebar, next to Settings; outside the
+  demo the link is shown but does nothing), after
   30 minutes idle, or after 8 hours. A restart logs everyone out.
 - Without a session, `/api/*` answers 401 and pages redirect to
   `ui/login.html`.

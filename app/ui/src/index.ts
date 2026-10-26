@@ -30,7 +30,7 @@ import { installMapPane } from "./panes/canvas/mapPane.js";
 import { getActiveUserId, getLastProjectId, setActiveUserId } from "./user/activeAccount.js";
 import { applyStoredTheme } from "./user/theme.js";
 import { toggleMapIds } from "./panes/canvas/idView.js";
-import { installLogoutLink } from "./demo/logoutLink.js";
+import { wireLogoutLink } from "./demo/logoutLink.js";
 import { setMapStartDepth } from "./demo/mapStartDepth.js";
 import type { AccountView, ProjectView } from "./dataShapes.js";
 
@@ -293,7 +293,7 @@ fetchSession()
   .catch(() => ({ demo: false, map_start_depth: null, start_project_id: null }))
   .then((session) => {
     setMapStartDepth(session.map_start_depth);
-    installLogoutLink(document.querySelector(".sidebar-more") as HTMLElement, session.demo);
+    wireLogoutLink(document.getElementById("logout-link") as HTMLAnchorElement, session.demo);
     return load(session.start_project_id);
   })
   .catch((err) => {

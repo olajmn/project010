@@ -11,10 +11,94 @@ next.
 
 ## Active
 
-80. **Settings** (Step, placeholder) — third part of the
-    user-experience pass: where things sit in Settings and how one
-    moves through it. Scope not set yet. Related: Ideas, "Calmer row
-    actions in Settings".
+80. **The sidebar and Settings** (Step) — third part of the
+    user-experience pass: where things sit and how one moves through
+    them. Being collected; nothing planned or changed yet. The app
+    now has enough functions that the interface needs the same care
+    as the code; no solution is chosen for any point below.
+    1. **Log out outside the demo too** (chosen; do first). The
+       sidebar's foot shows Log out only in demo mode
+       (`ui/src/demo/logoutLink.ts`, decided by `GET /api/session`).
+       Show it locally as well, so both look the same while working;
+       locally it is a placeholder that does nothing. Plan, no new
+       files:
+       - `ui/index.html`: the link sits in `.sidebar-more` next to
+         Settings, as static markup like Settings.
+       - `ui/src/demo/logoutLink.ts`: stays in `demo/` (logging out is
+         the demo's behavior); it no longer creates the link, only
+         wires its click: in demo mode log out and go to the login
+         page, otherwise do nothing. `index.ts` passes the link
+         instead of `.sidebar-more`.
+       - Docs: `docs/demo.md` (Login page, Log out row),
+         `docs/04-current-state.md` § 1 Demo mode. Done (`wireLogoutLink()`).
+    2. **The Accounts panel is hard to read with several accounts.**
+       With one account and its projects (as in the demo) it is clear.
+       With several, account names (the active one with a dot, others
+       grey as "account 752f8233") and project names are one flat list
+       of the same kind of row: everything can be clicked, and nothing
+       shows which rows are accounts and which are projects, or what a
+       click does (switch account, or open a project).
+       Chosen direction: the sidebar lists only the active account's
+       projects, and the account is switched from the top, as Slack or
+       Notion switch workspaces. Plan:
+       - **The brand becomes the switcher.** `accounts/brandButton.ts`
+         shows the active account's name (`userLabel()`) with a chevron
+         instead of the word "Accounts"; a click opens a small menu of
+         every live account as equals, the active one marked with the
+         same dot as today, and a last item "Manage accounts" that opens
+         Settings → Directory. The menu lists accounts only, never
+         projects: another account's project is opened by switching
+         first. New capability, own files:
+         `ui/src/panes/create/accounts/accountSwitcher.ts` and
+         `ui/css/panes/create/accountSwitcher.css` (mirror). It closes
+         on an outside click or Esc through `openPopover()`
+         (`panes/canvas/openPopover.ts`), so it adds no new dismiss
+         code (Parallel paths P7).
+       - **One flat project list.** `accounts/panel.ts` draws the
+         active account's projects (newest first, as now) with "+"
+         under them; no account cards. The project rows move from
+         `accounts/accountCard.ts` (`buildProjectGroup()`) into
+         `accounts/projectList.ts`; `accountCard.ts` is deleted with
+         its expand state (`accounts.cardExpanded`).
+       - **The list no longer collapses.** With accounts in the
+         switcher, the panel's open/closed toggle has nothing left to
+         hide: `OPEN_KEY`, `LEGACY_OPEN_KEY`, `restoreIfRemembered()`
+         (called from `index.ts`) and `placeCreateButton()`'s two
+         positions go.
+       - **Empty states stay:** no accounts ("create one in Settings →
+         Directory") and no projects ("No projects yet").
+       - CSS: `css/panes/create/accountsPanel.css` loses the card
+         rules; check `sidebar.css` for the brand.
+       - Docs: `docs/ui.md` § 1 (Sidebar row), `docs/04-current-state.md`
+         § 2 (Accounts row).
+       - Check after: switching account opens that account's last
+         project or none, the selected project stays marked, and
+         Settings links still work.
+       - Easy to change later: the switcher, the list, and the brand
+         stay in separate files with one job each, and each lands as
+         its own commit (switcher, then list), so either can be
+         adjusted or reverted alone.
+       - Review: grep for `buildAccountCard`, `isAccountCardExpanded`,
+         `sidebar-account-card`, `accounts.panelOpen`; run
+         `/full-check`.
+    3. **Row actions are everywhere (Directory, Archive).** Each row
+       right-aligns its own actions, so Rename, Send…, Restore, Delete,
+       and Details do not line up from row to row, and the red Delete
+       sits mid-row on almost every line. Options noted earlier: Rename
+       and Delete move to the details page, leaving Send… and Details in
+       the lists (as #88 moved ids and logs there); or Delete stays grey
+       like the others and turns red only on hover and in its
+       confirmation.
+    4. **Archive is one long, hard-to-scan list.** Accounts and projects
+       mix in one list; each row carries a long line of facts ("project
+       · Open · held by account 48492dc8 · made … · changed …"); an
+       archived account's projects appear as separate rows marked Open;
+       and the same name can appear twice (two "New project 3").
+    5. **Details pages read like raw data.** The facts are right and
+       belong there, but "Kind: account", the full id, and the dates as
+       a plain table are hard to care about; the same holds for a
+       project's rows in Directory. A project's log says "Renamed ·
+       Renamed: POKER HANDS → poker" (the word twice).
 
 ## Queue
 
@@ -169,6 +253,12 @@ next.
     (`app/backend/api/demo/settings.py`, [[demo]]).
 61. **Zero data retention for the demo's chat** (Question) — whether to
     require ZDR at OpenRouter ([[05-decisions]] #70).
+82. **The demo's large project lags when opened wide** (Question) —
+    with many of Building Project's 156 nodes shown, the map lags;
+    with levels hidden it is smooth. A first visit should not start
+    with lag. Open: open the demo's projects fewer levels deep
+    (`ui/src/demo/mapStartDepth.ts` already picks a depth), make
+    drawing many nodes cheaper, or both.
 
 ## Ideas (not decided)
 
@@ -209,12 +299,6 @@ choice.
   only, apart from Archive (which lists things to act on). #88 removed
   the last such feed (All activity) so each log is read through the
   account or project it belongs to; bringing one back reopens that.
-- **Calmer row actions in Settings** — the rows' actions do not line
-  up (each row right-aligns its own), and the red Delete sits mid-row.
-  Either Rename and Delete move to an account's details page, leaving
-  Send… and Details in the lists (as #88 moved ids and logs there), or
-  Delete stays grey like the others and turns red only on hover and in
-  its confirmation.
 - **Smaller always-loaded instructions** — `CLAUDE.md` imports all four
   `global-standards/` guides plus `CONVENTIONS.md` and
   `COLLABORATION.md`, so every request carries them
