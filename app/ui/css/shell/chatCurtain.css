@@ -1,0 +1,24 @@
+/* Chat as a curtain: the chat panel widens to the left by --chat-overlap
+ * and lies over the map (and the sidebar, in a very narrow window).
+ * The overlap is set by src/shell/chatCurtain.ts; 0 when the chat fits
+ * beside the map. */
+
+.workspace {
+  --chat-overlap: 0px;
+  /* The chat may reach past the workspace into the sidebar. */
+  overflow: visible;
+}
+
+.workspace .project-chat {
+  position: relative;
+  z-index: 4;
+  margin-left: calc(-1 * var(--chat-overlap));
+  width: calc(100% + var(--chat-overlap));
+  /* Its own edge while it covers the map, where the column rule is hidden. */
+  box-shadow: -1px 0 0 var(--color-border);
+}
+
+/* The drag handle follows the chat's left edge. */
+.workspace .chat-resize {
+  left: calc(-1 * var(--chat-overlap));
+}

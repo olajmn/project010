@@ -2,12 +2,14 @@
 //
 // Contents
 //  1. Three-column rules (edit here)
+//      - mapFloorPx()
 //  2. Shared column resize
 //      - installColumnResize()
 //  3. Installers
 //      - installSidebarResize()
 //      - installChatResize()
 
+import { applyChatCurtain } from "./chatCurtain.js";
 import {
   installCollapseRail,
   type CollapseRailApi,
@@ -19,14 +21,40 @@ import {
 //   │ sidebar  │ map (flexible)  │   chat   │
 //   └──────────┴─────────────────┴──────────┘
 //
-// Map has no own width var — it takes leftover space.
-// maxFraction is of that column's container (shell for sidebar,
-// workspace for chat).
+// Map has no own width var — it takes leftover space, down to its floor
+// (mapFloorPx()). The sidebar keeps pixels; the chat keeps a share of the
+// shell, so a narrower window shrinks chat and map together. Chat width
+// past the map's floor covers the map (chatCurtain.ts), up to the
+// sidebar's edge.
 
 const MAP = {
-  /** Soft floor so the middle pane stays usable. */
+  /** Floor while no map is open (no top bar to measure). */
   minPx: 280,
 };
+
+/** The map column's floor: the width its top bar needs, so the bar's
+ *  buttons are never clipped. Falls back to MAP.minPx with no map open. */
+function mapFloorPx(): number {
+  const bar = document.querySelector<HTMLElement>(".map-top-bar");
+  const column = bar?.closest<HTMLElement>(".project-column");
+  if (!bar || !column || bar.offsetParent === null) return MAP.minPx;
+  const barStyle = getComputedStyle(bar);
+  const items = Array.from(bar.children) as HTMLElement[];
+  let needed =
+    Number.parseFloat(barStyle.paddingLeft) +
+    Number.parseFloat(barStyle.paddingRight) +
+    (Number.parseFloat(barStyle.columnGap) || 0) * Math.max(0, items.length - 1);
+  for (const item of items) {
+    const itemStyle = getComputedStyle(item);
+    needed +=
+      item.offsetWidth +
+      Number.parseFloat(itemStyle.marginLeft) +
+      Number.parseFloat(itemStyle.marginRight);
+  }
+  // The column's own border sits outside the bar.
+  const columnExtra = column.offsetWidth - bar.offsetWidth;
+  return Math.ceil(needed + columnExtra);
+}
 
 const SIDEBAR = {
   storageKey: "projects.sidebarWidthPx",
@@ -35,23 +63,19 @@ const SIDEBAR = {
   minPx: 180,
   /** Of .app-shell — 1/2 ≈ drag out to mid-screen. */
   maxFraction: 1 / 2,
-  /** Leave at least this much for map + chat together. */
-  minRestPx: MAP.minPx + 240,
   bodyClass: "is-resizing-sidebar",
 };
 
 const CHAT = {
-  widthStorageKey: "projects.chatWidthPx",
+  /** Open width as a share of .app-shell (0–1), so it narrows with the
+   *  window; the map takes what is left. */
+  widthStorageKey: "projects.chatWidthShare",
   collapsedStorageKey: "projects.chatCollapsed",
   cssVar: "--chat-width",
-  /** Hard min while open; click opens here. Snap = half of this. */
+  /** Hard min while open; first open uses it. Snap = half of this. */
   minPx: 320,
-  /** Of .workspace — same three-way feel as sidebar. */
-  maxFraction: 1 / 2,
-  /** Leave at least this much for the map. */
-  minOtherPx: MAP.minPx,
-  /** Collapsed width: 0 — only a double line at the edge is left.
-   *  Keep in sync with css/shell/columnRail.css */
+  /** Collapsed width: 0 — only a double line at the edge is left
+   *  (css/shell/columnRail.css). */
   railWidthPx: 0,
   /** Rising across this while collapsed → open (nearer rail than snap). */
   expandThresholdPx: 100,
@@ -69,39 +93,40 @@ type ColumnResizeOpts = {
   storageKey: string;
   defaultWidth: number;
   minWidth: number;
-  /** Absolute ceiling (optional; prefer maxFraction). */
-  maxWidthCap?: number;
   /** Fraction of container width (e.g. 1/2). */
   maxFraction?: number;
   /** Leave at least this much for the rest of the container. */
-  minOther: number;
+  minOther: () => number;
   /** How pointer X maps to the column width. */
   widthFromPointer: (clientX: number, rect: DOMRect) => number;
   bodyClass: string;
 };
 
+export type ColumnResizeApi = {
+  /** Re-apply the width within today's limits (after the map appears,
+   *  its floor can change). */
+  refit: () => void;
+};
+
 function maxAllowed(
   container: HTMLElement,
   minWidth: number,
-  minOther: number,
+  minOther: () => number,
   maxFraction?: number,
-  maxWidthCap?: number,
 ): number {
-  const byRest = Math.max(minWidth, container.clientWidth - minOther);
+  const byRest = Math.max(minWidth, container.clientWidth - minOther());
   const byFraction =
     maxFraction != null ? container.clientWidth * maxFraction : Infinity;
-  const byCap = maxWidthCap ?? Infinity;
-  return Math.min(byRest, byFraction, byCap);
+  return Math.min(byRest, byFraction);
 }
 
-function installColumnResize(opts: ColumnResizeOpts): void {
+function installColumnResize(opts: ColumnResizeOpts): ColumnResizeApi {
   const apply = (px: number) => {
     const max = maxAllowed(
       opts.container,
       opts.minWidth,
       opts.minOther,
       opts.maxFraction,
-      opts.maxWidthCap,
     );
     const clamped = Math.min(max, Math.max(opts.minWidth, Math.round(px)));
     opts.container.style.setProperty(opts.cssVar, `${clamped}px`);
@@ -188,11 +213,14 @@ function installColumnResize(opts: ColumnResizeOpts): void {
   opts.handle.addEventListener("pointercancel", onUp);
   opts.handle.addEventListener("lostpointercapture", onLostCapture);
 
-  window.addEventListener("resize", () => {
+  const refit = (): void => {
     const raw = getComputedStyle(opts.container).getPropertyValue(opts.cssVar);
     const px = Number.parseFloat(raw);
     if (Number.isFinite(px)) apply(px);
-  });
+  };
+  window.addEventListener("resize", refit);
+
+  return { refit };
 }
 
 // 3. Installers
@@ -200,8 +228,9 @@ function installColumnResize(opts: ColumnResizeOpts): void {
 export function installSidebarResize(
   shell: HTMLElement,
   handle: HTMLElement,
-): void {
-  installColumnResize({
+  chatPanel: HTMLElement,
+): ColumnResizeApi {
+  return installColumnResize({
     container: shell,
     handle,
     cssVar: SIDEBAR.cssVar,
@@ -209,7 +238,11 @@ export function installSidebarResize(
     defaultWidth: SIDEBAR.defaultPx,
     minWidth: SIDEBAR.minPx,
     maxFraction: SIDEBAR.maxFraction,
-    minOther: SIDEBAR.minRestPx,
+    // Leave the map its floor beside the chat's minimum (the chat covers
+    // the map for any width beyond that); nothing when the chat is closed.
+    minOther: () =>
+      mapFloorPx() +
+      (chatPanel.offsetWidth > 0 ? CHAT.minPx : 0),
     widthFromPointer: (clientX, rect) => clientX - rect.left,
     bodyClass: SIDEBAR.bodyClass,
   });
@@ -224,12 +257,12 @@ export function installChatResize(
     container: workspace,
     handle,
     panel,
-    cssVar: CHAT.cssVar,
     widthStorageKey: CHAT.widthStorageKey,
+    shareOf: workspace.parentElement ?? workspace,
     collapsedStorageKey: CHAT.collapsedStorageKey,
     minWidth: CHAT.minPx,
-    maxFraction: CHAT.maxFraction,
-    minOther: CHAT.minOtherPx,
+    applyWidth: (px) =>
+      applyChatCurtain(workspace, CHAT.cssVar, px, mapFloorPx()),
     railWidth: CHAT.railWidthPx,
     snapThreshold: Math.round(CHAT.minPx / 2),
     expandThreshold: CHAT.expandThresholdPx,

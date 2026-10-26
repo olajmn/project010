@@ -1098,6 +1098,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; the log is a separate file per account, and nothing else reads it.
 
+## 91. 2026-10-26 — The chat covers the map instead of squeezing it
+
+**Decision:** The three columns stay side by side at every window width; the stacked layout under 800 px is gone (four `@media` blocks). The map's floor is the width its top bar needs (`mapFloorPx()` in `shell/columnWidths.ts`), so its buttons are never clipped; with no map open it is 280 px. The sidebar keeps its width in pixels and leaves the map its floor beside the chat's minimum. The chat's width is stored as a share of the window (`projects.chatWidthShare`; the old pixel key is no longer read), so a narrower window shrinks chat and map together, and the half-of-workspace cap is gone. Chat width past the map's floor lies over the map (`shell/chatCurtain.ts`, `css/shell/chatCurtain.css`): when dragged, up to the sidebar's edge; in a window too narrow for all three, over the sidebar too. Both columns re-apply their limits after each render, since the map's top bar sets the floor. `TODO.md` 78.
+
+**Date:** 2026-10-26
+
+**Alternatives considered:** keeping the stacked layout (on a desktop, a narrow window became a different app); a top bar that hides buttons in a menu as the map narrows (more code, and buttons move); widths in pixels for the chat too (the map absorbed every change of the window alone).
+
+**Why this choice:** The app is for a computer; phone widths are not a goal. The behavior follows Zed: the file panel stays put, the chat scales with the window and covers the editor when there is no room, so nothing is ever squeezed into a broken state.
+
+**Reversible?** Yes; the widths live in the browser's storage, and the layout is CSS plus two small modules.
+
 ## See also
 
 - [[03-architecture]]

@@ -8,17 +8,10 @@
  * Numbers (min / rail / expand): src/shell/columnWidths.ts CHAT
  *
  * Contents
- *  1. Workspace rail width
- *  2. Collapsed panel and edge handle
+ *  1. Collapsed panel and edge handle
  */
 
-/* 1. Workspace rail width — keep in sync with CHAT.railWidthPx */
-
-.workspace.is-chat-collapsed {
-  --chat-width: 0px;
-}
-
-/* 2. Collapsed panel and edge handle. The map runs to the block's edge
+/* 1. Collapsed panel and edge handle. The map runs to the block's edge
  * (no column rule); the seam's grab area (css/shell/layout.css) moves
  * just inside that edge and shows one thin line, brighter on hover. */
 

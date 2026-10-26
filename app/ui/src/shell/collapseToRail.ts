@@ -17,15 +17,16 @@ export type CollapseRailOpts = {
   handle: HTMLElement;
   /** Pane that gets the collapsed class (chat panel, sidebar, …). */
   panel: HTMLElement;
-  cssVar: string;
+  /** Stores the open width as a share of `shareOf`'s width (0–1), so the
+   *  column narrows with the window. */
   widthStorageKey: string;
+  shareOf: HTMLElement;
   collapsedStorageKey: string;
-  /** Hard floor while open; click opens here too. */
+  /** Hard floor while open; opens here until a width is stored. */
   minWidth: number;
-  /** Fraction of container width (e.g. 1/2). Optional. */
-  maxFraction?: number;
-  /** Leave at least this much for the rest of the container. */
-  minOther: number;
+  /** Writes a width to the page. The open width is capped at the
+   *  container's width. */
+  applyWidth: (px: number) => void;
   /** Width when collapsed (0 for the chat). */
   railWidth: number;
   /** Falling across this while open → collapse (~ half of min). */
@@ -42,35 +43,36 @@ export type CollapseRailOpts = {
 export type CollapseRailApi = {
   collapse: () => void;
   expand: () => void;
+  /** Re-apply the stored share within today's limits (after the map
+   *  appears, its floor can change). */
+  refit: () => void;
 };
 
 // 2. Public API
 
 export function installCollapseRail(opts: CollapseRailOpts): CollapseRailApi {
   let collapsed = localStorage.getItem(opts.collapsedStorageKey) === "1";
-  let openWidth = readStoredOpenWidth(opts);
+  /** Open width as a share of `shareOf`; null until the first drag. */
+  let openShare = readStoredShare(opts);
   let dragging = false;
   let activePointerId: number | null = null;
   /** Prior pointer width this drag — edge-trigger snap/expand. */
   let prevRaw: number | null = null;
 
-  const maxOpen = (): number => {
-    const byRest = Math.max(
-      opts.minWidth,
-      opts.container.clientWidth - opts.minOther,
-    );
-    const byFraction =
-      opts.maxFraction != null
-        ? opts.container.clientWidth * opts.maxFraction
-        : Infinity;
-    return Math.min(byFraction, byRest);
-  };
+  const maxOpen = (): number =>
+    Math.max(opts.minWidth, opts.container.clientWidth);
 
   const clampOpen = (px: number): number =>
     Math.min(maxOpen(), Math.max(opts.minWidth, Math.round(px)));
 
-  const setWidth = (px: number): void => {
-    opts.container.style.setProperty(opts.cssVar, `${Math.round(px)}px`);
+  /** The stored share in pixels today, within the limits. */
+  const openPx = (): number =>
+    clampOpen(
+      openShare != null ? openShare * opts.shareOf.clientWidth : opts.minWidth,
+    );
+
+  const refit = (): void => {
+    opts.applyWidth(collapsed ? opts.railWidth : openPx());
   };
 
   const pointerWidth = (event: PointerEvent): number =>
@@ -120,7 +122,7 @@ export function installCollapseRail(opts: CollapseRailOpts): CollapseRailApi {
     if (final == null) return;
 
     if (collapsed) {
-      setWidth(opts.railWidth);
+      opts.applyWidth(opts.railWidth);
       return;
     }
     expand(final);
@@ -129,24 +131,22 @@ export function installCollapseRail(opts: CollapseRailOpts): CollapseRailApi {
   const collapse = (): void => {
     collapsed = true;
     localStorage.setItem(opts.collapsedStorageKey, "1");
-    setWidth(opts.railWidth);
+    opts.applyWidth(opts.railWidth);
     syncDom();
   };
 
   const expand = (width?: number): void => {
     collapsed = false;
     localStorage.setItem(opts.collapsedStorageKey, "0");
-    openWidth = clampOpen(width ?? opts.minWidth);
-    localStorage.setItem(opts.widthStorageKey, String(openWidth));
+    if (width != null) {
+      openShare = clampOpen(width) / Math.max(1, opts.shareOf.clientWidth);
+      localStorage.setItem(opts.widthStorageKey, openShare.toFixed(4));
+    }
     syncDom();
-    setWidth(openWidth);
+    refit();
   };
 
-  if (collapsed) setWidth(opts.railWidth);
-  else {
-    openWidth = clampOpen(openWidth);
-    setWidth(openWidth);
-  }
+  refit();
   syncDom();
 
   const onMove = (event: PointerEvent): void => {
@@ -162,7 +162,7 @@ export function installCollapseRail(opts: CollapseRailOpts): CollapseRailApi {
         expand(raw);
         return;
       }
-      setWidth(opts.railWidth);
+      opts.applyWidth(opts.railWidth);
       return;
     }
 
@@ -170,7 +170,7 @@ export function installCollapseRail(opts: CollapseRailOpts): CollapseRailApi {
       collapse();
       return;
     }
-    setWidth(clampOpen(raw));
+    opts.applyWidth(clampOpen(raw));
   };
 
   const onUp = (event: PointerEvent): void => {
@@ -210,23 +210,15 @@ export function installCollapseRail(opts: CollapseRailOpts): CollapseRailApi {
   opts.handle.addEventListener("pointercancel", onUp);
   opts.handle.addEventListener("lostpointercapture", onLostCapture);
 
-  window.addEventListener("resize", () => {
-    if (collapsed) {
-      setWidth(opts.railWidth);
-      return;
-    }
-    openWidth = clampOpen(openWidth);
-    setWidth(openWidth);
-  });
+  // The window, and the sidebar beside it, both change the container.
+  new ResizeObserver(refit).observe(opts.container);
 
-  return { collapse, expand };
+  return { collapse, expand, refit };
 }
 
-function readStoredOpenWidth(opts: CollapseRailOpts): number {
+function readStoredShare(opts: CollapseRailOpts): number | null {
   const stored = Number(localStorage.getItem(opts.widthStorageKey));
-  return Number.isFinite(stored) && stored >= opts.minWidth
-    ? stored
-    : opts.minWidth;
+  return Number.isFinite(stored) && stored > 0 && stored < 1 ? stored : null;
 }
 
 /** Pointer rose across `threshold` (prev below, now at/above). */

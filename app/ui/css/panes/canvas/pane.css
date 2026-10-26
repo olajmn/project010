@@ -143,9 +143,3 @@
   font-weight: 300;
   line-height: var(--line-height);
 }
-
-@media (max-width: 800px) {
-  .project-column {
-    border-right: none;
-  }
-}

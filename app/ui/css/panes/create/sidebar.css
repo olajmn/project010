@@ -143,10 +143,3 @@
 .sidebar-more a:hover {
   color: var(--color-accent);
 }
-
-@media (max-width: 800px) {
-  .sidebar {
-    border-right: none;
-    border-bottom: var(--border);
-  }
-}

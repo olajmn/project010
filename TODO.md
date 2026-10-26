@@ -11,8 +11,42 @@ next.
 
 ## Active
 
-77. **Everything is held, and projects are nodes** (Step) — a small
-    rule with a wide reach: nothing exists without a holder, and a
+79. **Chat About-frames: show which one is chosen, keep the scroll**
+    (Step) — second part of the user-experience pass. Clicking an
+    About "…" frame chooses it (the input then reads "Talk about …"),
+    but nothing on the frame says so once the pointer leaves it, and
+    the thread sometimes jumps to the bottom. Both are the same concern
+    as today's code, so no new files: `src/panes/chat/showOnlyThis.ts`
+    (`createIsolateChat()` `fill()`) and
+    `css/panes/chat/agent-chat.css` (`.chat-focus-section`).
+    1. **The chosen frame stays marked.** `fill()` gets what the chat
+       is about now (a node id or a day) and gives the matching frame
+       an `is-selected` class; the CSS gives it the same outline as
+       `:hover`, kept while it is chosen. It clears when the chat is
+       about the whole project again. The map's own mark (dashed
+       outline, "Looking at: …") stays as it is.
+    2. **The thread keeps its place.** `fill()` sets `scrollTop` to the
+       bottom on every render unless it is leaving Show only this.
+       Assumption: choosing a frame re-renders the thread through
+       `fill()`, and that is the jump; check before changing. Then:
+       keep the scroll position on a re-render, and go to the bottom
+       only when a new message arrives or the thread was already at
+       the bottom.
+    3. **Review.** Read the diff for duplicate or unused code, run
+       `/full-check`, and update `docs/chat.md` or `docs/ui.md` where
+       they describe the frames.
+80. **Settings** (Step, placeholder) — third part of the
+    user-experience pass: where things sit in Settings and how one
+    moves through it. Scope not set yet. Related: Ideas, "Calmer row
+    actions in Settings".
+
+## Queue
+
+### Backend and code
+
+77. **Everything is held, and projects are nodes** (Step, **parked**
+    2026-10-26 for the user-experience pass; next large step) — a
+    small rule with a wide reach: nothing exists without a holder, and a
     project is the same kind of thing as a node. The pitch stays (a
     workspace for the structure of projects); this adds a layer: an
     account becomes a workspace where things can be copied, moved, and
@@ -46,11 +80,6 @@ next.
        project once it is inside another one.
     4. **The workspace.** An account's things can be pasted, moved, and
        put together freely across what are projects today.
-
-## Queue
-
-### Backend and code
-
 66. **Parked Time code** (Question) — `backend/foundation/` (about
     1,800 lines: `week_windows()` / `day_windows()`, `step_plan`; P1,
     P2) is used by nothing in the product ([[04-current-state]]). It is
@@ -85,6 +114,10 @@ next.
 
 ### Map and nodes
 
+81. **A renamed node can sit under the chat** (Step, later) — the chat
+    lies over the map past the map's floor ([[05-decisions]] #91), so
+    the field for a node's name can be partly hidden while typing. The
+    map could scroll that node into view.
 72. **Node id follow-ups** (Step, when needed) — ids are random UUIDv4
     since 2026-10-24 (#78, `app/backend/project/node/README.md`). Open:
     a node's details on the node itself (its ⋯ menu on the map: id,
@@ -206,6 +239,17 @@ choice.
   Send… and Details in the lists (as #88 moved ids and logs there), or
   Delete stays grey like the others and turns red only on hover and in
   its confirmation.
+- **Smaller always-loaded instructions** — `CLAUDE.md` imports all four
+  `global-standards/` guides plus `CONVENTIONS.md` and
+  `COLLABORATION.md`, so every request carries them
+  (`WRITING_STYLE_GUIDE.md` alone about 2k tokens). From safest to
+  largest effect: move the Weak/Better examples out of the imported
+  files; remove what is said twice (`COLLABORATION.md` vs
+  `AI_COLLABORATION_GUIDE.md`, the code and writing guides on facts vs
+  assumptions); load the writing and code rules only for matching
+  paths. Assumption: Claude Code supports path-scoped rule files; not
+  checked. A rule that is not loaded is not followed, so what must
+  always hold stays imported.
 
 ## Parallel paths
 

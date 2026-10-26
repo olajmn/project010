@@ -73,6 +73,7 @@ The layers and their rules are in [[03-architecture]]. By feature:
 | Current state panel | `project/current_state/` | `panes/chat/currentState/` |
 | A project's or account's details page and its log (a project's saved changes; an account's own log, empty until something happens after 2026-10-25) | `project/timeline.py`, `panes/create/account_log.py` | `settings/details/` |
 | Archive (restore / delete; an archived account's projects listed under it, to send or delete; an account that holds projects is not deleted) | `panes/create/lifecycle.py`, `panes/create/project_account.py`, `storage/accounts_persistence.py` | `settings/archive/` |
+| Column widths: the sidebar keeps pixels, the chat a share of the window and lies over the map past the map's floor ([[ui]] § 1) | — | `shell/columnWidths.ts`, `shell/chatCurtain.ts`, `shell/collapseToRail.ts` |
 | Every HTTP route | `api/app.py` (FastAPI) | `api.ts` |
 | Demo mode: login, sessions, limits | `api/demo/` | `demo/`, `ui/login.html` |
 

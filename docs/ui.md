@@ -25,6 +25,15 @@ the bubble in the block's top-right corner (filled while open, hollow
 while hidden); hidden, it leaves a thin double line at the edge, which
 drags it back out.
 
+The columns stay side by side at every window width; there is no stacked
+layout for narrow screens (phone widths are not a goal). The sidebar
+keeps its width in pixels. The chat keeps a share of the window, so a
+narrower window shrinks chat and canvas together. The canvas never gets
+narrower than its top bar needs; chat width beyond that lies over the
+canvas instead, up to the sidebar's edge when dragged, and over the
+sidebar too in a window too narrow for all three
+(`src/shell/columnWidths.ts`, `src/shell/chatCurtain.ts`).
+
 ## 2. The canvas
 
 ```text

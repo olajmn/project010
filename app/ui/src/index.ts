@@ -80,6 +80,9 @@ function ensureSel(): void {
 function renderAll(): void {
   accountsPanel.refresh();
   mapPane.render();
+  // The map's top bar sets the columns' limits; re-apply them once drawn.
+  chatRailApi.refit();
+  sidebarApi.refit();
 }
 
 // 2. Install panes
@@ -112,7 +115,7 @@ installCommandHighlight(chatInput);
 installInputGrow(chatInput);
 installEnterToSend(chatInput, chatForm);
 
-installSidebarResize(appShell, sidebarResize);
+const sidebarApi = installSidebarResize(appShell, sidebarResize, projectChat);
 const chatRailApi = installChatResize(workspace, chatResize, projectChat);
 installChatToggle(workspace, () => {
   if (workspace.classList.contains("is-chat-collapsed")) chatRailApi.expand();
