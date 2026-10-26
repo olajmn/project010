@@ -11,88 +11,12 @@ next.
 
 ## Active
 
-80. **The sidebar and Settings** (Step) — third part of the
-    user-experience pass: where things sit and how one moves through
-    them. Being collected; nothing planned or changed yet. The app
-    now has enough functions that the interface needs the same care
-    as the code; no solution is chosen for any point below.
-    1. **Log out outside the demo too** (chosen; do first). The
-       sidebar's foot shows Log out only in demo mode
-       (`ui/src/demo/logoutLink.ts`, decided by `GET /api/session`).
-       Show it locally as well, so both look the same while working;
-       locally it is a placeholder that does nothing. Plan, no new
-       files:
-       - `ui/index.html`: the link sits in `.sidebar-more` next to
-         Settings, as static markup like Settings.
-       - `ui/src/demo/logoutLink.ts`: stays in `demo/` (logging out is
-         the demo's behavior); it no longer creates the link, only
-         wires its click: in demo mode log out and go to the login
-         page, otherwise do nothing. `index.ts` passes the link
-         instead of `.sidebar-more`.
-       - Docs: `docs/demo.md` (Login page, Log out row),
-         `docs/04-current-state.md` § 1 Demo mode. Done (`wireLogoutLink()`).
-    2. **The Accounts panel is hard to read with several accounts.**
-       With one account and its projects (as in the demo) it is clear.
-       With several, account names (the active one with a dot, others
-       grey as "account 752f8233") and project names are one flat list
-       of the same kind of row: everything can be clicked, and nothing
-       shows which rows are accounts and which are projects, or what a
-       click does (switch account, or open a project).
-       Chosen direction: the sidebar lists only the active account's
-       projects, and the account is switched from the top, as Slack or
-       Notion switch workspaces. Plan:
-       - **The brand becomes the switcher.** `accounts/brandButton.ts`
-         shows the active account's name (`userLabel()`) with a chevron
-         instead of the word "Accounts"; a click opens a small menu of
-         every live account as equals, the active one marked with the
-         same dot as today, and a last item "Manage accounts" that opens
-         Settings → Directory. The menu lists accounts only, never
-         projects: another account's project is opened by switching
-         first. New capability, own files:
-         `ui/src/panes/create/accounts/accountSwitcher.ts` and
-         `ui/css/panes/create/accountSwitcher.css` (mirror). It closes
-         on an outside click or Esc through `openPopover()`
-         (`panes/canvas/openPopover.ts`), so it adds no new dismiss
-         code (Parallel paths P7).
-       - **One flat project list.** `accounts/panel.ts` draws the
-         active account's projects (newest first, as now) with "+"
-         under them; no account cards. The project rows move from
-         `accounts/accountCard.ts` (`buildProjectGroup()`) into
-         `accounts/projectList.ts`; `accountCard.ts` is deleted with
-         its expand state (`accounts.cardExpanded`).
-       - **The list no longer collapses.** With accounts in the
-         switcher, the panel's open/closed toggle has nothing left to
-         hide: `OPEN_KEY`, `LEGACY_OPEN_KEY`, `restoreIfRemembered()`
-         (called from `index.ts`) and `placeCreateButton()`'s two
-         positions go.
-       - **Empty states stay:** no accounts ("create one in Settings →
-         Directory") and no projects ("No projects yet").
-       - CSS: `css/panes/create/accountsPanel.css` loses the card
-         rules; check `sidebar.css` for the brand.
-       - Docs: `docs/ui.md` § 1 (Sidebar row), `docs/04-current-state.md`
-         § 2 (Accounts row).
-       - Check after: switching account opens that account's last
-         project or none, the selected project stays marked, and
-         Settings links still work.
-       - Easy to change later: the switcher, the list, and the brand
-         stay in separate files with one job each, and each lands as
-         its own commit (switcher, then list), so either can be
-         adjusted or reverted alone.
-       - Commit 1 (switcher) done: `accountSwitcher.ts` /
-         `accountSwitcher.css`, the brand's label in `brandButton.ts`,
-         and the panel always shown (its toggle went with it, since the
-         brand now opens the switcher). Still to do in commit 2: the
-         flat list, and moving the `settings-active-pulse` keyframes
-         from `accountsPanel.css` to `accountSwitcher.css` when the card
-         rules go. Commit 2 (list) done and tested: `projectList.ts`,
-         `panel.ts` reduced to the list and its empty notes, "+" placed
-         once under the list, `accountCard.ts` deleted, and the unused
-         `applyUsers()` in `index.ts` removed (the card took it but
-         never called it).
-       - Review: grep for `buildAccountCard`, `isAccountCardExpanded`,
-         `sidebar-account-card`, `accounts.panelOpen`; run
-         `/full-check`.
-    3. **Row actions are everywhere (Directory, Archive).** Each row
+80. **Settings: rows, Archive, and details pages** (Step) — third part
+    of the user-experience pass: where things sit and how one moves
+    through them. The app now has enough functions that the interface
+    needs the same care as the code. The sidebar part is done
+    ([[05-decisions]] #92); no solution is chosen for the points below.
+    1. **Row actions are everywhere (Directory, Archive).** Each row
        right-aligns its own actions, so Rename, Send…, Restore, Delete,
        and Details do not line up from row to row, and the red Delete
        sits mid-row on almost every line. Options noted earlier: Rename
@@ -100,16 +24,22 @@ next.
        the lists (as #88 moved ids and logs there); or Delete stays grey
        like the others and turns red only on hover and in its
        confirmation.
-    4. **Archive is one long, hard-to-scan list.** Accounts and projects
+    2. **Archive is one long, hard-to-scan list.** Accounts and projects
        mix in one list; each row carries a long line of facts ("project
        · Open · held by account 48492dc8 · made … · changed …"); an
        archived account's projects appear as separate rows marked Open;
        and the same name can appear twice (two "New project 3").
-    5. **Details pages read like raw data.** The facts are right and
+    3. **Details pages read like raw data.** The facts are right and
        belong there, but "Kind: account", the full id, and the dates as
        a plain table are hard to care about; the same holds for a
        project's rows in Directory. A project's log says "Renamed ·
-       Renamed: POKER HANDS → poker" (the word twice).
+       Renamed: POKER HANDS → poker" (the word twice). Discussed, not
+       decided: ids are central to the system and should show, but by
+       what they do rather than as raw rows — one short-id badge
+       wherever a thing appears (map, sidebar, details, log, Archive);
+       the badge staying put through a rename or a Send…, and telling
+       two same-named things apart; the full id on hover or copy; one
+       sentence saying every thing keeps its id for good.
 
 ## Queue
 

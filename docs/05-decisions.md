@@ -1110,6 +1110,18 @@ Also decided the same day: `world/` remains separate from `foundation/`. World r
 
 **Reversible?** Yes; the widths live in the browser's storage, and the layout is CSS plus two small modules.
 
+## 92. 2026-10-26 — The sidebar shows one account at a time
+
+**Decision:** The sidebar's top button names the active account and opens an account switcher: a menu of every live account as equals, the active one marked with the pulsing dot, and "Manage accounts" (Settings → Directory). Under it is one flat list of that account's projects, newest first, always shown, with "+" under it; the open project is in full colour, bold, on a light tint, the others muted, and the account name in full colour above them. The menu lists accounts only; another account's project is opened by switching first. The account cards, their expand state, and the panel's open/closed toggle are gone. Log out shows in the sidebar's foot outside the demo too, where it does nothing. Files: `panes/create/accounts/` (`accountSwitcher.ts`, `projectList.ts`, `panel.ts`, `brandButton.ts`), `demo/logoutLink.ts`. `TODO.md` 80.
+
+**Date:** 2026-10-26
+
+**Alternatives considered:** keeping every account with its projects in one list (with several accounts, accounts and projects were the same kind of row and a click's effect was unclear); the switcher's menu listing each account's projects too (the same mix again, inside a menu).
+
+**Why this choice:** One place for each thing: the account is chosen at the top, the project in the list. Accounts stay equals, none above the others. Slack and Notion switch workspaces the same way.
+
+**Reversible?** Yes; nothing saved changes shape, and the switcher, the list, and the button are separate files.
+
 ## See also
 
 - [[03-architecture]]

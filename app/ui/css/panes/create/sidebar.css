@@ -12,7 +12,7 @@
  *      - .sidebar / .sidebar-accounts / .sidebar-brand
  *  2. Add button
  *      - .sidebar-add (project Create)
- *  3. Bottom bar (Settings)
+ *  3. Bottom bar (Settings, Log out)
  */
 
 /* 1. Sidebar frame + brand */
@@ -91,7 +91,7 @@
   margin-top: var(--space-2);
 }
 
-/* 3. Bottom bar (Settings) */
+/* 3. Bottom bar (Settings, Log out) */
 
 /* The sidebar's bottom bar: Settings on its own at the foot, with no
  * rule above it (UI pass — the rule used to meet the map's footer line

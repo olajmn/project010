@@ -14,9 +14,9 @@
 }
 
 /* Disclosure chevron on the two column headings that open something
- * (Accounts in the sidebar, Current state above the chat): › closed,
- * ⌄ open. Both mark "open" with .is-active. Drawn from two borders so it
- * takes the text colour and needs no icon font. */
+ * (the account switcher in the sidebar, Current state above the chat):
+ * › closed, ⌄ open. Both mark "open" with .is-active. Drawn from two
+ * borders so it takes the text colour and needs no icon font. */
 .sidebar-brand::after,
 .project-chat .chat-brand::after {
   content: "";
